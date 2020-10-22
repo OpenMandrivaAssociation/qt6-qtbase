@@ -47,7 +47,7 @@ Source:		qtbase-%{snapshot}.tar.zst
 %else
 Source:		http://download.qt-project.org/%{?beta:development}%{!?beta:official}_releases/qt/%(echo %{version}|cut -d. -f1-2)/%{version}%{?beta:-%{beta}}/submodules/qtbase-everywhere-src-%{version}%{?beta:-%{beta}}.tar.xz
 %endif
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}2
 Group:		System/Libraries
 Summary:	Version %{major} of the Qt framework
 BuildRequires:	cmake
@@ -421,7 +421,7 @@ Qt %{major} Network library
 %package -n %{devnetwork}
 Summary:	Development files for the Qt %{major} Network library
 Group:		Development/KDE and Qt
-Requires:	%{libgui} = %{EVRD}
+Requires:	%{libnetwork} = %{EVRD}
 Requires:	%{devcore} = %{EVRD}
 
 %description -n %{devnetwork}
@@ -451,7 +451,7 @@ Qt %{major} OpenGL library
 %package -n %{devopengl}
 Summary:	Development files for the Qt %{major} OpenGL library
 Group:		Development/KDE and Qt
-Requires:	%{libgui} = %{EVRD}
+Requires:	%{libopengl} = %{EVRD}
 Requires:	%{devcore} = %{EVRD}
 
 %description -n %{devopengl}
@@ -481,8 +481,9 @@ Qt %{major} OpenGL Widgets library
 %package -n %{devopenglwidgets}
 Summary:	Development files for the Qt %{major} OpenGL Widgets library
 Group:		Development/KDE and Qt
-Requires:	%{libgui} = %{EVRD}
+Requires:	%{libopenglwidgets} = %{EVRD}
 Requires:	%{devcore} = %{EVRD}
+Requires:	%{devopengl} = %{EVRD}
 
 %description -n %{devopenglwidgets}
 Development files for the Qt %{major} OpenGL Widgets library
@@ -513,7 +514,7 @@ Qt %{major} printing support library
 %package -n %{devprintsupport}
 Summary:	Development files for the Qt %{major} printing support library
 Group:		Development/KDE and Qt
-Requires:	%{libgui} = %{EVRD}
+Requires:	%{libprintsupport} = %{EVRD}
 Requires:	%{devcore} = %{EVRD}
 
 %description -n %{devprintsupport}
@@ -548,7 +549,7 @@ Qt %{major} SQL library
 %package -n %{devsql}
 Summary:	Development files for the Qt %{major} SQL library
 Group:		Development/KDE and Qt
-Requires:	%{libgui} = %{EVRD}
+Requires:	%{libsql} = %{EVRD}
 Requires:	%{devcore} = %{EVRD}
 
 %description -n %{devsql}
@@ -578,7 +579,7 @@ Qt %{major} Test library
 %package -n %{devtest}
 Summary:	Development files for the Qt %{major} Test library
 Group:		Development/KDE and Qt
-Requires:	%{libgui} = %{EVRD}
+Requires:	%{libtest} = %{EVRD}
 Requires:	%{devcore} = %{EVRD}
 
 %description -n %{devtest}
@@ -674,7 +675,7 @@ Qt %{major} XML library
 %package -n %{devxml}
 Summary:	Development files for the Qt %{major} XML library
 Group:		Development/KDE and Qt
-Requires:	%{libgui} = %{EVRD}
+Requires:	%{libxml} = %{EVRD}
 Requires:	%{devcore} = %{EVRD}
 
 %description -n %{devxml}
