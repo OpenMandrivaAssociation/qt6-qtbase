@@ -150,6 +150,9 @@ Qt %{major} Core library
 Summary:	Development files for the Qt %{major} Core library
 Group:		Development/KDE and Qt
 Requires:	%{libcore} = %{EVRD}
+Requires:	%{name}-tools = %{EVRD}
+# cmake files still depend on qmake to read variables
+Requires:	qmake-qt%{major} = %{EVRD}
 
 %description -n %{devcore}
 Development files for the Qt %{major} Core library
