@@ -1,5 +1,5 @@
 #define snapshot 20200627
-%define beta beta1
+%define beta beta2
 %define major 6
 
 %define libconcurrent %mklibname Qt%{major}Concurrent %{major}
