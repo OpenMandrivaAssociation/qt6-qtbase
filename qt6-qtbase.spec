@@ -1,5 +1,5 @@
 #define snapshot 20200627
-%define beta beta2
+%define beta beta3
 %define major 6
 
 %define libconcurrent %mklibname Qt%{major}Concurrent %{major}
@@ -277,6 +277,8 @@ Qt %{major} EglFS KMS support library
 %files -n %{libeglfskmssupport}
 %{_libdir}/libQt%{major}EglFsKmsSupport.so.*
 %{_qtdir}/lib/libQt%{major}EglFsKmsSupport.so.*
+%{_libdir}/libQt%{major}EglFsKmsGbmSupport.so.*
+%{_qtdir}/lib/libQt6EglFsKmsGbmSupport.so.*
 
 %package -n %{deveglfskmssupport}
 Summary:	Development files for the Qt %{major} KMS support library
@@ -293,7 +295,15 @@ Development files for the Qt %{major} EglFS KMS support library
 %{_libdir}/libQt%{major}EglFsKmsSupport.so
 %{_qtdir}/lib/libQt%{major}EglFsKmsSupport.so
 %{_qtdir}/lib/libQt%{major}EglFsKmsSupport.prl
+%{_qtdir}/include/QtEglFsKmsSupport
 %{_qtdir}/modules/EglFsKmsSupport.json
+%{_libdir}/cmake/Qt%{major}EglFsKmsGbmSupport
+%{_libdir}/libQt%{major}EglFsKmsGbmSupport.so
+%{_qtdir}/include/QtEglFsKmsGbmSupport
+%{_qtdir}/lib/cmake/Qt%{major}EglFsKmsGbmSupport
+%{_qtdir}/lib/libQt%{major}EglFsKmsGbmSupport.prl
+%{_qtdir}/lib/libQt%{major}EglFsKmsGbmSupport.so
+%{_qtdir}/modules/EglFsKmsGbmSupport.json
 
 %package -n %{devfbsupport}
 Summary:	Framebuffer support library for Qt %{major}
@@ -723,6 +733,7 @@ The legacy qmake build tool for Qt %{major}
 %files -n qmake-qt%{major}
 %{_qtdir}/bin/qmake
 %{_qtdir}/mkspecs
+%{_qtdir}/bin/qt-internal-configure-tests
 
 %package -n qt%{major}-cmake
 Summary: Cmake extensions for Qt %{major}
