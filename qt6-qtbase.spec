@@ -92,6 +92,9 @@ BuildRequires:	pkgconfig(xrender)
 BuildRequires:	pkgconfig(openssl)
 BuildRequires:	pkgconfig(systemd)
 BuildRequires:	cups-devel
+BuildRequires:	openvg-devel
+BuildRequires:	pkgconfig(libbrotlidec)
+BuildRequires:	pkgconfig(libbrotlienc)
 # For the QtSQL plugins
 BuildRequires:	pkgconfig(sqlite3)
 BuildRequires:	pkgconfig(libmariadb)
@@ -792,6 +795,7 @@ Qt %{major} build tools
 	-DFEATURE_xcb_native_painting:BOOL=ON \
 	-DFEATURE_openssl:BOOL=ON \
 	-DFEATURE_openssl_linked:BOOL=ON \
+	-DFEATURE_system_zlib:BOOL=ON \
 	-DFEATURE_system_sqlite:BOOL=ON \
 	-DINPUT_doubleconversion=system \
 	-DINPUT_freetype=system \
