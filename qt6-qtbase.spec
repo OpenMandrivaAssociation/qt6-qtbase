@@ -55,6 +55,9 @@ BuildRequires:	ninja
 BuildRequires:	perl
 BuildRequires:	icu
 BuildRequires:	pkgconfig(libzstd)
+# Not really used, but referenced by the paranoid integrity
+# check in cmake files
+BuildRequires:	%{_lib}zstd-static-devel
 BuildRequires:	pkgconfig(libudev)
 BuildRequires:	pkgconfig(libdrm)
 BuildRequires:	pkgconfig(gbm)
