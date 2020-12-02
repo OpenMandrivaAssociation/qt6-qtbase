@@ -100,6 +100,7 @@ BuildRequires:	cups-devel
 BuildRequires:	openvg-devel
 BuildRequires:	pkgconfig(libbrotlidec)
 BuildRequires:	pkgconfig(libbrotlienc)
+BuildRequires:	pkgconfig(libsctp)
 # For the QtSQL plugins
 BuildRequires:	pkgconfig(sqlite3)
 BuildRequires:	pkgconfig(libmariadb)
@@ -814,7 +815,6 @@ sed -i -e 's,@QTDIR@,%{_qtdir},g' src/gui/kernel/qguiapplication.cpp
 	-DQT_FEATURE_system_sqlite:BOOL=ON \
 	-DQT_FEATURE_libproxy:BOOL=ON \
 	-DQT_FEATURE_ltcg:BOOL=ON \
-	-DQT_FEATURE_openvg:BOOL=ON \
 	-DQT_FEATURE_sctp:BOOL=ON \
 	-DINPUT_doubleconversion=system \
 	-DINPUT_freetype=system \
