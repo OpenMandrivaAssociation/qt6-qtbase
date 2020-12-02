@@ -1,5 +1,5 @@
 #define snapshot 20200627
-%define beta beta5
+%define beta rc2
 %define major 6
 
 %define libconcurrent %mklibname Qt%{major}Concurrent %{major}
@@ -47,6 +47,8 @@ Source:		qtbase-%{snapshot}.tar.zst
 %else
 Source:		http://download.qt-project.org/%{?beta:development}%{!?beta:official}_releases/qt/%(echo %{version}|cut -d. -f1-2)/%{version}%{?beta:-%{beta}}/submodules/qtbase-everywhere-src-%{version}%{?beta:-%{beta}}.tar.xz
 %endif
+Patch0:		qtbase-6.0-rc2-examples-compile.patch
+Patch1:		qtbase-init-pluginpath.patch
 Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
 Group:		System/Libraries
 Summary:	Version %{major} of the Qt framework
@@ -776,38 +778,53 @@ Qt %{major} build tools
 
 %prep
 %autosetup -p1 -n qtbase%{!?snapshot:-everywhere-src-%{version}%{?beta:-%{beta}}}
-# For a yet to be determined reason, the first call to cmake fails
-#%cmake -G Ninja || :
+
+sed -i -e 's,@QTDIR@,%{_qtdir},g' src/gui/kernel/qguiapplication.cpp
+
+# FIXME This may be interesting in the future:
+#	-DQT_FEATURE_cxx2a:BOOL=ON
+# As of 6.0.0-rc2 and clang 11.0.1, causes a compile failure
+
+# FIXME This may be interesting for some boards
+#	-DQT_FEATURE_opengl_dynamic:BOOL=ON \
+#	-DQT_FEATURE_opengles2:BOOL=ON
+# But as of 6.0.0-rc2, it disables the even more useful X11 GLX plugin
+# opengles2 disables it in cmake, the others cause bogus linkage
+
+# FIXME Investigate
+#	-DQT_FEATURE_lttng:BOOL=ON
+
 %cmake -G Ninja \
 	-DCMAKE_INSTALL_PREFIX=%{_qtdir} \
-	-DBUILD_EXAMPLES:BOOL=ON \
+	-DQT_BUILD_EXAMPLES:BOOL=ON \
 	-DBUILD_SHARED_LIBS:BOOL=ON \
-	-DFEATURE_aesni:BOOL=ON \
-	-DFEATURE_cxx2a:BOOL=ON \
-	-DFEATURE_dynamicgl:BOOL=ON \
-	-DFEATURE_ipc_posix:BOOL=ON \
-	-DFEATURE_journald:BOOL=ON \
-	-DFEATURE_ftp:BOOL=ON \
-	-DFEATURE_opengl_dynamic:BOOL=ON \
-	-DFEATURE_opengl_desktop:BOOL=ON \
-	-DFEATURE_opengles2:BOOL=ON \
-	-DFEATURE_opengles3:BOOL=ON \
-	-DFEATURE_opengles31:BOOL=ON \
-	-DFEATURE_opengles32:BOOL=ON \
-	-DFEATURE_use_lld_linker:BOOL=ON \
-	-DFEATURE_xcb_native_painting:BOOL=ON \
-	-DFEATURE_openssl:BOOL=ON \
-	-DFEATURE_openssl_linked:BOOL=ON \
-	-DFEATURE_system_zlib:BOOL=ON \
-	-DFEATURE_system_sqlite:BOOL=ON \
+	-DQT_FEATURE_aesni:BOOL=ON \
+	-DQT_FEATURE_dynamicgl:BOOL=ON \
+	-DQT_FEATURE_ipc_posix:BOOL=ON \
+	-DQT_FEATURE_journald:BOOL=ON \
+	-DQT_FEATURE_opengl_desktop:BOOL=ON \
+	-DQT_FEATURE_opengles3:BOOL=ON \
+	-DQT_FEATURE_opengles31:BOOL=ON \
+	-DQT_FEATURE_opengles32:BOOL=ON \
+	-DQT_FEATURE_use_lld_linker:BOOL=ON \
+	-DQT_FEATURE_xcb_native_painting:BOOL=ON \
+	-DQT_FEATURE_openssl:BOOL=ON \
+	-DQT_FEATURE_openssl_linked:BOOL=ON \
+	-DQT_FEATURE_system_zlib:BOOL=ON \
+	-DQT_FEATURE_system_sqlite:BOOL=ON \
+	-DQT_FEATURE_libproxy:BOOL=ON \
+	-DQT_FEATURE_ltcg:BOOL=ON \
+	-DQT_FEATURE_openvg:BOOL=ON \
+	-DQT_FEATURE_sctp:BOOL=ON \
 	-DINPUT_doubleconversion=system \
 	-DINPUT_freetype=system \
 	-DINPUT_harfbuzz=system \
 	-DINPUT_libjpeg=system \
 	-DINPUT_libpng=system \
 	-DINPUT_sqlite=system \
+	-DQT_INPUT_openssl=linked \
 %ifarch %{armx}
-	-DFEATURE_neon:BOOL=ON \
+	-DQT_FEATURE_neon:BOOL=ON \
 %endif
 	-DQT_USE_BUNDLED_BundledFreetype:BOOL=OFF \
 	-DQT_USE_BUNDLED_BundledHarfbuzz:BOOL=OFF \

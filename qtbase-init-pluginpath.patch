@@ -1,0 +1,13 @@
+diff -up qtbase-everywhere-src-6.0.0-rc2/src/gui/kernel/qguiapplication.cpp.omv~ qtbase-everywhere-src-6.0.0-rc2/src/gui/kernel/qguiapplication.cpp
+--- qtbase-everywhere-src-6.0.0-rc2/src/gui/kernel/qguiapplication.cpp.omv~	2020-12-02 22:38:23.220123381 +0100
++++ qtbase-everywhere-src-6.0.0-rc2/src/gui/kernel/qguiapplication.cpp	2020-12-02 22:42:46.405673328 +0100
+@@ -1485,6 +1485,9 @@ void QGuiApplicationPrivate::createPlatf
+         argc = j;
+     }
+ 
++    if(platformPluginPath.isEmpty())
++        platformPluginPath = QStringLiteral("@QTDIR@/plugins");
++
+     init_platform(QLatin1String(platformName), platformPluginPath, platformThemeName, argc, argv);
+ 
+     if (!icon.isEmpty())

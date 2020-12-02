@@ -1,0 +1,22 @@
+diff -up qtbase-everywhere-src-6.0.0-rc2/examples/network/multistreamclient/timeconsumer.cpp.omv~ qtbase-everywhere-src-6.0.0-rc2/examples/network/multistreamclient/timeconsumer.cpp
+--- qtbase-everywhere-src-6.0.0-rc2/examples/network/multistreamclient/timeconsumer.cpp.omv~	2020-12-02 19:27:44.893680645 +0100
++++ qtbase-everywhere-src-6.0.0-rc2/examples/network/multistreamclient/timeconsumer.cpp	2020-12-02 19:27:59.424884511 +0100
+@@ -53,6 +53,7 @@
+ #include <QString>
+ #include <QDataStream>
+ #include <QTimer>
++#include <QIODevice>
+ 
+ TimeConsumer::TimeConsumer(QObject *parent)
+     : Consumer(parent)
+diff -up qtbase-everywhere-src-6.0.0-rc2/examples/network/multistreamserver/timeprovider.cpp.omv~ qtbase-everywhere-src-6.0.0-rc2/examples/network/multistreamserver/timeprovider.cpp
+--- qtbase-everywhere-src-6.0.0-rc2/examples/network/multistreamserver/timeprovider.cpp.omv~	2020-12-02 19:28:41.110470139 +0100
++++ qtbase-everywhere-src-6.0.0-rc2/examples/network/multistreamserver/timeprovider.cpp	2020-12-02 19:28:49.393586641 +0100
+@@ -52,6 +52,7 @@
+ #include <QDataStream>
+ #include <QTime>
+ #include <QByteArray>
++#include <QIODevice>
+ 
+ TimeProvider::TimeProvider(QObject *parent)
+     : Provider(parent)
