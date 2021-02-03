@@ -40,7 +40,7 @@
 %define _qtdir %{_libdir}/qt%{major}
 
 Name:		qt6-qtbase
-Version:	6.0.0
+Version:	6.0.1
 %if 0%{?snapshot:1}
 # "git archive"-d from "dev" branch of git://code.qt.io/qt/qtbase.git
 Source:		qtbase-%{snapshot}.tar.zst
@@ -759,6 +759,10 @@ Cmake extensions for Qt %{major}
 %{_qtdir}/bin/cmake_automoc_parser
 %{_qtdir}/lib/cmake/Qt%{major}
 %{_qtdir}/lib/cmake/Qt%{major}BuildInternals
+%dir %{_qtdir}/libexec
+%{_qtdir}/libexec/android_cmakelist_patcher.sh
+%{_qtdir}/libexec/android_emulator_launcher.sh
+%{_qtdir}/libexec/ensure_pro_file.cmake
 
 %package tools
 Summary: Qt %{major} build tools
