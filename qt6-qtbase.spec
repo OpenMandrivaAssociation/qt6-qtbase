@@ -1,5 +1,5 @@
 #define snapshot 20200627
-#define beta rc6
+#define beta beta1
 %define major 6
 
 %define libconcurrent %mklibname Qt%{major}Concurrent %{major}
@@ -40,7 +40,7 @@
 %define _qtdir %{_libdir}/qt%{major}
 
 Name:		qt6-qtbase
-Version:	6.0.1
+Version:	6.0.2
 %if 0%{?snapshot:1}
 # "git archive"-d from "dev" branch of git://code.qt.io/qt/qtbase.git
 Source:		qtbase-%{snapshot}.tar.zst
@@ -760,7 +760,6 @@ Cmake extensions for Qt %{major}
 %{_qtdir}/lib/cmake/Qt%{major}
 %{_qtdir}/lib/cmake/Qt%{major}BuildInternals
 %dir %{_qtdir}/libexec
-%{_qtdir}/libexec/android_cmakelist_patcher.sh
 %{_qtdir}/libexec/android_emulator_launcher.sh
 %{_qtdir}/libexec/ensure_pro_file.cmake
 
