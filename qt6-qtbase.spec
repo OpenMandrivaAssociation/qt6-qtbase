@@ -1,5 +1,5 @@
 #define snapshot 20200627
-#define beta rc6
+%define beta rc
 %define major 6
 
 %define libconcurrent %mklibname Qt%{major}Concurrent %{major}
@@ -40,7 +40,7 @@
 %define _qtdir %{_libdir}/qt%{major}
 
 Name:		qt6-qtbase
-Version:	6.0.1
+Version:	6.1.0
 %if 0%{?snapshot:1}
 # "git archive"-d from "dev" branch of git://code.qt.io/qt/qtbase.git
 Source:		qtbase-%{snapshot}.tar.zst
@@ -171,28 +171,22 @@ Development files for the Qt %{major} Core library
 %{_qtdir}/bin/qt-configure-module
 %{_qtdir}/lib/cmake/Qt%{major}Core
 %{_qtdir}/lib/cmake/Qt%{major}CoreTools
-%{_qtdir}/lib/cmake/Qt%{major}Core_qobject
 %{_qtdir}/lib/cmake/Qt%{major}HostInfo
 %{_qtdir}/lib/libQt%{major}Core.prl
 %{_qtdir}/lib/libQt%{major}Core.so
-%{_qtdir}/lib/libQt%{major}Core_qobject.a
-%{_qtdir}/lib/libQt%{major}Core_qobject.prl
 %{_libdir}/libQt%{major}Core.so
-%{_libdir}/libQt%{major}Core_qobject.a
 %{_libdir}/cmake/Qt%{major}
 %{_libdir}/cmake/Qt%{major}BuildInternals
 %{_libdir}/cmake/Qt%{major}Core
 %{_libdir}/cmake/Qt%{major}CoreTools
-%{_libdir}/cmake/Qt%{major}Core_qobject
 %{_libdir}/cmake/Qt%{major}HostInfo
 %dir %{_qtdir}/modules
 %{_qtdir}/modules/Core.json
-%{_qtdir}/modules/Core_qobject.json
 %{_qtdir}/bin/moc
 %{_qtdir}/bin/rcc
 %dir %{_qtdir}/lib/metatypes
-%{_qtdir}/lib/metatypes/qt6core_qobject_relwithdebinfo_metatypes.json
 %{_qtdir}/lib/metatypes/qt6core_relwithdebinfo_metatypes.json
+%{_qtdir}/libexec
 
 %package -n %{libdbus}
 Summary:	Qt %{major} D-Bus library
@@ -439,6 +433,8 @@ Qt %{major} Network library
 %files -n %{libnetwork}
 %{_libdir}/libQt%{major}Network.so.*
 %{_qtdir}/lib/libQt%{major}Network.so.*
+%dir %{_qtdir}/plugins/networkinformationbackends
+%{_qtdir}/plugins/networkinformationbackends/libnetworkmanagernetworkinformationbackend.so
 
 %package -n %{devnetwork}
 Summary:	Development files for the Qt %{major} Network library
@@ -741,8 +737,10 @@ The legacy qmake build tool for Qt %{major}
 
 %files -n qmake-qt%{major}
 %{_qtdir}/bin/qmake
+%{_qtdir}/bin/qmake6
 %{_qtdir}/mkspecs
 %{_qtdir}/bin/qt-internal-configure-tests
+%{_qtdir}/bin/ensure_pro_file.cmake
 
 %package -n qt%{major}-cmake
 Summary: Cmake extensions for Qt %{major}
@@ -759,10 +757,8 @@ Cmake extensions for Qt %{major}
 %{_qtdir}/bin/cmake_automoc_parser
 %{_qtdir}/lib/cmake/Qt%{major}
 %{_qtdir}/lib/cmake/Qt%{major}BuildInternals
-%dir %{_qtdir}/libexec
-%{_qtdir}/libexec/android_cmakelist_patcher.sh
-%{_qtdir}/libexec/android_emulator_launcher.sh
-%{_qtdir}/libexec/ensure_pro_file.cmake
+%{_qtdir}/bin/android_emulator_launcher.sh
+%{_qtdir}/bin/ensure_pro_file.cmake
 
 %package tools
 Summary: Qt %{major} build tools
@@ -854,6 +850,12 @@ done
 for i in %{buildroot}%{_qtdir}/lib/cmake/*; do
 	ln -s ../qt%{major}/lib/cmake/$(basename ${i}) %{buildroot}%{_libdir}/cmake/
 done
+# Qt6 seems to be a little confused about bindir vs libexecdir, with stuff
+# like moc and rcc that will definitely be called by Makefiles directly,
+# living in libexec. Let's "fix" this...
+mv %{buildroot}%{_qtdir}/libexec/* %{buildroot}%{_qtdir}/bin
+rmdir %{buildroot}%{_qtdir}/libexec
+ln -s bin %{buildroot}%{_qtdir}/libexec
 # Put syncqt where the other Qt packages can find it
 mkdir -p %{buildroot}%{_libexecdir}
 ln -s ../%{_lib}/qt%{major}/libexec/syncqt.pl %{buildroot}%{_libexecdir}/
