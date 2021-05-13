@@ -49,7 +49,7 @@ Source:		http://download.qt-project.org/%{?beta:development}%{!?beta:official}_r
 %endif
 Patch0:		qtbase-6.0-rc2-examples-compile.patch
 Patch1:		qtbase-init-pluginpath.patch
-Release:	%{?beta:0.%{beta}.}%{?snapshot:1.%{snapshot}.}1
+Release:	%{?beta:0.%{beta}.}%{?snapshot:1.%{snapshot}.}2
 Group:		System/Libraries
 Summary:	Version %{major} of the Qt framework
 BuildRequires:	cmake
@@ -135,7 +135,6 @@ Development files for the Qt %{major} Concurrent library
 
 %files -n %{devconcurrent}
 %{_qtdir}/include/QtConcurrent
-%{_qtdir}/lib/cmake/Qt%{major}Concurrent
 %{_libdir}/cmake/Qt%{major}Concurrent
 %{_libdir}/libQt%{major}Concurrent.so
 %{_qtdir}/lib/libQt%{major}Concurrent.so
@@ -169,14 +168,9 @@ Development files for the Qt %{major} Core library
 %files -n %{devcore}
 %{_qtdir}/include/QtCore
 %{_qtdir}/bin/qt-configure-module
-%{_qtdir}/lib/cmake/Qt%{major}Core
-%{_qtdir}/lib/cmake/Qt%{major}CoreTools
-%{_qtdir}/lib/cmake/Qt%{major}HostInfo
 %{_qtdir}/lib/libQt%{major}Core.prl
 %{_qtdir}/lib/libQt%{major}Core.so
 %{_libdir}/libQt%{major}Core.so
-%{_libdir}/cmake/Qt%{major}
-%{_libdir}/cmake/Qt%{major}BuildInternals
 %{_libdir}/cmake/Qt%{major}Core
 %{_libdir}/cmake/Qt%{major}CoreTools
 %{_libdir}/cmake/Qt%{major}HostInfo
@@ -211,8 +205,6 @@ Development files for the Qt %{major} D-Bus library
 
 %files -n %{devdbus}
 %{_qtdir}/include/QtDBus
-%{_qtdir}/lib/cmake/Qt%{major}DBus
-%{_qtdir}/lib/cmake/Qt%{major}DBusTools
 %{_libdir}/cmake/Qt%{major}DBus
 %{_libdir}/cmake/Qt%{major}DBusTools
 %{_libdir}/libQt%{major}DBus.so
@@ -245,7 +237,6 @@ Development files for the Qt %{major} EglFS device integration library
 
 %files -n %{deveglfsdeviceintegration}
 %{_qtdir}/include/QtEglFSDeviceIntegration
-%{_qtdir}/lib/cmake/Qt%{major}EglFSDeviceIntegration
 %{_libdir}/cmake/Qt%{major}EglFSDeviceIntegration
 %{_libdir}/libQt%{major}EglFSDeviceIntegration.so
 %{_qtdir}/lib/libQt%{major}EglFSDeviceIntegration.so
@@ -262,7 +253,6 @@ Device discovery support library for Qt %{major}
 
 %files -n %{devdevicediscoverysupport}
 %{_qtdir}/include/QtDeviceDiscoverySupport
-%{_qtdir}/lib/cmake/Qt%{major}DeviceDiscoverySupport
 %{_libdir}/cmake/Qt%{major}DeviceDiscoverySupport
 %{_libdir}/libQt%{major}DeviceDiscoverySupport.a
 %{_qtdir}/lib/libQt%{major}DeviceDiscoverySupport.a
@@ -282,6 +272,7 @@ Qt %{major} EglFS KMS support library
 %{_qtdir}/lib/libQt%{major}EglFsKmsSupport.so.*
 %{_libdir}/libQt%{major}EglFsKmsGbmSupport.so.*
 %{_qtdir}/lib/libQt6EglFsKmsGbmSupport.so.*
+%{_libdir}/cmake/Qt6EglFsKmsGbmSupport
 
 %package -n %{deveglfskmssupport}
 Summary:	Development files for the Qt %{major} KMS support library
@@ -293,17 +284,14 @@ Requires:	%{libeglfskmssupport} = %{EVRD}
 Development files for the Qt %{major} EglFS KMS support library
 
 %files -n %{deveglfskmssupport}
-%{_qtdir}/lib/cmake/Qt%{major}EglFsKmsSupport
 %{_libdir}/cmake/Qt%{major}EglFsKmsSupport
 %{_libdir}/libQt%{major}EglFsKmsSupport.so
 %{_qtdir}/lib/libQt%{major}EglFsKmsSupport.so
 %{_qtdir}/lib/libQt%{major}EglFsKmsSupport.prl
 %{_qtdir}/include/QtEglFsKmsSupport
 %{_qtdir}/modules/EglFsKmsSupport.json
-%{_libdir}/cmake/Qt%{major}EglFsKmsGbmSupport
 %{_libdir}/libQt%{major}EglFsKmsGbmSupport.so
 %{_qtdir}/include/QtEglFsKmsGbmSupport
-%{_qtdir}/lib/cmake/Qt%{major}EglFsKmsGbmSupport
 %{_qtdir}/lib/libQt%{major}EglFsKmsGbmSupport.prl
 %{_qtdir}/lib/libQt%{major}EglFsKmsGbmSupport.so
 %{_qtdir}/modules/EglFsKmsGbmSupport.json
@@ -318,7 +306,6 @@ Framebuffer support library for Qt %{major}
 
 %files -n %{devfbsupport}
 %{_qtdir}/include/QtFbSupport
-%{_qtdir}/lib/cmake/Qt%{major}FbSupport
 %{_libdir}/cmake/Qt%{major}FbSupport
 %{_libdir}/libQt%{major}FbSupport.a
 %{_qtdir}/lib/libQt%{major}FbSupport.a
@@ -378,8 +365,6 @@ Development files for the Qt %{major} GUI library
 
 %files -n %{devgui}
 %{_qtdir}/include/QtGui
-%{_qtdir}/lib/cmake/Qt%{major}Gui
-%{_qtdir}/lib/cmake/Qt%{major}GuiTools
 %{_libdir}/cmake/Qt%{major}Gui
 %{_libdir}/cmake/Qt%{major}GuiTools
 %{_libdir}/libQt%{major}Gui.so
@@ -398,7 +383,6 @@ Input support library for Qt %{major}
 
 %files -n %{devinputsupport}
 %{_qtdir}/include/QtInputSupport
-%{_qtdir}/lib/cmake/Qt%{major}InputSupport
 %{_libdir}/cmake/Qt%{major}InputSupport
 %{_libdir}/libQt%{major}InputSupport.a
 %{_qtdir}/lib/libQt%{major}InputSupport.a
@@ -415,7 +399,6 @@ KMS support library for Qt %{major}
 
 %files -n %{devkmssupport}
 %{_qtdir}/include/QtKmsSupport
-%{_qtdir}/lib/cmake/Qt%{major}KmsSupport
 %{_libdir}/cmake/Qt%{major}KmsSupport
 %{_libdir}/libQt%{major}KmsSupport.a
 %{_qtdir}/lib/libQt%{major}KmsSupport.a
@@ -447,7 +430,6 @@ Development files for the Qt %{major} Network library
 
 %files -n %{devnetwork}
 %{_qtdir}/include/QtNetwork
-%{_qtdir}/lib/cmake/Qt%{major}Network
 %{_libdir}/cmake/Qt%{major}Network
 %{_libdir}/libQt%{major}Network.so
 %{_qtdir}/lib/libQt%{major}Network.so
@@ -477,7 +459,6 @@ Development files for the Qt %{major} OpenGL library
 
 %files -n %{devopengl}
 %{_qtdir}/include/QtOpenGL
-%{_qtdir}/lib/cmake/Qt%{major}OpenGL
 %{_libdir}/cmake/Qt%{major}OpenGL
 %{_libdir}/libQt%{major}OpenGL.so
 %{_qtdir}/lib/libQt%{major}OpenGL.so
@@ -508,7 +489,6 @@ Development files for the Qt %{major} OpenGL Widgets library
 
 %files -n %{devopenglwidgets}
 %{_qtdir}/include/QtOpenGLWidgets
-%{_qtdir}/lib/cmake/Qt%{major}OpenGLWidgets
 %{_libdir}/cmake/Qt%{major}OpenGLWidgets
 %{_libdir}/libQt%{major}OpenGLWidgets.so
 %{_qtdir}/lib/libQt%{major}OpenGLWidgets.so
@@ -540,7 +520,6 @@ Development files for the Qt %{major} printing support library
 
 %files -n %{devprintsupport}
 %{_qtdir}/include/QtPrintSupport
-%{_qtdir}/lib/cmake/Qt%{major}PrintSupport
 %{_libdir}/cmake/Qt%{major}PrintSupport
 %{_libdir}/libQt%{major}PrintSupport.so
 %{_qtdir}/lib/libQt%{major}PrintSupport.so
@@ -575,7 +554,6 @@ Development files for the Qt %{major} SQL library
 
 %files -n %{devsql}
 %{_qtdir}/include/QtSql
-%{_qtdir}/lib/cmake/Qt%{major}Sql
 %{_libdir}/cmake/Qt%{major}Sql
 %{_libdir}/libQt%{major}Sql.so
 %{_qtdir}/lib/libQt%{major}Sql.so
@@ -605,7 +583,6 @@ Development files for the Qt %{major} Test library
 
 %files -n %{devtest}
 %{_qtdir}/include/QtTest
-%{_qtdir}/lib/cmake/Qt%{major}Test
 %{_libdir}/cmake/Qt%{major}Test
 %{_libdir}/libQt%{major}Test.so
 %{_qtdir}/lib/libQt%{major}Test.so
@@ -635,8 +612,6 @@ Development files for the Qt %{major} Widgets library
 
 %files -n %{devwidgets}
 %{_qtdir}/include/QtWidgets
-%{_qtdir}/lib/cmake/Qt%{major}Widgets
-%{_qtdir}/lib/cmake/Qt%{major}WidgetsTools
 %{_libdir}/cmake/Qt%{major}Widgets
 %{_libdir}/cmake/Qt%{major}WidgetsTools
 %{_libdir}/libQt%{major}Widgets.so
@@ -671,7 +646,6 @@ Requires:	%{devcore} = %{EVRD}
 Development files for the Qt %{major} XCB QPA library
 
 %files -n %{devxcbqpa}
-%{_qtdir}/lib/cmake/Qt%{major}XcbQpa
 %{_libdir}/cmake/Qt%{major}XcbQpa
 %{_libdir}/libQt%{major}XcbQpa.so
 %{_qtdir}/lib/libQt%{major}XcbQpa.so
@@ -701,7 +675,6 @@ Development files for the Qt %{major} XML library
 
 %files -n %{devxml}
 %{_qtdir}/include/QtXml
-%{_qtdir}/lib/cmake/Qt%{major}Xml
 %{_libdir}/cmake/Qt%{major}Xml
 %{_libdir}/libQt%{major}Xml.so
 %{_qtdir}/lib/libQt%{major}Xml.so
@@ -755,8 +728,9 @@ Cmake extensions for Qt %{major}
 %{_qtdir}/bin/qt-cmake-private-install.cmake
 %{_qtdir}/bin/qt-cmake-standalone-test
 %{_qtdir}/bin/cmake_automoc_parser
-%{_qtdir}/lib/cmake/Qt%{major}
-%{_qtdir}/lib/cmake/Qt%{major}BuildInternals
+%{_qtdir}/lib/cmake
+%{_libdir}/cmake/Qt%{major}
+%{_libdir}/cmake/Qt%{major}BuildInternals
 %{_qtdir}/bin/android_emulator_launcher.sh
 %{_qtdir}/bin/ensure_pro_file.cmake
 
@@ -847,9 +821,8 @@ mkdir -p %{buildroot}%{_bindir} %{buildroot}%{_libdir}/cmake
 for i in %{buildroot}%{_qtdir}/lib/*.so* %{buildroot}%{_qtdir}/lib/*.a; do
 	ln -s qt%{major}/lib/$(basename ${i}) %{buildroot}%{_libdir}/
 done
-for i in %{buildroot}%{_qtdir}/lib/cmake/*; do
-	ln -s ../qt%{major}/lib/cmake/$(basename ${i}) %{buildroot}%{_libdir}/cmake/
-done
+mv %{buildroot}%{_qtdir}/lib/cmake %{buildroot}%{_libdir}
+ln -s ../../cmake %{buildroot}%{_qtdir}/lib
 # Qt6 seems to be a little confused about bindir vs libexecdir, with stuff
 # like moc and rcc that will definitely be called by Makefiles directly,
 # living in libexec. Let's "fix" this...
