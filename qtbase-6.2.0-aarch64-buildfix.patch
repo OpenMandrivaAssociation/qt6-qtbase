@@ -1,0 +1,18 @@
+diff -up qtbase-everywhere-src-6.2.0-beta3/src/corelib/tools/qhash.cpp.omv~ qtbase-everywhere-src-6.2.0-beta3/src/corelib/tools/qhash.cpp
+--- qtbase-everywhere-src-6.2.0-beta3/src/corelib/tools/qhash.cpp.omv~	2021-08-25 17:50:02.497924286 +0000
++++ qtbase-everywhere-src-6.2.0-beta3/src/corelib/tools/qhash.cpp	2021-08-25 18:06:52.022574719 +0000
+@@ -44,6 +44,14 @@
+ #ifndef _CRT_RAND_S
+ #define _CRT_RAND_S
+ #endif
++
++#ifdef __aarch64__ // for vaesmcq_u8
++#define __ARM_FEATURE_AES 1
++#define __ARM_ARCH 8
++#include <arm_acle.h>
++#include <arm_neon.h>
++#endif
++
+ #include <stdlib.h>
+ #include <stdint.h>
+ 
