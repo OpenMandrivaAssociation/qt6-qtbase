@@ -1,5 +1,5 @@
 #define snapshot 20200627
-%define beta beta3
+%define beta beta4
 %define major 6
 
 %define libconcurrent %mklibname Qt%{major}Concurrent %{major}
@@ -428,10 +428,10 @@ Qt %{major} Network library
 %{_libdir}/libQt%{major}Network.so.*
 %{_qtdir}/lib/libQt%{major}Network.so.*
 %dir %{_qtdir}/plugins/networkinformation
-%{_qtdir}/plugins/networkinformation/libnetworkmanager.so
+%{_qtdir}/plugins/networkinformation/libqnetworkmanager.so
 %dir %{_qtdir}/plugins/tls
-%{_qtdir}/plugins/tls/libcertonlybackend.so
-%{_qtdir}/plugins/tls/libopensslbackend.so
+%{_qtdir}/plugins/tls/libqcertonlybackend.so
+%{_qtdir}/plugins/tls/libqopensslbackend.so
 
 %package -n %{devnetwork}
 Summary:	Development files for the Qt %{major} Network library
