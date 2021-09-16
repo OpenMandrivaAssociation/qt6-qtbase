@@ -1,5 +1,5 @@
 #define snapshot 20200627
-%define beta beta4
+%define beta rc
 %define major 6
 
 %define libconcurrent %mklibname Qt%{major}Concurrent %{major}
@@ -338,7 +338,7 @@ Qt %{major} GUI library
 %{_qtdir}/plugins/egldeviceintegrations/libqeglfs-emu-integration.so
 %{_qtdir}/plugins/egldeviceintegrations/libqeglfs-kms-egldevice-integration.so
 %{_qtdir}/plugins/egldeviceintegrations/libqeglfs-kms-integration.so
-%{_qtdir}/plugins/egldeviceintegrations/libqeglfs-x11-integration.so
+#{_qtdir}/plugins/egldeviceintegrations/libqeglfs-x11-integration.so
 %dir %{_qtdir}/plugins/generic
 %{_qtdir}/plugins/generic/libqevdevkeyboardplugin.so
 %{_qtdir}/plugins/generic/libqevdevmouseplugin.so
@@ -654,7 +654,7 @@ Qt %{major} XCB QPA library
 %{_libdir}/libQt%{major}XcbQpa.so.*
 %{_qtdir}/lib/libQt%{major}XcbQpa.so.*
 %dir %{_qtdir}/plugins/xcbglintegrations
-%{_qtdir}/plugins/xcbglintegrations/libqxcb-egl-integration.so
+#{_qtdir}/plugins/xcbglintegrations/libqxcb-egl-integration.so
 %{_qtdir}/plugins/xcbglintegrations/libqxcb-glx-integration.so
 
 %package -n %{devxcbqpa}
