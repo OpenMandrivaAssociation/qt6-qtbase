@@ -1,5 +1,5 @@
 #define snapshot 20200627
-%define beta rc2
+#define beta rc2
 %define major 6
 
 %define libconcurrent %mklibname Qt%{major}Concurrent %{major}
@@ -773,7 +773,6 @@ Qt %{major} build tools
 %{_qtdir}/bin/qvkgen
 %{_qtdir}/bin/syncqt.pl
 %{_qtdir}/bin/tracegen
-%{_qtdir}/libexec/syncqt.pl
 %{_libexecdir}/syncqt.pl
 
 %prep
