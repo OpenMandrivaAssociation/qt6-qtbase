@@ -1,9 +1,9 @@
-diff -up qtbase-everywhere-src-6.1.0-rc/src/gui/kernel/qguiapplication.cpp.2~ qtbase-everywhere-src-6.1.0-rc/src/gui/kernel/qguiapplication.cpp
---- qtbase-everywhere-src-6.1.0-rc/src/gui/kernel/qguiapplication.cpp.2~	2021-04-28 00:16:42.563147153 +0200
-+++ qtbase-everywhere-src-6.1.0-rc/src/gui/kernel/qguiapplication.cpp	2021-04-28 01:41:28.784589969 +0200
-@@ -1494,6 +1494,9 @@ void QGuiApplicationPrivate::createPlatf
+diff -up qtbase-everywhere-src-6.2.1/src/gui/kernel/qguiapplication.cpp.2~ qtbase-everywhere-src-6.2.1/src/gui/kernel/qguiapplication.cpp
+--- qtbase-everywhere-src-6.2.1/src/gui/kernel/qguiapplication.cpp.2~	2021-10-28 13:13:27.154627570 +0200
++++ qtbase-everywhere-src-6.2.1/src/gui/kernel/qguiapplication.cpp	2021-10-28 13:54:04.809808183 +0200
+@@ -1474,6 +1474,9 @@ void QGuiApplicationPrivate::createPlatf
+ 
      Q_UNUSED(platformExplicitlySelected);
- #endif
  
 +    if(platformPluginPath.isEmpty())
 +        platformPluginPath = QStringLiteral("@QTDIR@/plugins");
