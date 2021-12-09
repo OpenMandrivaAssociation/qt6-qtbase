@@ -50,7 +50,7 @@ Source:		http://download.qt-project.org/%{?beta:development}%{!?beta:official}_r
 Patch0:		qtbase-6.0-rc2-examples-compile.patch
 Patch1:		qtbase-init-pluginpath.patch
 Patch2:		qtbase-6.2.0-aarch64-buildfix.patch
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}2
 Group:		System/Libraries
 Summary:	Version %{major} of the Qt framework
 BuildRequires:	cmake
@@ -732,6 +732,7 @@ Group: Development/Tools
 The legacy qmake build tool for Qt %{major}
 
 %files -n qmake-qt%{major}
+%{_bindir}/qmake-qt6
 %{_qtdir}/bin/qmake
 %{_qtdir}/bin/qmake6
 %{_qtdir}/mkspecs
@@ -856,3 +857,6 @@ ln -s bin %{buildroot}%{_qtdir}/libexec
 # Put syncqt where the other Qt packages can find it
 mkdir -p %{buildroot}%{_libexecdir}
 ln -s ../%{_lib}/qt%{major}/libexec/syncqt.pl %{buildroot}%{_libexecdir}/
+# And put qmake-qt6 where some stuff (e.g. LO) looks for it
+mkdir -p %{buildroot}%{_bindir}
+ln -s %{_qtdir}/bin/qmake %{buildroot}%{_bindir}/qmake-qt6
