@@ -50,7 +50,7 @@ Source:		http://download.qt-project.org/%{?beta:development}%{!?beta:official}_r
 Patch0:		qtbase-6.0-rc2-examples-compile.patch
 Patch1:		qtbase-init-pluginpath.patch
 Patch2:		qtbase-6.2.0-aarch64-buildfix.patch
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}2
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}3
 Group:		System/Libraries
 Summary:	Version %{major} of the Qt framework
 BuildRequires:	cmake
