@@ -40,7 +40,7 @@
 %define _qtdir %{_libdir}/qt%{major}
 
 Name:		qt6-qtbase
-Version:	6.2.2
+Version:	6.2.3
 %if 0%{?snapshot:1}
 # "git archive"-d from "dev" branch of git://code.qt.io/qt/qtbase.git
 Source:		qtbase-%{snapshot}.tar.zst
@@ -51,7 +51,7 @@ Patch0:		qtbase-6.0-rc2-examples-compile.patch
 Patch1:		qtbase-init-pluginpath.patch
 Patch2:		qtbase-6.2.0-aarch64-buildfix.patch
 Patch3:		aarch64-qhash-fix-build-with-gcc.patch
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}3
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
 Group:		System/Libraries
 Summary:	Version %{major} of the Qt framework
 BuildRequires:	cmake
