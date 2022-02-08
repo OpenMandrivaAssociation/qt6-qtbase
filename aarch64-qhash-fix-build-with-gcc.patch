@@ -1,16 +1,16 @@
-diff -up qtbase-everywhere-src-6.2.2/src/corelib/tools/qhash.cpp.omv~ qtbase-everywhere-src-6.2.2/src/corelib/tools/qhash.cpp
---- qtbase-everywhere-src-6.2.2/src/corelib/tools/qhash.cpp.omv~	2022-01-10 12:28:32.644999695 +0000
-+++ qtbase-everywhere-src-6.2.2/src/corelib/tools/qhash.cpp	2022-01-10 12:29:36.234390709 +0000
-@@ -537,6 +537,8 @@ lt16:
- #endif
+diff -up qtbase-everywhere-src-6.3.0-beta1/src/corelib/tools/qhash.cpp.4~ qtbase-everywhere-src-6.3.0-beta1/src/corelib/tools/qhash.cpp
+--- qtbase-everywhere-src-6.3.0-beta1/src/corelib/tools/qhash.cpp.4~	2022-02-08 22:27:16.310164087 +0100
++++ qtbase-everywhere-src-6.3.0-beta1/src/corelib/tools/qhash.cpp	2022-02-08 22:32:19.325340292 +0100
+@@ -521,6 +521,8 @@ static uint siphash(const uint8_t *in, u
  
- #if defined(Q_PROCESSOR_ARM) && QT_COMPILER_SUPPORTS_HERE(AES) && !defined(QHASH_AES_SANITIZER_BUILD) && !defined(QT_BOOTSTRAPPED)
+ #undef QHASH_AES_SANITIZER_BUILD
+ 
 +#pragma GCC push_options
 +#pragma GCC target ("+nothing+crypto")
  QT_FUNCTION_TARGET(AES)
- static size_t aeshash(const uchar *p, size_t len, size_t seed) noexcept
+ static size_t aeshash(const uchar *p, size_t len, size_t seed, size_t seed2) noexcept
  {
-@@ -667,6 +669,7 @@ lt8:
+@@ -774,6 +776,7 @@ lt8:
      return vgetq_lane_u32(vreinterpretq_u32_u8(state0), 0);
  #  endif
  }

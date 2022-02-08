@@ -1,5 +1,5 @@
 #define snapshot 20200627
-#define beta rc2
+%define beta beta1
 %define major 6
 
 %define libconcurrent %mklibname Qt%{major}Concurrent %{major}
@@ -40,7 +40,7 @@
 %define _qtdir %{_libdir}/qt%{major}
 
 Name:		qt6-qtbase
-Version:	6.2.3
+Version:	6.3.0
 %if 0%{?snapshot:1}
 # "git archive"-d from "dev" branch of git://code.qt.io/qt/qtbase.git
 Source:		qtbase-%{snapshot}.tar.zst
@@ -431,6 +431,7 @@ Qt %{major} Network library
 %{_qtdir}/lib/libQt%{major}Network.so.*
 %dir %{_qtdir}/plugins/networkinformation
 %{_qtdir}/plugins/networkinformation/libqnetworkmanager.so
+%{_qtdir}/plugins/networkinformation/libqglib.so
 %dir %{_qtdir}/plugins/tls
 %{_qtdir}/plugins/tls/libqcertonlybackend.so
 %{_qtdir}/plugins/tls/libqopensslbackend.so
@@ -656,7 +657,6 @@ Qt %{major} XCB QPA library
 %{_qtdir}/lib/libQt%{major}XcbQpa.so.*
 %dir %{_qtdir}/plugins/xcbglintegrations
 %{_qtdir}/plugins/xcbglintegrations/libqxcb-egl-integration.so
-%{_qtdir}/plugins/xcbglintegrations/libqxcb-glx-integration.so
 
 %package -n %{devxcbqpa}
 Summary:	Development files for the Qt %{major} XCB QPA library
@@ -800,10 +800,13 @@ sed -i -e 's,@QTDIR@,%{_qtdir},g' src/gui/kernel/qguiapplication.cpp
 	-DQT_BUILD_EXAMPLES:BOOL=ON \
 	-DBUILD_SHARED_LIBS:BOOL=ON \
 	-DQT_FEATURE_aesni:BOOL=ON \
+	-DQT_FEATURE_cxx20:BOOL=ON \
 	-DQT_FEATURE_dynamicgl:BOOL=ON \
 	-DQT_FEATURE_ipc_posix:BOOL=ON \
 	-DQT_FEATURE_journald:BOOL=ON \
+	-DQT_FEATURE_opengl_dynamic:BOOL=ON \
 	-DQT_FEATURE_opengl_desktop:BOOL=ON \
+	-DQT_FEATURE_opengles2:BOOL=ON \
 	-DQT_FEATURE_opengles3:BOOL=ON \
 	-DQT_FEATURE_opengles31:BOOL=ON \
 	-DQT_FEATURE_opengles32:BOOL=ON \
@@ -813,9 +816,13 @@ sed -i -e 's,@QTDIR@,%{_qtdir},g' src/gui/kernel/qguiapplication.cpp
 	-DQT_FEATURE_openssl_linked:BOOL=ON \
 	-DQT_FEATURE_system_zlib:BOOL=ON \
 	-DQT_FEATURE_system_sqlite:BOOL=ON \
+	-DQT_FEATURE_system_xcb_xinput:BOOL=ON \
 	-DQT_FEATURE_libproxy:BOOL=ON \
 	-DQT_FEATURE_ltcg:BOOL=ON \
 	-DQT_FEATURE_sctp:BOOL=ON \
+	-DQT_FEATURE_gc_binaries:BOOL=ON \
+	-DQT_FEATURE_futimes:BOOL=ON \
+	-DQT_FEATURE_renameat2:BOOL=ON \
 	-DINPUT_doubleconversion=system \
 	-DINPUT_freetype=system \
 	-DINPUT_harfbuzz=system \
