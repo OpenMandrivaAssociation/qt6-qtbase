@@ -153,6 +153,7 @@ Qt %{major} Core library
 %dir %{_qtdir}
 %dir %{_qtdir}/lib
 %{_qtdir}/lib/libQt%{major}Core.so.*
+%{_sysconfdir}/ld.so.conf.d/*.conf
 
 %package -n %{devcore}
 Summary:	Development files for the Qt %{major} Core library
@@ -785,8 +786,13 @@ export LD_LIBRARY_PATH="$(pwd)/build/lib:${LD_LIBRARY_PATH}"
 
 %install
 %ninja_install -C build
-# Static helper lib without headers -- useless
-rm -f %{buildroot}%{_qtdir}/%{_lib}/libpnp_basictools.a
-# And put qmake-qt6 where some stuff (e.g. LO) looks for it
+
+# Make sure the libraries can be found
+mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d/
+cat >%{buildroot}%{_sysconfdir}/ld.so.conf.d/qt%{major}.conf <<EOF
+%{_qtdir}/lib
+EOF
+
+# Put qmake-qt6 where some stuff (e.g. LO) looks for it
 mkdir -p %{buildroot}%{_bindir}
 ln -s %{_qtdir}/bin/qmake %{buildroot}%{_bindir}/qmake-qt6
