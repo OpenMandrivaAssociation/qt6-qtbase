@@ -1,43 +1,5 @@
 #define snapshot 20200627
 #define beta rc
-%define major 6
-
-%define libconcurrent %mklibname Qt%{major}Concurrent
-%define devconcurrent %mklibname -d Qt%{major}Concurrent
-%define libcore %mklibname Qt%{major}Core
-%define devcore %mklibname -d Qt%{major}Core
-%define libdbus %mklibname Qt%{major}DBus
-%define devdbus %mklibname -d Qt%{major}DBus
-%define devdevicediscoverysupport %mklibname -d Qt%{major}DeviceDiscoverySupport
-%define libeglfsdeviceintegration %mklibname Qt%{major}EglFSDeviceIntegration
-%define deveglfsdeviceintegration %mklibname -d Qt%{major}EglFSDeviceIntegration
-%define libeglfskmssupport %mklibname Qt%{major}EglFsKmsSupport
-%define deveglfskmssupport %mklibname -d Qt%{major}EglFsKmsSupport
-%define devfbsupport %mklibname -d Qt%{major}FbSupport
-%define libgui %mklibname Qt%{major}Gui
-%define devgui %mklibname -d Qt%{major}Gui
-%define devinputsupport %mklibname -d Qt%{major}InputSupport
-%define devkmssupport %mklibname -d Qt%{major}KmsSupport
-%define libnetwork %mklibname Qt%{major}Network
-%define devnetwork %mklibname -d Qt%{major}Network
-%define libopengl %mklibname Qt%{major}OpenGL
-%define devopengl %mklibname -d Qt%{major}OpenGL
-%define libopenglwidgets %mklibname Qt%{major}OpenGLWidgets
-%define devopenglwidgets %mklibname -d Qt%{major}OpenGLWidgets
-%define libprintsupport %mklibname Qt%{major}PrintSupport
-%define devprintsupport %mklibname -d Qt%{major}PrintSupport
-%define libsql %mklibname Qt%{major}Sql
-%define devsql %mklibname -d Qt%{major}Sql
-%define libtest %mklibname Qt%{major}Test
-%define devtest %mklibname -d Qt%{major}Test
-%define libwidgets %mklibname Qt%{major}Widgets
-%define devwidgets %mklibname -d Qt%{major}Widgets
-%define libxcbqpa %mklibname Qt%{major}XcbQpa
-%define devxcbqpa %mklibname -d Qt%{major}XcbQpa
-%define libxml %mklibname Qt%{major}Xml
-%define devxml %mklibname -d Qt%{major}Xml
-
-%define _qtdir %{_libdir}/qt%{major}
 
 Name:		qt6-qtbase
 Version:	6.3.0
@@ -47,13 +9,16 @@ Source:		qtbase-%{snapshot}.tar.zst
 %else
 Source:		http://download.qt-project.org/%{?beta:development}%{!?beta:official}_releases/qt/%(echo %{version}|cut -d. -f1-2)/%{version}%{?beta:-%{beta}}/submodules/qtbase-everywhere-src-%{version}%{?beta:-%{beta}}.tar.xz
 %endif
+# rpm macros
+Source100:	macros.qt6
+%{load:%{S:100}}
 Patch0:		qtbase-6.0-rc2-examples-compile.patch
 Patch1:		qtbase-init-pluginpath.patch
 Patch2:		qtbase-6.2.0-aarch64-buildfix.patch
 Patch3:		aarch64-qhash-fix-build-with-gcc.patch
 Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
 Group:		System/Libraries
-Summary:	Version %{major} of the Qt framework
+Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
 BuildRequires:	ninja
 BuildRequires:	perl
@@ -113,566 +78,132 @@ BuildRequires:	pkgconfig(gtk+-3.0)
 License:	LGPLv3/GPLv3/GPLv2
 
 %description
-Version %{major} of the Qt framework
+Version %{qtmajor} of the Qt framework
 
-%package -n %{libconcurrent}
-Summary:	Qt %{major} Concurrent library
-Group:		System/Libraries
-Requires:	%{libcore} = %{EVRD}
-
-%description -n %{libconcurrent}
-Qt %{major} Concurrent library
-
-%files -n %{libconcurrent}
-%{_qtdir}/lib/libQt%{major}Concurrent.so.*
-
-%package -n %{devconcurrent}
-Summary:	Development files for the Qt %{major} Concurrent library
-Group:		Development/KDE and Qt
-Requires:	%{devcore} = %{EVRD}
-Requires:	%{libconcurrent} = %{EVRD}
-
-%description -n %{devconcurrent}
-Development files for the Qt %{major} Concurrent library
-
-%files -n %{devconcurrent}
-%{_qtdir}/include/QtConcurrent
-%{_qtdir}/lib/libQt%{major}Concurrent.so
-%{_qtdir}/lib/libQt%{major}Concurrent.prl
-%{_qtdir}/modules/Concurrent.json
-%{_qtdir}/lib/metatypes/qt6concurrent_*_metatypes.json
-
-%package -n %{libcore}
-Summary:	Qt %{major} Core library
-Group:		System/Libraries
-
-%description -n %{libcore}
-Qt %{major} Core library
-
-%files -n %{libcore}
-%dir %{_qtdir}
-%dir %{_qtdir}/lib
-%{_qtdir}/lib/libQt%{major}Core.so.*
+%define extra_files_Core \
 %{_sysconfdir}/ld.so.conf.d/*.conf
 
-%package -n %{devcore}
-Summary:	Development files for the Qt %{major} Core library
-Group:		Development/KDE and Qt
-Requires:	%{libcore} = %{EVRD}
-Requires:	%{name}-tools = %{EVRD}
-# cmake files still depend on qmake to read variables
-Requires:	qmake-qt%{major} = %{EVRD}
-
-%description -n %{devcore}
-Development files for the Qt %{major} Core library
-
-%files -n %{devcore}
-%{_qtdir}/include/QtCore
-%{_qtdir}/bin/qt-configure-module
-%{_qtdir}/lib/libQt%{major}Core.prl
-%{_qtdir}/lib/libQt%{major}Core.so
-%dir %{_qtdir}/modules
-%{_qtdir}/modules/Core.json
-%{_qtdir}/libexec/moc
-%{_qtdir}/libexec/rcc
+%define extra_devel_files_Core \
+%{_qtdir}/bin/qt-configure-module \
+%dir %{_qtdir}/libexec \
+%{_qtdir}/libexec/moc \
+%{_qtdir}/libexec/rcc \
+%dir %{_qtdir}/modules \
 %dir %{_qtdir}/lib/metatypes
-%{_qtdir}/lib/metatypes/qt6core_relwithdebinfo_metatypes.json
-%dir %{_qtdir}/libexec
 
-%package -n %{libdbus}
-Summary:	Qt %{major} D-Bus library
-Group:		System/Libraries
-Requires:	%{libcore} = %{EVRD}
+%define extra_devel_reqprov_Core \
+Requires: %{name}-tools = %{EVRD} \
+Requires: qmake-qt%{qtmajor} = %{EVRD} \
 
-%description -n %{libdbus}
-Qt %{major} D-Bus library
-
-%files -n %{libdbus}
-%{_qtdir}/lib/libQt%{major}DBus.so.*
-
-%package -n %{devdbus}
-Summary:	Development files for the Qt %{major} D-Bus library
-Group:		Development/KDE and Qt
-Requires:	%{libdbus} = %{EVRD}
-Requires:	%{devcore} = %{EVRD}
-
-%description -n %{devdbus}
-Development files for the Qt %{major} D-Bus library
-
-%files -n %{devdbus}
-%{_qtdir}/include/QtDBus
-%{_qtdir}/lib/libQt%{major}DBus.so
-%{_qtdir}/lib/libQt%{major}DBus.prl
-%{_qtdir}/bin/qdbuscpp2xml
-%{_qtdir}/bin/qdbusxml2cpp
-%{_qtdir}/modules/DBus.json
-%{_qtdir}/lib/metatypes/qt6dbus_*_metatypes.json
-
-%package -n %{libeglfsdeviceintegration}
-Summary:	Qt %{major} EglFS device integration library
-Group:		System/Libraries
-Requires:	%{libcore} = %{EVRD}
-
-%description -n %{libeglfsdeviceintegration}
-Qt %{major} EglFS device integration library
-
-%files -n %{libeglfsdeviceintegration}
-%{_qtdir}/lib/libQt%{major}EglFSDeviceIntegration.so.*
-
-%package -n %{deveglfsdeviceintegration}
-Summary:	Development files for the Qt %{major} EglFS device integration library
-Group:		Development/KDE and Qt
-Requires:	%{devcore} = %{EVRD}
-Requires:	%{libeglfsdeviceintegration} = %{EVRD}
-
-%description -n %{deveglfsdeviceintegration}
-Development files for the Qt %{major} EglFS device integration library
-
-%files -n %{deveglfsdeviceintegration}
-%{_qtdir}/include/QtEglFSDeviceIntegration
-%{_qtdir}/lib/libQt%{major}EglFSDeviceIntegration.so
-%{_qtdir}/lib/libQt%{major}EglFSDeviceIntegration.prl
-%{_qtdir}/modules/EglFSDeviceIntegrationPrivate.json
-%{_qtdir}/lib/metatypes/qt6eglfsdeviceintegrationprivate_*_metatypes.json
-
-%package -n %{devdevicediscoverysupport}
-Summary:	Device discovery support library for Qt %{major}
-Group:		Development/KDE and Qt
-Requires:	%{devcore} = %{EVRD}
-
-%description -n %{devdevicediscoverysupport}
-Device discovery support library for Qt %{major}
-
-%files -n %{devdevicediscoverysupport}
-%{_qtdir}/modules/DeviceDiscoverySupportPrivate.json
-%{_qtdir}/include/QtDeviceDiscoverySupport
-%{_qtdir}/lib/libQt%{major}DeviceDiscoverySupport.a
-%{_qtdir}/lib/libQt%{major}DeviceDiscoverySupport.prl
-%{_qtdir}/lib/metatypes/qt6devicediscoverysupportprivate_*_metatypes.json
-
-%package -n %{libeglfskmssupport}
-Summary:	Qt %{major} EglFS KMS support library
-Group:		System/Libraries
-Requires:	%{libcore} = %{EVRD}
-
-%description -n %{libeglfskmssupport}
-Qt %{major} EglFS KMS support library
-
-%files -n %{libeglfskmssupport}
-%{_qtdir}/lib/libQt%{major}EglFsKmsSupport.so.*
-%{_qtdir}/lib/libQt6EglFsKmsGbmSupport.so.*
-%{_qtdir}/modules/KmsSupportPrivate.json
-
-%package -n %{deveglfskmssupport}
-Summary:	Development files for the Qt %{major} KMS support library
-Group:		Development/KDE and Qt
-Requires:	%{devcore} = %{EVRD}
-Requires:	%{libeglfskmssupport} = %{EVRD}
-
-%description -n %{deveglfskmssupport}
-Development files for the Qt %{major} EglFS KMS support library
-
-%files -n %{deveglfskmssupport}
-%{_qtdir}/lib/libQt%{major}EglFsKmsSupport.so
-%{_qtdir}/lib/libQt%{major}EglFsKmsSupport.prl
-%{_qtdir}/include/QtEglFsKmsSupport
-%{_qtdir}/include/QtEglFsKmsGbmSupport
-%{_qtdir}/lib/libQt%{major}EglFsKmsGbmSupport.prl
-%{_qtdir}/lib/libQt%{major}EglFsKmsGbmSupport.so
-%{_qtdir}/modules/EglFsKmsGbmSupportPrivate.json
-%{_qtdir}/modules/EglFsKmsSupportPrivate.json
-%{_qtdir}/lib/metatypes/qt6eglfskmsgbmsupportprivate_*_metatypes.json
-%{_qtdir}/lib/metatypes/qt6eglfskmssupportprivate_*_metatypes.json
-
-%package -n %{devfbsupport}
-Summary:	Framebuffer support library for Qt %{major}
-Group:		Development/KDE and Qt
-Requires:	%{devcore} = %{EVRD}
-
-%description -n %{devfbsupport}
-Framebuffer support library for Qt %{major}
-
-%files -n %{devfbsupport}
-%{_qtdir}/include/QtFbSupport
-%{_qtdir}/lib/libQt%{major}FbSupport.a
-%{_qtdir}/lib/libQt%{major}FbSupport.prl
-%{_qtdir}/modules/FbSupportPrivate.json
-%{_qtdir}/lib/metatypes/qt6fbsupportprivate_*_metatypes.json
-
-%package -n %{libgui}
-Summary:	Qt %{major} GUI library
-Group:		System/Libraries
-Requires:	%{libcore} = %{EVRD}
-
-%description -n %{libgui}
-Qt %{major} GUI library
-
-%files -n %{libgui}
-%{_qtdir}/lib/libQt%{major}Gui.so.*
-%dir %{_qtdir}/plugins/egldeviceintegrations
-%{_qtdir}/plugins/egldeviceintegrations/libqeglfs-emu-integration.so
-%{_qtdir}/plugins/egldeviceintegrations/libqeglfs-kms-egldevice-integration.so
-%{_qtdir}/plugins/egldeviceintegrations/libqeglfs-kms-integration.so
-%{_qtdir}/plugins/egldeviceintegrations/libqeglfs-x11-integration.so
-%dir %{_qtdir}/plugins/generic
-%{_qtdir}/plugins/generic/libqevdevkeyboardplugin.so
-%{_qtdir}/plugins/generic/libqevdevmouseplugin.so
-%{_qtdir}/plugins/generic/libqevdevtabletplugin.so
-%{_qtdir}/plugins/generic/libqevdevtouchplugin.so
-%{_qtdir}/plugins/generic/libqlibinputplugin.so
-%{_qtdir}/plugins/generic/libqtuiotouchplugin.so
-%dir %{_qtdir}/plugins/imageformats
-%{_qtdir}/plugins/imageformats/libqgif.so
-%{_qtdir}/plugins/imageformats/libqico.so
-%{_qtdir}/plugins/imageformats/libqjpeg.so
-%dir %{_qtdir}/plugins/platforminputcontexts
-%{_qtdir}/plugins/platforminputcontexts/libcomposeplatforminputcontextplugin.so
-%{_qtdir}/plugins/platforminputcontexts/libibusplatforminputcontextplugin.so
-%dir %{_qtdir}/plugins/platforms
-%{_qtdir}/plugins/platforms/libqeglfs.so
-%{_qtdir}/plugins/platforms/libqlinuxfb.so
-%{_qtdir}/plugins/platforms/libqminimal.so
-%{_qtdir}/plugins/platforms/libqminimalegl.so
-%{_qtdir}/plugins/platforms/libqoffscreen.so
-%{_qtdir}/plugins/platforms/libqvkkhrdisplay.so
-%{_qtdir}/plugins/platforms/libqvnc.so
-%{_qtdir}/plugins/platforms/libqxcb.so
-%dir %{_qtdir}/plugins/platformthemes
-%{_qtdir}/plugins/platformthemes/libqgtk3.so
+%define extra_files_Gui \
+%dir %{_qtdir}/plugins/egldeviceintegrations \
+%{_qtdir}/plugins/egldeviceintegrations/libqeglfs-emu-integration.so \
+%{_qtdir}/plugins/egldeviceintegrations/libqeglfs-kms-egldevice-integration.so \
+%{_qtdir}/plugins/egldeviceintegrations/libqeglfs-kms-integration.so \
+%{_qtdir}/plugins/egldeviceintegrations/libqeglfs-x11-integration.so \
+%dir %{_qtdir}/plugins/xcbglintegrations \
+%{_qtdir}/plugins/xcbglintegrations/libqxcb-egl-integration.so \
+%dir %{_qtdir}/plugins/generic \
+%{_qtdir}/plugins/generic/libqevdevkeyboardplugin.so \
+%{_qtdir}/plugins/generic/libqevdevmouseplugin.so \
+%{_qtdir}/plugins/generic/libqevdevtabletplugin.so \
+%{_qtdir}/plugins/generic/libqevdevtouchplugin.so \
+%{_qtdir}/plugins/generic/libqlibinputplugin.so \
+%{_qtdir}/plugins/generic/libqtuiotouchplugin.so \
+%dir %{_qtdir}/plugins/imageformats \
+%{_qtdir}/plugins/imageformats/libqgif.so \
+%{_qtdir}/plugins/imageformats/libqico.so \
+%{_qtdir}/plugins/imageformats/libqjpeg.so \
+%dir %{_qtdir}/plugins/platforminputcontexts \
+%{_qtdir}/plugins/platforminputcontexts/libcomposeplatforminputcontextplugin.so \
+%{_qtdir}/plugins/platforminputcontexts/libibusplatforminputcontextplugin.so \
+%dir %{_qtdir}/plugins/platforms \
+%{_qtdir}/plugins/platforms/libqeglfs.so \
+%{_qtdir}/plugins/platforms/libqlinuxfb.so \
+%{_qtdir}/plugins/platforms/libqminimal.so \
+%{_qtdir}/plugins/platforms/libqminimalegl.so \
+%{_qtdir}/plugins/platforms/libqoffscreen.so \
+%{_qtdir}/plugins/platforms/libqvkkhrdisplay.so \
+%{_qtdir}/plugins/platforms/libqvnc.so \
+%{_qtdir}/plugins/platforms/libqxcb.so \
+%dir %{_qtdir}/plugins/platformthemes \
 %{_qtdir}/plugins/platformthemes/libqxdgdesktopportal.so
 
-%package -n %{devgui}
-Summary:	Development files for the Qt %{major} GUI library
-Group:		Development/KDE and Qt
-Requires:	%{libgui} = %{EVRD}
-Requires:	%{devcore} = %{EVRD}
+%define extra_devel_files_DBus \
+%{_qtdir}/bin/qdbuscpp2xml \
+%{_qtdir}/bin/qdbusxml2cpp
 
-%description -n %{devgui}
-Development files for the Qt %{major} GUI library
+%define extra_files_Network \
+%dir %{_qtdir}/plugins/networkinformation \
+%{_qtdir}/plugins/networkinformation/libqnetworkmanager.so \
+%{_qtdir}/plugins/networkinformation/libqglib.so \
+%dir %{_qtdir}/plugins/tls \
+%{_qtdir}/plugins/tls/libqcertonlybackend.so \
+%{_qtdir}/plugins/tls/libqopensslbackend.so \
 
-%files -n %{devgui}
-%{_qtdir}/include/QtGui
-%{_qtdir}/lib/libQt%{major}Gui.so
-%{_qtdir}/lib/libQt%{major}Gui.prl
-%{_qtdir}/modules/Gui.json
-%{_qtdir}/lib/metatypes/qt6gui_relwithdebinfo_metatypes.json
+%define extra_devel_files_Network \
+%{_qtdir}/lib/cmake/Qt6HostInfo
 
-%package -n %{devinputsupport}
-Summary:	Input support library for Qt %{major}
-Group:		Development/KDE and Qt
-Requires:	%{devcore} = %{EVRD}
-
-%description -n %{devinputsupport}
-Input support library for Qt %{major}
-
-%files -n %{devinputsupport}
-%{_qtdir}/include/QtInputSupport
-%{_qtdir}/lib/libQt%{major}InputSupport.a
-%{_qtdir}/lib/libQt%{major}InputSupport.prl
-%{_qtdir}/modules/InputSupportPrivate.json
-%{_qtdir}/lib/metatypes/qt6inputsupportprivate_*_metatypes.json
-
-%package -n %{devkmssupport}
-Summary:	KMS support library for Qt %{major}
-Group:		Development/KDE and Qt
-Requires:	%{devcore} = %{EVRD}
-
-%description -n %{devkmssupport}
-KMS support library for Qt %{major}
-
-%files -n %{devkmssupport}
-%{_qtdir}/include/QtKmsSupport
-%{_qtdir}/lib/libQt%{major}KmsSupport.a
-%{_qtdir}/lib/libQt%{major}KmsSupport.prl
-%{_qtdir}/lib/metatypes/qt6kmssupportprivate_*_metatypes.json
-
-%package -n %{libnetwork}
-Summary:	Qt %{major} Network library
-Group:		System/Libraries
-Requires:	%{libcore} = %{EVRD}
-
-%description -n %{libnetwork}
-Qt %{major} Network library
-
-%files -n %{libnetwork}
-%{_qtdir}/lib/libQt%{major}Network.so.*
-%dir %{_qtdir}/plugins/networkinformation
-%{_qtdir}/plugins/networkinformation/libqnetworkmanager.so
-%{_qtdir}/plugins/networkinformation/libqglib.so
-%dir %{_qtdir}/plugins/tls
-%{_qtdir}/plugins/tls/libqcertonlybackend.so
-%{_qtdir}/plugins/tls/libqopensslbackend.so
-
-%package -n %{devnetwork}
-Summary:	Development files for the Qt %{major} Network library
-Group:		Development/KDE and Qt
-Requires:	%{libnetwork} = %{EVRD}
-Requires:	%{devcore} = %{EVRD}
-
-%description -n %{devnetwork}
-Development files for the Qt %{major} Network library
-
-%files -n %{devnetwork}
-%{_qtdir}/include/QtNetwork
-%{_qtdir}/lib/libQt%{major}Network.so
-%{_qtdir}/lib/libQt%{major}Network.prl
-%{_qtdir}/modules/Network.json
-%{_qtdir}/lib/metatypes/qt6network_*_metatypes.json
-
-%package -n %{libopengl}
-Summary:	Qt %{major} OpenGL library
-Group:		System/Libraries
-Requires:	%{libcore} = %{EVRD}
-
-%description -n %{libopengl}
-Qt %{major} OpenGL library
-
-%files -n %{libopengl}
-%{_qtdir}/lib/libQt%{major}OpenGL.so.*
-
-%package -n %{devopengl}
-Summary:	Development files for the Qt %{major} OpenGL library
-Group:		Development/KDE and Qt
-Requires:	%{libopengl} = %{EVRD}
-Requires:	%{devcore} = %{EVRD}
-
-%description -n %{devopengl}
-Development files for the Qt %{major} OpenGL library
-
-%files -n %{devopengl}
-%{_qtdir}/include/QtOpenGL
-%{_qtdir}/lib/libQt%{major}OpenGL.so
-%{_qtdir}/lib/libQt%{major}OpenGL.prl
-%{_qtdir}/modules/OpenGL.json
-%{_qtdir}/lib/metatypes/qt6opengl_*_metatypes.json
-
-%package -n %{libopenglwidgets}
-Summary:	Qt %{major} OpenGL Widgets library
-Group:		System/Libraries
-Requires:	%{libcore} = %{EVRD}
-
-%description -n %{libopenglwidgets}
-Qt %{major} OpenGL Widgets library
-
-%files -n %{libopenglwidgets}
-%{_qtdir}/lib/libQt%{major}OpenGLWidgets.so.*
-
-%package -n %{devopenglwidgets}
-Summary:	Development files for the Qt %{major} OpenGL Widgets library
-Group:		Development/KDE and Qt
-Requires:	%{libopenglwidgets} = %{EVRD}
-Requires:	%{devcore} = %{EVRD}
-Requires:	%{devopengl} = %{EVRD}
-
-%description -n %{devopenglwidgets}
-Development files for the Qt %{major} OpenGL Widgets library
-
-%files -n %{devopenglwidgets}
-%{_qtdir}/include/QtOpenGLWidgets
-%{_qtdir}/lib/libQt%{major}OpenGLWidgets.so
-%{_qtdir}/lib/libQt%{major}OpenGLWidgets.prl
-%{_qtdir}/modules/OpenGLWidgets.json
-%{_qtdir}/lib/metatypes/qt6openglwidgets_*_metatypes.json
-
-%package -n %{libprintsupport}
-Summary:	Qt %{major} printing support library
-Group:		System/Libraries
-Requires:	%{libcore} = %{EVRD}
-
-%description -n %{libprintsupport}
-Qt %{major} printing support library
-
-%files -n %{libprintsupport}
-%{_qtdir}/lib/libQt%{major}PrintSupport.so.*
-%dir %{_qtdir}/plugins/printsupport
+%define extra_files_PrintSupport \
+%dir %{_qtdir}/plugins/printsupport \
 %{_qtdir}/plugins/printsupport/libcupsprintersupport.so
 
-%package -n %{devprintsupport}
-Summary:	Development files for the Qt %{major} printing support library
-Group:		Development/KDE and Qt
-Requires:	%{libprintsupport} = %{EVRD}
-Requires:	%{devcore} = %{EVRD}
-
-%description -n %{devprintsupport}
-Development files for the Qt %{major} printing support library
-
-%files -n %{devprintsupport}
-%{_qtdir}/include/QtPrintSupport
-%{_qtdir}/lib/libQt%{major}PrintSupport.so
-%{_qtdir}/lib/libQt%{major}PrintSupport.prl
-%{_qtdir}/modules/PrintSupport.json
-%{_qtdir}/lib/metatypes/qt6printsupport_*_metatypes.json
-
-%package -n %{libsql}
-Summary:	Qt %{major} SQL library
-Group:		System/Libraries
-Requires:	%{libcore} = %{EVRD}
-
-%description -n %{libsql}
-Qt %{major} SQL library
-
-%files -n %{libsql}
-%{_qtdir}/lib/libQt%{major}Sql.so.*
-%dir %{_qtdir}/plugins/sqldrivers
-%{_qtdir}/plugins/sqldrivers/libqsqlite.so
-%{_qtdir}/plugins/sqldrivers/libqsqlmysql.so
-%{_qtdir}/plugins/sqldrivers/libqsqlodbc.so
+%define extra_files_Sql \
+%dir %{_qtdir}/plugins/sqldrivers \
+%{_qtdir}/plugins/sqldrivers/libqsqlite.so \
+%{_qtdir}/plugins/sqldrivers/libqsqlmysql.so \
+%{_qtdir}/plugins/sqldrivers/libqsqlodbc.so \
 %{_qtdir}/plugins/sqldrivers/libqsqlpsql.so
 
-%package -n %{devsql}
-Summary:	Development files for the Qt %{major} SQL library
-Group:		Development/KDE and Qt
-Requires:	%{libsql} = %{EVRD}
-Requires:	%{devcore} = %{EVRD}
-
-%description -n %{devsql}
-Development files for the Qt %{major} SQL library
-
-%files -n %{devsql}
-%{_qtdir}/include/QtSql
-%{_qtdir}/lib/libQt%{major}Sql.so
-%{_qtdir}/lib/libQt%{major}Sql.prl
-%{_qtdir}/modules/Sql.json
-%{_qtdir}/lib/metatypes/qt6sql_*_metatypes.json
-
-%package -n %{libtest}
-Summary:	Qt %{major} Test library
-Group:		System/Libraries
-Requires:	%{libcore} = %{EVRD}
-
-%description -n %{libtest}
-Qt %{major} Test library
-
-%files -n %{libtest}
-%{_qtdir}/lib/libQt%{major}Test.so.*
-
-%package -n %{devtest}
-Summary:	Development files for the Qt %{major} Test library
-Group:		Development/KDE and Qt
-Requires:	%{libtest} = %{EVRD}
-Requires:	%{devcore} = %{EVRD}
-
-%description -n %{devtest}
-Development files for the Qt %{major} Test library
-
-%files -n %{devtest}
-%{_qtdir}/include/QtTest
-%{_qtdir}/lib/libQt%{major}Test.so
-%{_qtdir}/lib/libQt%{major}Test.prl
-%{_qtdir}/modules/Test.json
-%{_qtdir}/lib/metatypes/qt6test_*_metatypes.json
-
-%package -n %{libwidgets}
-Summary:	Qt %{major} Widgets library
-Group:		System/Libraries
-Requires:	%{libcore} = %{EVRD}
-
-%description -n %{libwidgets}
-Qt %{major} Widgets library
-
-%files -n %{libwidgets}
-%{_qtdir}/lib/libQt%{major}Widgets.so.*
-
-%package -n %{devwidgets}
-Summary:	Development files for the Qt %{major} Widgets library
-Group:		Development/KDE and Qt
-Requires:	%{libwidgets} = %{EVRD}
-Requires:	%{devcore} = %{EVRD}
-
-%description -n %{devwidgets}
-Development files for the Qt %{major} Widgets library
-
-%files -n %{devwidgets}
-%{_qtdir}/include/QtWidgets
-%{_qtdir}/lib/libQt%{major}Widgets.so
-%{_qtdir}/lib/libQt%{major}Widgets.prl
+%define extra_devel_files_Widgets \
 %{_qtdir}/libexec/uic
-%{_qtdir}/modules/Widgets.json
-%{_qtdir}/lib/metatypes/qt6widgets_relwithdebinfo_metatypes.json
 
-%package -n %{libxcbqpa}
-Summary:	Qt %{major} XCB QPA Library
-Group:		System/Libraries
-Requires:	%{libcore} = %{EVRD}
+%qt6libs Core Concurrent DBus EglFSDeviceIntegration EglFsKmsSupport EglFsKmsGbmSupport Gui Network OpenGL OpenGLWidgets PrintSupport Sql Test Widgets XcbQpa Xml
+%qt6staticlibs DeviceDiscoverySupport FbSupport InputSupport KmsSupport
 
-%description -n %{libxcbqpa}
-Qt %{major} XCB QPA library
-
-%files -n %{libxcbqpa}
-%{_qtdir}/lib/libQt%{major}XcbQpa.so.*
-%dir %{_qtdir}/plugins/xcbglintegrations
-%{_qtdir}/plugins/xcbglintegrations/libqxcb-egl-integration.so
-
-%package -n %{devxcbqpa}
-Summary:	Development files for the Qt %{major} XCB QPA library
-Group:		Development/KDE and Qt
-Requires:	%{libxcbqpa} = %{EVRD}
-Requires:	%{devcore} = %{EVRD}
-
-%description -n %{devxcbqpa}
-Development files for the Qt %{major} XCB QPA library
-
-%files -n %{devxcbqpa}
-%{_qtdir}/lib/libQt%{major}XcbQpa.so
-%{_qtdir}/lib/libQt%{major}XcbQpa.prl
-%{_qtdir}/modules/XcbQpaPrivate.json
-%{_qtdir}/lib/metatypes/qt6xcbqpaprivate_*_metatypes.json
-
-%package -n %{libxml}
-Summary:	Qt %{major} XML library
-Group:		System/Libraries
-Requires:	%{libcore} = %{EVRD}
-
-%description -n %{libxml}
-Qt %{major} XML library
-
-%files -n %{libxml}
-%{_qtdir}/lib/libQt%{major}Xml.so.*
-
-%package -n %{devxml}
-Summary:	Development files for the Qt %{major} XML library
-Group:		Development/KDE and Qt
-Requires:	%{libxml} = %{EVRD}
-Requires:	%{devcore} = %{EVRD}
-
-%description -n %{devxml}
-Development files for the Qt %{major} XML library
-
-%files -n %{devxml}
-%{_qtdir}/include/QtXml
-%{_qtdir}/lib/libQt%{major}Xml.so
-%{_qtdir}/lib/libQt%{major}Xml.prl
-%{_qtdir}/modules/Xml.json
-%{_qtdir}/lib/metatypes/qt6xml_*_metatypes.json
 
 %package doc
-Summary: Documentation for the Qt %{major} framework
+Summary: Documentation for the Qt %{qtmajor} framework
 Group: Documentation
 
 %description doc
-Documentation for the Qt %{major} framework
+Documentation for the Qt %{qtmajor} framework
 
 %files doc
 %{_qtdir}/doc
 
+
 %package examples
-Summary: Examples for the Qt %{major} framework
+Summary: Examples for the Qt %{qtmajor} framework
 Group: Documentation
 
 %description examples
-Documentation for the Qt %{major} framework
+Documentation for the Qt %{qtmajor} framework
 
 %files examples
 %{_qtdir}/examples
 
-%package -n qmake-qt%{major}
-Summary: The legacy qmake build tool for Qt %{major}
+
+%package theme-gtk3
+Summary: GTK3 Theme for Qt %{qtmajor}
+Group: User Interface/Desktops
+Requires: %{mklibname Qt%{qtmajor}Gui} = %{EVRD}
+
+%description theme-gtk3
+GTK3 Theme for Qt %{qtmajor}
+
+%files theme-gtk3
+%{_qtdir}/plugins/platformthemes/libqgtk3.so
+
+
+%package -n qmake-qt%{qtmajor}
+Summary: The legacy qmake build tool for Qt %{qtmajor}
 Group: Development/Tools
 
-%description -n qmake-qt%{major}
-The legacy qmake build tool for Qt %{major}
+%description -n qmake-qt%{qtmajor}
+The legacy qmake build tool for Qt %{qtmajor}
 
-%files -n qmake-qt%{major}
+%files -n qmake-qt%{qtmajor}
 %{_bindir}/qmake-qt6
 %{_qtdir}/bin/qmake
 %{_qtdir}/bin/qmake6
@@ -680,35 +211,40 @@ The legacy qmake build tool for Qt %{major}
 %{_qtdir}/libexec/qt-internal-configure-tests
 %{_qtdir}/libexec/ensure_pro_file.cmake
 
-%package -n qt%{major}-cmake
-Summary: Cmake extensions for Qt %{major}
+
+%package -n qt%{qtmajor}-cmake
+Summary: Cmake extensions for Qt %{qtmajor}
 Group: Development/KDE and Qt
 
-%description -n qt%{major}-cmake
-Cmake extensions for Qt %{major}
+%description -n qt%{qtmajor}-cmake
+Cmake extensions for Qt %{qtmajor}
 
-%files -n qt%{major}-cmake
+%files -n qt%{qtmajor}-cmake
 %{_qtdir}/bin/qt-cmake
 %{_qtdir}/bin/qt-cmake-private
 %{_qtdir}/bin/qt-cmake-private-install.cmake
 %{_qtdir}/bin/qt-cmake-standalone-test
 %{_qtdir}/libexec/cmake_automoc_parser
-%{_qtdir}/lib/cmake
+%dir %{_qtdir}/lib/cmake
+%{_qtdir}/lib/cmake/Qt6
+%{_qtdir}/lib/cmake/Qt6BuildInternals
 %{_qtdir}/libexec/android_emulator_launcher.sh
+%{_prefix}/lib/rpm/macros.d/macros.qt6
+
 
 %package tools
-Summary: Qt %{major} build tools
+Summary: Qt %{qtmajor} build tools
 Group: Development/KDE and Qt
 
 %description tools
-Qt %{major} build tools
+Qt %{qtmajor} build tools
 
 %files tools
 %{_qtdir}/bin/androiddeployqt
 %{_qtdir}/bin/androidtestrunner
 %{_qtdir}/libexec/qlalr
 %{_qtdir}/bin/qtpaths
-%{_qtdir}/bin/qtpaths%{major}
+%{_qtdir}/bin/qtpaths%{qtmajor}
 %{_qtdir}/libexec/qvkgen
 %{_qtdir}/libexec/syncqt.pl
 %{_qtdir}/libexec/tracegen
@@ -787,9 +323,13 @@ export LD_LIBRARY_PATH="$(pwd)/build/lib:${LD_LIBRARY_PATH}"
 %install
 %ninja_install -C build
 
+# Add rpm macros
+mkdir -p %{buildroot}%{_prefix}/lib/rpm/macros.d/
+cp %{S:100} %{buildroot}%{_prefix}/lib/rpm/macros.d/macros.qt6
+
 # Make sure the libraries can be found
 mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d/
-cat >%{buildroot}%{_sysconfdir}/ld.so.conf.d/qt%{major}.conf <<EOF
+cat >%{buildroot}%{_sysconfdir}/ld.so.conf.d/qt%{qtmajor}.conf <<EOF
 %{_qtdir}/lib
 EOF
 
