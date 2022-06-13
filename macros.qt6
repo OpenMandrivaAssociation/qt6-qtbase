@@ -35,6 +35,7 @@ Development files for the Qt %{qtmajor} %{1} library\
 %optional %{_qtdir}/lib/cmake/Qt%{qtmajor}%{1}\
 %optional %{_qtdir}/lib/cmake/Qt%{qtmajor}%{1}Private\
 %optional %{_qtdir}/lib/cmake/Qt%{qtmajor}%{1}Tools\
+%optional %{_qtdir}/lib/cmake/Qt%{qtmajor}BuildInternals/StandaloneTests/Qt%{1}TestsConfig.cmake\
 %optional %{_qtdir}/lib/metatypes/qt%{qtmajor}$(echo %{1}|tr A-Z a-z)_relwithdebinfo_metatypes.json\
 %optional %{_qtdir}/lib/metatypes/qt%{qtmajor}$(echo %{1}|tr A-Z a-z)private_relwithdebinfo_metatypes.json\
 %optional %{_qtdir}/mkspecs/modules/qt_lib_$(echo %{1}|tr A-Z a-z).pri\
