@@ -89,7 +89,8 @@ Version %{qtmajor} of the Qt framework
 %{_qtdir}/libexec/moc \
 %{_qtdir}/libexec/rcc \
 %dir %{_qtdir}/modules \
-%dir %{_qtdir}/lib/metatypes
+%dir %{_qtdir}/lib/metatypes \
+%{_qtdir}/lib/pkgconfig/Qt6Platform.pc
 
 %define extra_devel_reqprov_Core \
 Requires: %{name}-tools = %{EVRD} \
@@ -154,6 +155,9 @@ Requires: qmake-qt%{qtmajor} = %{EVRD} \
 %{_qtdir}/plugins/sqldrivers/libqsqlmysql.so \
 %{_qtdir}/plugins/sqldrivers/libqsqlodbc.so \
 %{_qtdir}/plugins/sqldrivers/libqsqlpsql.so
+
+%define extra_devel_files_Test \
+%{_qtdir}/libexec/qt-testrunner.py
 
 %define extra_devel_files_Widgets \
 %{_qtdir}/libexec/uic
