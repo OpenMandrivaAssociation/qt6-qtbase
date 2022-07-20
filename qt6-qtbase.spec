@@ -1,8 +1,8 @@
 #define snapshot 20200627
-#define beta rc
+%define beta beta2
 
 Name:		qt6-qtbase
-Version:	6.3.1
+Version:	6.4.0
 %if 0%{?snapshot:1}
 # "git archive"-d from "dev" branch of git://code.qt.io/qt/qtbase.git
 Source:		qtbase-%{snapshot}.tar.zst
@@ -12,10 +12,11 @@ Source:		http://download.qt-project.org/%{?beta:development}%{!?beta:official}_r
 # rpm macros
 Source100:	macros.qt6
 %{load:%{S:100}}
-Patch0:		qtbase-6.0-rc2-examples-compile.patch
-Patch1:		qtbase-init-pluginpath.patch
+#Patch0:		qtbase-6.0-rc2-examples-compile.patch
+#Patch1:		qtbase-init-pluginpath.patch
+Patch1:		qtbase-6.4.0b2-compile.patch
 Patch2:		qtbase-6.2.0-aarch64-buildfix.patch
-Patch3:		aarch64-qhash-fix-build-with-gcc.patch
+#Patch3:		aarch64-qhash-fix-build-with-gcc.patch
 Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
