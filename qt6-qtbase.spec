@@ -131,6 +131,21 @@ Requires: qmake-qt%{qtmajor} = %{EVRD} \
 %dir %{_qtdir}/plugins/platformthemes \
 %{_qtdir}/plugins/platformthemes/libqxdgdesktopportal.so
 
+# FIXME this really shouldn't be necessary, but the cmake files
+# perform a mistaken integrity check.
+# Not requiring all the plugins results in
+# CMake Error at /usr/lib64/qt6/lib/cmake/Qt6Gui/Qt6QGtk3ThemePluginTargets.cmake:95 (message):
+#   The imported target "Qt6::QGtk3ThemePlugin" references the file
+#      "/usr/lib64/qt6/./plugins/platformthemes/libqgtk3.so"
+#   but this file does not exist.  Possible reasons include:
+#   * The file was deleted, renamed, or moved to another location.
+#   * An install or uninstall procedure did not complete successfully.
+#   * The installation package was faulty and contained
+#      "/usr/lib64/qt6/lib/cmake/Qt6Gui/Qt6QGtk3ThemePluginTargets.cmake"
+#   but not all the files it references.
+%define extra_devel_reqprov_Gui \
+Requires: %{name}-theme-gtk3 = %{EVRD}
+
 %define extra_devel_files_DBus \
 %{_qtdir}/bin/qdbuscpp2xml \
 %{_qtdir}/bin/qdbusxml2cpp
@@ -220,6 +235,7 @@ The legacy qmake build tool for Qt %{qtmajor}
 %package -n qt%{qtmajor}-cmake
 Summary: Cmake extensions for Qt %{qtmajor}
 Group: Development/KDE and Qt
+Requires: cmake
 
 %description -n qt%{qtmajor}-cmake
 Cmake extensions for Qt %{qtmajor}
