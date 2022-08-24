@@ -144,7 +144,9 @@ Requires: qmake-qt%{qtmajor} = %{EVRD} \
 #      "/usr/lib64/qt6/lib/cmake/Qt6Gui/Qt6QGtk3ThemePluginTargets.cmake"
 #   but not all the files it references.
 %define extra_devel_reqprov_Gui \
-Requires: %{name}-theme-gtk3 = %{EVRD}
+Requires: %{name}-theme-gtk3 = %{EVRD} \
+Requires: pkgconfig(egl) \
+Requires: pkgconfig(glesv2)
 
 %define extra_devel_files_DBus \
 %{_qtdir}/bin/qdbuscpp2xml \
