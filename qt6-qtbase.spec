@@ -17,6 +17,9 @@ Source100:	macros.qt6
 Patch1:		qtbase-6.4.0b2-compile.patch
 Patch2:		qtbase-6.2.0-aarch64-buildfix.patch
 #Patch3:		aarch64-qhash-fix-build-with-gcc.patch
+# Just because there IS a static libzstd doesn't mean we
+# want to use it...
+Patch4:		qtbase-6.4.0b4-prefer-shared-zstd.patch
 Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework

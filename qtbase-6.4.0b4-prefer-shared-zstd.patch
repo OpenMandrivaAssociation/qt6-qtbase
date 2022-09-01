@@ -1,0 +1,18 @@
+diff -up qtbase-everywhere-src-6.4.0-beta4/cmake/FindWrapZLIB.cmake.omv~ qtbase-everywhere-src-6.4.0-beta4/cmake/FindWrapZLIB.cmake
+diff -up qtbase-everywhere-src-6.4.0-beta4/cmake/FindWrapZSTD.cmake.omv~ qtbase-everywhere-src-6.4.0-beta4/cmake/FindWrapZSTD.cmake
+--- qtbase-everywhere-src-6.4.0-beta4/cmake/FindWrapZSTD.cmake.omv~	2022-09-01 20:50:25.946497407 +0200
++++ qtbase-everywhere-src-6.4.0-beta4/cmake/FindWrapZSTD.cmake	2022-09-01 20:50:45.596285455 +0200
+@@ -25,10 +25,10 @@ include(FindPackageHandleStandardArgs)
+ if(TARGET zstd::libzstd_static OR TARGET zstd::libzstd_shared)
+     find_package_handle_standard_args(WrapZSTD
+                                       REQUIRED_VARS zstd_VERSION VERSION_VAR zstd_VERSION)
+-    if(TARGET zstd::libzstd_static)
+-        set(zstdtargetsuffix "_static")
+-    else()
++    if(TARGET zstd::libzstd_shared)
+         set(zstdtargetsuffix "_shared")
++    else()
++        set(zstdtargetsuffix "_static")
+     endif()
+     if(NOT TARGET WrapZSTD::WrapZSTD)
+         add_library(WrapZSTD::WrapZSTD INTERFACE IMPORTED)
