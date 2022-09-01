@@ -1,5 +1,5 @@
 #define snapshot 20200627
-%define beta beta3
+%define beta beta4
 
 Name:		qt6-qtbase
 Version:	6.4.0
@@ -290,6 +290,8 @@ sed -i -e 's,@QTDIR@,%{_qtdir},g' src/gui/kernel/qguiapplication.cpp
 # FIXME Investigate
 #	-DQT_FEATURE_lttng:BOOL=ON
 
+# -DBUILD_WITH_PCH:BOOL=OFF is a workaround for
+# https://github.com/llvm/llvm-project/issues/57505
 %cmake -G Ninja \
 	-DCMAKE_INSTALL_PREFIX=%{_qtdir} \
 	-DQT_BUILD_EXAMPLES:BOOL=ON \
@@ -337,7 +339,8 @@ sed -i -e 's,@QTDIR@,%{_qtdir},g' src/gui/kernel/qguiapplication.cpp
 	-DQT_USE_BUNDLED_BundledHarfbuzz:BOOL=OFF \
 	-DQT_USE_BUNDLED_BundledLibpng:BOOL=OFF \
 	-DQT_USE_BUNDLED_BundledPcre2:BOOL=OFF \
-	-DQT_WILL_INSTALL:BOOL=ON
+	-DQT_WILL_INSTALL:BOOL=ON \
+	-DBUILD_WITH_PCH:BOOL=OFF
 
 %build
 export LD_LIBRARY_PATH="$(pwd)/build/lib:${LD_LIBRARY_PATH}"
