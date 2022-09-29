@@ -1,5 +1,5 @@
 #define snapshot 20200627
-%define beta rc
+#define beta rc
 
 Name:		qt6-qtbase
 Version:	6.4.0
