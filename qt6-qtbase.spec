@@ -2,7 +2,7 @@
 #define beta rc
 
 Name:		qt6-qtbase
-Version:	6.4.0
+Version:	6.4.1
 %if 0%{?snapshot:1}
 # "git archive"-d from "dev" branch of git://code.qt.io/qt/qtbase.git
 Source:		qtbase-%{snapshot}.tar.zst
@@ -14,13 +14,12 @@ Source100:	macros.qt6
 %{load:%{S:100}}
 #Patch0:		qtbase-6.0-rc2-examples-compile.patch
 #Patch1:		qtbase-init-pluginpath.patch
-Patch1:		qtbase-6.4.0b2-compile.patch
 Patch2:		qtbase-6.2.0-aarch64-buildfix.patch
 #Patch3:		aarch64-qhash-fix-build-with-gcc.patch
 # Just because there IS a static libzstd doesn't mean we
 # want to use it...
 Patch4:		qtbase-6.4.0b4-prefer-shared-zstd.patch
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}2
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
@@ -170,6 +169,7 @@ Requires: pkgconfig(glesv2)
 %define extra_files_Sql \
 %dir %{_qtdir}/plugins/sqldrivers \
 %{_qtdir}/plugins/sqldrivers/libqsqlite.so \
+%{_qtdir}/plugins/sqldrivers/libqsqlibase.so \
 %{_qtdir}/plugins/sqldrivers/libqsqlmysql.so \
 %{_qtdir}/plugins/sqldrivers/libqsqlodbc.so \
 %{_qtdir}/plugins/sqldrivers/libqsqlpsql.so
@@ -284,11 +284,11 @@ sed -i -e 's,@QTDIR@,%{_qtdir},g' src/gui/kernel/qguiapplication.cpp
 # FIXME This may be interesting for some boards
 #	-DQT_FEATURE_opengl_dynamic:BOOL=ON \
 #	-DQT_FEATURE_opengles2:BOOL=ON
-# But as of 6.0.0-rc2, it disables the even more useful X11 GLX plugin
-# opengles2 disables it in cmake, the others cause bogus linkage
+# But as of 6.4.1, it disables the X11 GLX plugin
 
 # FIXME Investigate
 #	-DQT_FEATURE_lttng:BOOL=ON
+#	-DQT_FEATURE_xcb_glx_plugin:BOOL=ON
 
 # -DBUILD_WITH_PCH:BOOL=OFF is a workaround for
 # https://github.com/llvm/llvm-project/issues/57505
