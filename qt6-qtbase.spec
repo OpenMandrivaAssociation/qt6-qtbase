@@ -73,7 +73,7 @@ BuildRequires:	pkgconfig(libsctp)
 BuildRequires:	pkgconfig(sqlite3)
 BuildRequires:	pkgconfig(libmariadb)
 BuildRequires:	pkgconfig(libpq)
-BuildRequires:	firebird-devel
+BuildRequires:	firebird-devel pkgconfig(fbclient)
 # For the theme only
 BuildRequires:	pkgconfig(gtk+-3.0)
 License:	LGPLv3/GPLv3/GPLv2
@@ -168,12 +168,7 @@ Requires: pkgconfig(glesv2)
 %{_qtdir}/plugins/printsupport/libcupsprintersupport.so
 
 %define extra_files_Sql \
-%dir %{_qtdir}/plugins/sqldrivers \
-%{_qtdir}/plugins/sqldrivers/libqsqlite.so \
-%{_qtdir}/plugins/sqldrivers/libqsqlibase.so \
-%{_qtdir}/plugins/sqldrivers/libqsqlmysql.so \
-%{_qtdir}/plugins/sqldrivers/libqsqlodbc.so \
-%{_qtdir}/plugins/sqldrivers/libqsqlpsql.so
+%dir %{_qtdir}/plugins/sqldrivers
 
 %define extra_devel_files_Test \
 %{_qtdir}/libexec/qt-testrunner.py
@@ -184,6 +179,55 @@ Requires: pkgconfig(glesv2)
 %qt6libs Core Concurrent DBus EglFSDeviceIntegration EglFsKmsSupport EglFsKmsGbmSupport Gui Network OpenGL OpenGLWidgets PrintSupport Sql Test Widgets XcbQpa Xml
 %qt6staticlibs DeviceDiscoverySupport FbSupport InputSupport KmsSupport
 
+%package sql-sqlite
+Summary: QtSQL plugin for accessing SQLite databases
+Group: System/Libraries
+
+%description sql-sqlite
+QtSQL plugin for accessing SQLite databases
+
+%files sql-sqlite
+%{_qtdir}/plugins/sqldrivers/libqsqlite.so
+
+%package sql-firebird
+Summary: QtSQL plugin for accessing Firebird and Interbase databases
+Group: System/Libraries
+
+%description sql-firebird
+QtSQL plugin for accessing Firebird and Interbase databases
+
+%files sql-firebird
+%{_qtdir}/plugins/sqldrivers/libqsqlibase.so
+
+%package sql-mariadb
+Summary: QtSQL plugin for accessing MariaDB and MySQL databases
+Group: System/Libraries
+
+%description sql-mariadb
+QtSQL plugin for accessing MariaDB and MySQL databases
+
+%files sql-mariadb
+%{_qtdir}/plugins/sqldrivers/libqsqlmysql.so
+
+%package sql-odbc
+Summary: QtSQL plugin for accessing databases through ODBC
+Group: System/Libraries
+
+%description sql-odbc
+QtSQL plugin for accessing databases through ODBC
+
+%files sql-odbc
+%{_qtdir}/plugins/sqldrivers/libqsqlodbc.so
+
+%package sql-postgresql
+Summary: QtSQL plugin for accessing PostgreSQL databases
+Group: System/Libraries
+
+%description sql-postgresql
+QtSQL plugin for accessing PostgreSQL databases
+
+%files sql-postgresql
+%{_qtdir}/plugins/sqldrivers/libqsqlpsql.so
 
 %package doc
 Summary: Documentation for the Qt %{qtmajor} framework
