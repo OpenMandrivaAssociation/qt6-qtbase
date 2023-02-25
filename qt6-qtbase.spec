@@ -1,8 +1,8 @@
 #define snapshot 20200627
-#define beta rc
+%define beta beta3
 
 Name:		qt6-qtbase
-Version:	6.4.2
+Version:	6.5.0
 %if 0%{?snapshot:1}
 # "git archive"-d from "dev" branch of git://code.qt.io/qt/qtbase.git
 Source:		qtbase-%{snapshot}.tar.zst
@@ -19,6 +19,9 @@ Patch2:		qtbase-6.2.0-aarch64-buildfix.patch
 # Just because there IS a static libzstd doesn't mean we
 # want to use it...
 Patch4:		qtbase-6.4.0b4-prefer-shared-zstd.patch
+# Patches 5 and 6 address https://bugreports.qt.io/browse/QTBUG-111514
+Patch5:		qt-6.5.0-detect-linker-version-script-lld-16.patch
+Patch6:		qt-6.5.0-fix-linker-version-scripts-lld-16.patch
 Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
@@ -89,8 +92,8 @@ Version %{qtmajor} of the Qt framework
 %dir %{_qtdir}/libexec \
 %{_qtdir}/libexec/moc \
 %{_qtdir}/libexec/rcc \
+%dir %{_qtdir}/metatypes \
 %dir %{_qtdir}/modules \
-%dir %{_qtdir}/lib/metatypes \
 %{_qtdir}/lib/pkgconfig/Qt6Platform.pc
 
 %define extra_devel_reqprov_Core \
@@ -289,16 +292,15 @@ Cmake extensions for Qt %{qtmajor}
 
 %files -n qt%{qtmajor}-cmake
 %{_qtdir}/bin/qt-cmake
-%{_qtdir}/bin/qt-cmake-private
-%{_qtdir}/bin/qt-cmake-private-install.cmake
-%{_qtdir}/bin/qt-cmake-standalone-test
 %{_qtdir}/libexec/cmake_automoc_parser
 %dir %{_qtdir}/lib/cmake
 %{_qtdir}/lib/cmake/Qt6
 %{_qtdir}/lib/cmake/Qt6BuildInternals
 %{_qtdir}/libexec/android_emulator_launcher.sh
 %{_prefix}/lib/rpm/macros.d/macros.qt6
-
+%{_qtdir}/libexec/qt-cmake-private
+%{_qtdir}/libexec/qt-cmake-private-install.cmake
+%{_qtdir}/libexec/qt-cmake-standalone-test
 
 %package tools
 Summary: Qt %{qtmajor} build tools
@@ -309,13 +311,16 @@ Qt %{qtmajor} build tools
 
 %files tools
 %{_qtdir}/bin/androiddeployqt
+%{_qtdir}/bin/androiddeployqt%{qtmajor}
 %{_qtdir}/bin/androidtestrunner
 %{_qtdir}/libexec/qlalr
 %{_qtdir}/bin/qtpaths
 %{_qtdir}/bin/qtpaths%{qtmajor}
 %{_qtdir}/libexec/qvkgen
-%{_qtdir}/libexec/syncqt.pl
 %{_qtdir}/libexec/tracegen
+%{_qtdir}/libexec/sanitizer-testrunner.py
+%{_qtdir}/libexec/syncqt
+%{_qtdir}/libexec/tracepointgen
 
 %prep
 %autosetup -p1 -n qtbase%{!?snapshot:-everywhere-src-%{version}%{?beta:-%{beta}}}
