@@ -1,6 +1,10 @@
 #define snapshot 20200627
 %define beta rc
 
+%ifarch %{aarch64}
+%global optflags %{optflags} -march=armv8-a+crypto
+%endif
+
 Name:		qt6-qtbase
 Version:	6.5.0
 %if 0%{?snapshot:1}
