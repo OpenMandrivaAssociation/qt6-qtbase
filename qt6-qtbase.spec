@@ -26,7 +26,7 @@ Patch4:		qtbase-6.4.0b4-prefer-shared-zstd.patch
 # Patches 5 and 6 address https://bugreports.qt.io/browse/QTBUG-111514
 Patch5:		qt-6.5.0-detect-linker-version-script-lld-16.patch
 Patch6:		qt-6.5.0-fix-linker-version-scripts-lld-16.patch
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}2
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
@@ -98,7 +98,8 @@ Version %{qtmajor} of the Qt framework
 %{_qtdir}/libexec/rcc \
 %dir %{_qtdir}/metatypes \
 %dir %{_qtdir}/modules \
-%{_qtdir}/lib/pkgconfig/Qt6Platform.pc
+%{_libdir}/pkgconfig/Qt6Platform.pc \
+%{_qtdir}/lib/pkgconfig
 
 %define extra_devel_reqprov_Core \
 Requires: %{name}-tools = %{EVRD} \
@@ -416,3 +417,22 @@ EOF
 # Put qmake-qt6 where some stuff (e.g. LO) looks for it
 mkdir -p %{buildroot}%{_bindir}
 ln -s %{_qtdir}/bin/qmake %{buildroot}%{_bindir}/qmake-qt6
+
+%qt6_postinstall
+ln -s ../../pkgconfig %{buildroot}%{_qtdir}/lib/pkgconfig
+
+# FIXME
+# Replace the %{_qtdir}/lib/pkgconfig from qt6-qtbase <= 6.5.0-1
+# with a symlink. This should be removed once we stop supporting
+# updating from a version of OMV with qt6-qtbase <= 6.5.0-1
+%pretrans -p <lua>
+st = posix.stat("%{_qtdir}/lib/pkgconfig")
+if st and st.type == "directory" then
+	for i,p in pairs(posix.dir("%{_qtdir}/lib/pkgconfig")) do
+		if(p ~= "." and p ~= "..") then
+			os.rename("%{_qtdir}/lib/pkgconfig/" .. p, "%{_libdir}/pkgconfig/" .. p)
+		end
+	end
+	posix.rmdir("%{_qtdir}/lib/pkgconfig")
+	posix.symlink("../../pkgconfig", "%{_qtdir}/lib/pkgconfig")
+end
