@@ -26,7 +26,7 @@ Patch4:		qtbase-6.4.0b4-prefer-shared-zstd.patch
 # Patches 5 and 6 address https://bugreports.qt.io/browse/QTBUG-111514
 Patch5:		qt-6.5.0-detect-linker-version-script-lld-16.patch
 Patch6:		qt-6.5.0-fix-linker-version-scripts-lld-16.patch
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}2
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}3
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
@@ -283,6 +283,8 @@ The legacy qmake build tool for Qt %{qtmajor}
 %{_qtdir}/bin/qmake
 %{_qtdir}/bin/qmake6
 %{_qtdir}/mkspecs
+%exclude %{_qtdir}/mkspecs/modules/*
+%{_qtdir}/mkspecs/modules/README
 %{_qtdir}/libexec/qt-internal-configure-tests
 %{_qtdir}/libexec/ensure_pro_file.cmake
 
