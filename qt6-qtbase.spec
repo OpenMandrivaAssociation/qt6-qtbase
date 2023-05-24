@@ -6,7 +6,7 @@
 %endif
 
 Name:		qt6-qtbase
-Version:	6.5.0
+Version:	6.5.1
 %if 0%{?snapshot:1}
 # "git archive"-d from "dev" branch of git://code.qt.io/qt/qtbase.git
 Source:		qtbase-%{snapshot}.tar.zst
@@ -26,7 +26,7 @@ Patch4:		qtbase-6.4.0b4-prefer-shared-zstd.patch
 # Patches 5 and 6 address https://bugreports.qt.io/browse/QTBUG-111514
 Patch5:		qt-6.5.0-detect-linker-version-script-lld-16.patch
 Patch6:		qt-6.5.0-fix-linker-version-scripts-lld-16.patch
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}3
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
@@ -185,7 +185,7 @@ Requires: pkgconfig(glesv2)
 %{_qtdir}/libexec/uic
 
 %qt6libs Core Concurrent DBus EglFSDeviceIntegration EglFsKmsSupport EglFsKmsGbmSupport Gui Network OpenGL OpenGLWidgets PrintSupport Sql Test Widgets XcbQpa Xml
-%qt6staticlibs DeviceDiscoverySupport FbSupport InputSupport KmsSupport
+%qt6staticlibs DeviceDiscoverySupport FbSupport ExampleIcons InputSupport KmsSupport
 
 %package sql-sqlite
 Summary: QtSQL plugin for accessing SQLite databases
@@ -419,6 +419,9 @@ EOF
 # Put qmake-qt6 where some stuff (e.g. LO) looks for it
 mkdir -p %{buildroot}%{_bindir}
 ln -s %{_qtdir}/bin/qmake %{buildroot}%{_bindir}/qmake-qt6
+
+# This seems to be accidentally installed
+rm -rf %{buildroot}%{_qtdir}/lib/objects-RelWithDebInfo/ExampleIconsPrivate_resources_1
 
 %qt6_postinstall
 ln -s ../../pkgconfig %{buildroot}%{_qtdir}/lib/pkgconfig
