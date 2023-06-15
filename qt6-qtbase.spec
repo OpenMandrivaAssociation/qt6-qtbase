@@ -1,12 +1,12 @@
 #define snapshot 20200627
-#define beta rc
+%define beta beta1
 
 %ifarch %{aarch64}
 %global optflags %{optflags} -march=armv8-a+crypto
 %endif
 
 Name:		qt6-qtbase
-Version:	6.5.1
+Version:	6.6.0
 %if 0%{?snapshot:1}
 # "git archive"-d from "dev" branch of git://code.qt.io/qt/qtbase.git
 Source:		qtbase-%{snapshot}.tar.zst
@@ -20,12 +20,6 @@ Source100:	macros.qt6
 #Patch1:		qtbase-init-pluginpath.patch
 Patch2:		qtbase-6.2.0-aarch64-buildfix.patch
 #Patch3:		aarch64-qhash-fix-build-with-gcc.patch
-# Just because there IS a static libzstd doesn't mean we
-# want to use it...
-Patch4:		qtbase-6.4.0b4-prefer-shared-zstd.patch
-# Patches 5 and 6 address https://bugreports.qt.io/browse/QTBUG-111514
-Patch5:		qt-6.5.0-detect-linker-version-script-lld-16.patch
-Patch6:		qt-6.5.0-fix-linker-version-scripts-lld-16.patch
 Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
@@ -299,6 +293,7 @@ Cmake extensions for Qt %{qtmajor}
 
 %files -n qt%{qtmajor}-cmake
 %{_qtdir}/bin/qt-cmake
+%{_qtdir}/bin/qt-cmake-create
 %{_qtdir}/libexec/cmake_automoc_parser
 %dir %{_qtdir}/lib/cmake
 %{_qtdir}/lib/cmake/Qt6
