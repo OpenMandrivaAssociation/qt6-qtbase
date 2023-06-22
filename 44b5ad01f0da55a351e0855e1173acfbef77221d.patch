@@ -1,0 +1,121 @@
+diff -up qtbase-everywhere-src-6.6.0-beta1/src/tools/moc/moc.cpp.2~ qtbase-everywhere-src-6.6.0-beta1/src/tools/moc/moc.cpp
+--- qtbase-everywhere-src-6.6.0-beta1/src/tools/moc/moc.cpp.2~	2023-06-06 14:09:02.000000000 +0200
++++ qtbase-everywhere-src-6.6.0-beta1/src/tools/moc/moc.cpp	2023-06-22 19:07:05.342680755 +0200
+@@ -409,8 +409,7 @@ bool Moc::parseFunction(FunctionDef *def
+     def->isVirtual = false;
+     def->isStatic = false;
+     //skip modifiers and attributes
+-    while (test(INLINE) || (test(STATIC) && (def->isStatic = true) == true) ||
+-        (test(VIRTUAL) && (def->isVirtual = true) == true) //mark as virtual
++    while (testForFunctionModifiers(def)
+         || skipCxxAttributes() || testFunctionAttribute(def) || testFunctionRevision(def)) {}
+     bool templateFunction = (lookup() == TEMPLATE);
+     def->type = parseType();
+@@ -426,6 +425,10 @@ bool Moc::parseFunction(FunctionDef *def
+         scopedFunctionName = def->type.isScoped;
+         def->type = Type("int");
+     } else {
++        // we might have modifiers and attributes after a tag
++        // note that testFunctionAttribute is handled further below,
++        // and revisions and attributes must come first
++        while (testForFunctionModifiers(def)) {}
+         Type tempType = parseType();;
+         while (!tempType.name.isEmpty() && lookup() != LPAREN) {
+             if (testFunctionAttribute(def->type.firstToken, def))
+@@ -509,14 +512,20 @@ bool Moc::parseFunction(FunctionDef *def
+     return true;
+ }
+ 
++bool Moc::testForFunctionModifiers(FunctionDef *def)
++{
++    return test(EXPLICIT) || test(INLINE) ||
++            (test(STATIC) && (def->isStatic = true)) ||
++            (test(VIRTUAL) && (def->isVirtual = true));
++}
++
+ // like parseFunction, but never aborts with an error
+ bool Moc::parseMaybeFunction(const ClassDef *cdef, FunctionDef *def)
+ {
+     def->isVirtual = false;
+     def->isStatic = false;
+     //skip modifiers and attributes
+-    while (test(EXPLICIT) || test(INLINE) || (test(STATIC) && (def->isStatic = true) == true) ||
+-        (test(VIRTUAL) && (def->isVirtual = true) == true) //mark as virtual
++    while (testForFunctionModifiers(def)
+         || skipCxxAttributes() || testFunctionAttribute(def) || testFunctionRevision(def)) {}
+     bool tilde = test(TILDE);
+     def->type = parseType();
+@@ -534,6 +543,10 @@ bool Moc::parseMaybeFunction(const Class
+             def->type = Type("int");
+         }
+     } else {
++        // ### TODO: The condition before testForFunctionModifiers shoulnd't be necessary,
++        // but otherwise we end up with misparses
++        if (def->isSlot || def->isSignal || def->isInvokable)
++            while (testForFunctionModifiers(def)) {}
+         Type tempType = parseType();;
+         while (!tempType.name.isEmpty() && lookup() != LPAREN) {
+             if (testFunctionAttribute(def->type.firstToken, def))
+diff -up qtbase-everywhere-src-6.6.0-beta1/src/tools/moc/moc.h.2~ qtbase-everywhere-src-6.6.0-beta1/src/tools/moc/moc.h
+--- qtbase-everywhere-src-6.6.0-beta1/src/tools/moc/moc.h.2~	2023-06-22 19:07:05.342680755 +0200
++++ qtbase-everywhere-src-6.6.0-beta1/src/tools/moc/moc.h	2023-06-22 19:07:30.209892611 +0200
+@@ -280,6 +280,7 @@ public:
+ 
+     void checkSuperClasses(ClassDef *def);
+     void checkProperties(ClassDef* cdef);
++    bool testForFunctionModifiers(FunctionDef *def);
+ };
+ 
+ inline QByteArray noRef(const QByteArray &type)
+diff -up qtbase-everywhere-src-6.6.0-beta1/tests/auto/tools/moc/tst_moc.cpp.2~ qtbase-everywhere-src-6.6.0-beta1/tests/auto/tools/moc/tst_moc.cpp
+--- qtbase-everywhere-src-6.6.0-beta1/tests/auto/tools/moc/tst_moc.cpp.2~	2023-06-06 14:09:02.000000000 +0200
++++ qtbase-everywhere-src-6.6.0-beta1/tests/auto/tools/moc/tst_moc.cpp	2023-06-22 19:07:05.343680763 +0200
+@@ -83,6 +83,19 @@ Q_DECLARE_METATYPE(const QMetaObject*);
+ 
+ #define TESTEXPORTMACRO Q_DECL_EXPORT
+ 
++#if !defined(Q_MOC_RUN) && !defined(Q_NOREPLY)
++# define Q_NOREPLY
++#endif
++
++struct TagTest : QObject {
++    Q_OBJECT
++
++    Q_INVOKABLE Q_NOREPLY inline int test() {return 0;}
++public slots:
++    Q_NOREPLY virtual inline void pamOpen(int){}
++};
++
++
+ namespace TestNonQNamespace {
+ 
+ struct TestGadget {
+@@ -787,6 +800,7 @@ private slots:
+     void privateQPropertyShim();
+     void readWriteThroughBindable();
+     void invokableCtors();
++    void virtualInlineTaggedSlot();
+ 
+ signals:
+     void sigWithUnsignedArg(unsigned foo);
+@@ -4575,6 +4589,20 @@ void tst_Moc::invokableCtors()
+     QCOMPARE(result2.m_thing, 17);
+ }
+ 
++void tst_Moc::virtualInlineTaggedSlot()
++{
++    auto mo = TagTest::staticMetaObject;
++    auto idx = mo.indexOfMethod("pamOpen(int)");
++    auto method = mo.method(idx);
++    QVERIFY(method.isValid()); // fails!
++    QCOMPARE(method.tag(), "Q_NOREPLY");
++    idx = mo.indexOfMethod("test()");
++    method = mo.method(idx);
++    QVERIFY(method.isValid());
++    QCOMPARE(method.tag(), "Q_NOREPLY");
++    QCOMPARE(method.returnMetaType(), QMetaType::fromType<int>());
++}
++
+ QTEST_MAIN(tst_Moc)
+ 
+ // the generated code must compile with QT_NO_KEYWORDS

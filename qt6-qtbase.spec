@@ -20,7 +20,10 @@ Source100:	macros.qt6
 #Patch1:		qtbase-init-pluginpath.patch
 Patch2:		qtbase-6.2.0-aarch64-buildfix.patch
 #Patch3:		aarch64-qhash-fix-build-with-gcc.patch
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
+# Backports from master
+# https://bugreports.qt.io/browse/QTBUG-111330
+Patch1000:	44b5ad01f0da55a351e0855e1173acfbef77221d.patch
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}2
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
