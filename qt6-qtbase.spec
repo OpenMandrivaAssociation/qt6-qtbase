@@ -21,7 +21,7 @@ Source100:	macros.qt6
 Patch0:		qtbase-6.6.0-b2-QTBUG-115243.patch
 Patch2:		qtbase-6.2.0-aarch64-buildfix.patch
 #Patch3:		aarch64-qhash-fix-build-with-gcc.patch
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}2
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
@@ -108,6 +108,7 @@ Requires: qmake-qt%{qtmajor} = %{EVRD} \
 %{_qtdir}/plugins/egldeviceintegrations/libqeglfs-x11-integration.so \
 %dir %{_qtdir}/plugins/xcbglintegrations \
 %{_qtdir}/plugins/xcbglintegrations/libqxcb-egl-integration.so \
+%{_qtdir}/plugins/xcbglintegrations/libqxcb-glx-integration.so\
 %dir %{_qtdir}/plugins/generic \
 %{_qtdir}/plugins/generic/libqevdevkeyboardplugin.so \
 %{_qtdir}/plugins/generic/libqevdevmouseplugin.so \
@@ -337,11 +338,12 @@ sed -i -e 's,@QTDIR@,%{_qtdir},g' src/gui/kernel/qguiapplication.cpp
 # FIXME This may be interesting for some boards
 #	-DQT_FEATURE_opengl_dynamic:BOOL=ON \
 #	-DQT_FEATURE_opengles2:BOOL=ON
-# But as of 6.4.1, it disables the X11 GLX plugin
+# But as of 6.6.0-beta2, it disables the X11 GLX plugin and
+# enabling any GLES driver breaks video output in QMplay2 and
+# obs-studio
 
 # FIXME Investigate
 #	-DQT_FEATURE_lttng:BOOL=ON
-#	-DQT_FEATURE_xcb_glx_plugin:BOOL=ON
 
 # -DBUILD_WITH_PCH:BOOL=OFF is a workaround for
 # https://github.com/llvm/llvm-project/issues/57505
@@ -354,12 +356,12 @@ sed -i -e 's,@QTDIR@,%{_qtdir},g' src/gui/kernel/qguiapplication.cpp
 	-DQT_FEATURE_dynamicgl:BOOL=ON \
 	-DQT_FEATURE_ipc_posix:BOOL=ON \
 	-DQT_FEATURE_journald:BOOL=ON \
-	-DQT_FEATURE_opengl_dynamic:BOOL=ON \
+	-DQT_FEATURE_opengl_dynamic:BOOL=OFF \
 	-DQT_FEATURE_opengl_desktop:BOOL=ON \
-	-DQT_FEATURE_opengles2:BOOL=ON \
-	-DQT_FEATURE_opengles3:BOOL=ON \
-	-DQT_FEATURE_opengles31:BOOL=ON \
-	-DQT_FEATURE_opengles32:BOOL=ON \
+	-DQT_FEATURE_opengles2:BOOL=OFF \
+	-DQT_FEATURE_opengles3:BOOL=OFF \
+	-DQT_FEATURE_opengles31:BOOL=OFF \
+	-DQT_FEATURE_opengles32:BOOL=OFF \
 	-DQT_FEATURE_use_lld_linker:BOOL=ON \
 	-DQT_FEATURE_xcb_native_painting:BOOL=ON \
 	-DQT_FEATURE_openssl:BOOL=ON \
