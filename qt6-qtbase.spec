@@ -100,6 +100,9 @@ Version %{qtmajor} of the Qt framework
 Requires: %{name}-tools = %{EVRD} \
 Requires: qmake-qt%{qtmajor} = %{EVRD} \
 
+%define extra_devel_reqprov_Gui \
+Requires: cmake(Qt6DBus)
+
 %define extra_files_Gui \
 %dir %{_qtdir}/plugins/egldeviceintegrations \
 %{_qtdir}/plugins/egldeviceintegrations/libqeglfs-emu-integration.so \
