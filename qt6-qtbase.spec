@@ -1,5 +1,5 @@
 #define snapshot 20200627
-%define beta beta2
+%define beta beta3
 
 %ifarch %{aarch64}
 %global optflags %{optflags} -march=armv8-a+crypto
@@ -18,10 +18,9 @@ Source100:	macros.qt6
 %{load:%{S:100}}
 #Patch0:		qtbase-6.0-rc2-examples-compile.patch
 #Patch1:		qtbase-init-pluginpath.patch
-Patch0:		qtbase-6.6.0-b2-QTBUG-115243.patch
 Patch2:		qtbase-6.2.0-aarch64-buildfix.patch
 #Patch3:		aarch64-qhash-fix-build-with-gcc.patch
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}2
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
