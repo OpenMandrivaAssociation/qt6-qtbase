@@ -74,7 +74,8 @@ BuildRequires:	pkgconfig(libsctp)
 BuildRequires:	pkgconfig(sqlite3)
 BuildRequires:	pkgconfig(libmariadb)
 BuildRequires:	pkgconfig(libpq)
-BuildRequires:	firebird-devel pkgconfig(fbclient)
+BuildRequires:	firebird-devel
+BuildRequires:	pkgconfig(fbclient)
 # For the theme only
 BuildRequires:	pkgconfig(gtk+-3.0)
 License:	LGPLv3/GPLv3/GPLv2
@@ -173,6 +174,9 @@ Requires: pkgconfig(glesv2)
 %dir %{_qtdir}/plugins/printsupport \
 %{_qtdir}/plugins/printsupport/libcupsprintersupport.so
 
+%define extra_devel_reqprov_Sql \
+Requires: %{name}-sql-sqlite
+
 %define extra_files_Sql \
 %dir %{_qtdir}/plugins/sqldrivers
 
@@ -245,7 +249,6 @@ Documentation for the Qt %{qtmajor} framework
 %files doc
 %{_qtdir}/doc
 
-
 %package examples
 Summary: Examples for the Qt %{qtmajor} framework
 Group: Documentation
@@ -255,7 +258,6 @@ Documentation for the Qt %{qtmajor} framework
 
 %files examples
 %{_qtdir}/examples
-
 
 %package theme-gtk3
 Summary: GTK3 Theme for Qt %{qtmajor}
@@ -267,7 +269,6 @@ GTK3 Theme for Qt %{qtmajor}
 
 %files theme-gtk3
 %{_qtdir}/plugins/platformthemes/libqgtk3.so
-
 
 %package -n qmake-qt%{qtmajor}
 Summary: The legacy qmake build tool for Qt %{qtmajor}
@@ -285,7 +286,6 @@ The legacy qmake build tool for Qt %{qtmajor}
 %{_qtdir}/mkspecs/modules/README
 %{_qtdir}/libexec/qt-internal-configure-tests
 %{_qtdir}/libexec/ensure_pro_file.cmake
-
 
 %package -n qt%{qtmajor}-cmake
 Summary: Cmake extensions for Qt %{qtmajor}
