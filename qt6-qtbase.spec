@@ -20,7 +20,7 @@ Source100:	macros.qt6
 #Patch1:		qtbase-init-pluginpath.patch
 Patch2:		qtbase-6.2.0-aarch64-buildfix.patch
 #Patch3:		aarch64-qhash-fix-build-with-gcc.patch
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}2
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
@@ -258,6 +258,7 @@ Documentation for the Qt %{qtmajor} framework
 
 %files examples
 %{_qtdir}/examples
+%{_qtdir}/lib/objects-RelWithDebInfo/ExampleIconsPrivate_resources_1
 
 %package theme-gtk3
 Summary: GTK3 Theme for Qt %{qtmajor}
@@ -419,9 +420,6 @@ EOF
 # Put qmake-qt6 where some stuff (e.g. LO) looks for it
 mkdir -p %{buildroot}%{_bindir}
 ln -s %{_qtdir}/bin/qmake %{buildroot}%{_bindir}/qmake-qt6
-
-# This seems to be accidentally installed
-rm -rf %{buildroot}%{_qtdir}/lib/objects-RelWithDebInfo/ExampleIconsPrivate_resources_1
 
 %qt6_postinstall
 ln -s ../../pkgconfig %{buildroot}%{_qtdir}/lib/pkgconfig
