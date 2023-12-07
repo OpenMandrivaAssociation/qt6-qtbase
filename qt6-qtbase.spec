@@ -20,7 +20,7 @@ Source100:	macros.qt6
 #Patch1:		qtbase-init-pluginpath.patch
 Patch2:		qtbase-6.2.0-aarch64-buildfix.patch
 #Patch3:		aarch64-qhash-fix-build-with-gcc.patch
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}2
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
@@ -99,9 +99,15 @@ Version %{qtmajor} of the Qt framework
 %define extra_devel_reqprov_Core \
 Requires: %{name}-tools = %{EVRD} \
 Requires: qmake-qt%{qtmajor} = %{EVRD} \
+Requires: cmake(Qt6)
 
 %define extra_devel_reqprov_Gui \
-Requires: cmake(Qt6DBus)
+Requires: cmake(Qt6DBus) \
+Requires: pkgconfig(egl) \
+Requires: pkgconfig(glesv2)
+
+%define extra_devel_reqprov_Widgets \
+Requires: cmake(Qt6Gui)
 
 %define extra_files_Gui \
 %dir %{_qtdir}/plugins/egldeviceintegrations \
@@ -137,23 +143,6 @@ Requires: cmake(Qt6DBus)
 %{_qtdir}/plugins/platforms/libqxcb.so \
 %dir %{_qtdir}/plugins/platformthemes \
 %{_qtdir}/plugins/platformthemes/libqxdgdesktopportal.so
-
-# FIXME this really shouldn't be necessary, but the cmake files
-# perform a mistaken integrity check.
-# Not requiring all the plugins results in
-# CMake Error at /usr/lib64/qt6/lib/cmake/Qt6Gui/Qt6QGtk3ThemePluginTargets.cmake:95 (message):
-#   The imported target "Qt6::QGtk3ThemePlugin" references the file
-#      "/usr/lib64/qt6/./plugins/platformthemes/libqgtk3.so"
-#   but this file does not exist.  Possible reasons include:
-#   * The file was deleted, renamed, or moved to another location.
-#   * An install or uninstall procedure did not complete successfully.
-#   * The installation package was faulty and contained
-#      "/usr/lib64/qt6/lib/cmake/Qt6Gui/Qt6QGtk3ThemePluginTargets.cmake"
-#   but not all the files it references.
-%define extra_devel_reqprov_Gui \
-Requires: %{name}-theme-gtk3 = %{EVRD} \
-Requires: pkgconfig(egl) \
-Requires: pkgconfig(glesv2)
 
 %define extra_devel_files_DBus \
 %{_qtdir}/bin/qdbuscpp2xml \
