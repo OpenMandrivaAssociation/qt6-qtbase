@@ -20,7 +20,7 @@ Source100:	macros.qt6
 #Patch1:		qtbase-init-pluginpath.patch
 Patch2:		qtbase-6.2.0-aarch64-buildfix.patch
 #Patch3:		aarch64-qhash-fix-build-with-gcc.patch
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}2
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
@@ -144,6 +144,25 @@ Requires: cmake(Qt6Gui)
 %dir %{_qtdir}/plugins/platformthemes \
 %{_qtdir}/plugins/platformthemes/libqxdgdesktopportal.so
 
+%define extra_devel_files_FbSupport \
+%{_qtdir}/mkspecs/modules/qt_lib_fb_support_private.pri
+
+%define extra_devel_files_InputSupport \
+%{_qtdir}/mkspecs/modules/qt_lib_input_support_private.pri
+
+%define extra_devel_files_EglFsKmsSupport \
+%{_qtdir}/mkspecs/modules/qt_lib_eglfs_kms_support_private.pri \
+%{_qtdir}/mkspecs/modules/qt_lib_kms_support_private.pri
+
+%define extra_devel_files_EglFsKmsGbmSupport \
+%{_qtdir}/mkspecs/modules/qt_lib_eglfs_kms_gbm_support_private.pri
+
+%define extra_devel_files_DeviceDiscoverySupport \
+%{_qtdir}/mkspecs/modules/qt_lib_devicediscovery_support_private.pri
+
+%define extra_devel_files_XcbQpa \
+%{_qtdir}/mkspecs/modules/qt_lib_xcb_qpa_lib_private.pri
+
 %define extra_devel_files_DBus \
 %{_qtdir}/bin/qdbuscpp2xml \
 %{_qtdir}/bin/qdbusxml2cpp
@@ -170,10 +189,16 @@ Requires: %{name}-sql-sqlite
 %dir %{_qtdir}/plugins/sqldrivers
 
 %define extra_devel_files_Test \
-%{_qtdir}/libexec/qt-testrunner.py
+%{_qtdir}/libexec/qt-testrunner.py \
+%{_qtdir}/mkspecs/modules/qt_lib_testlib.pri \
+%{_qtdir}/mkspecs/modules/qt_lib_testlib_private.pri
 
 %define extra_devel_files_Widgets \
 %{_qtdir}/libexec/uic
+
+%define extra_devel_files_ExampleIcons \
+%{_qtdir}/lib/objects-RelWithDebInfo/ExampleIconsPrivate_resources_1 \
+%{_qtdir}/mkspecs/modules/qt_lib_example_icons_private.pri
 
 %qt6libs Core Concurrent DBus EglFSDeviceIntegration EglFsKmsSupport EglFsKmsGbmSupport Gui Network OpenGL OpenGLWidgets PrintSupport Sql Test Widgets XcbQpa Xml
 %qt6staticlibs DeviceDiscoverySupport FbSupport ExampleIcons InputSupport KmsSupport
@@ -247,7 +272,6 @@ Documentation for the Qt %{qtmajor} framework
 
 %files examples
 %{_qtdir}/examples
-%{_qtdir}/lib/objects-RelWithDebInfo/ExampleIconsPrivate_resources_1
 
 %package theme-gtk3
 Summary: GTK3 Theme for Qt %{qtmajor}
