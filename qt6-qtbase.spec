@@ -1,5 +1,5 @@
 #define snapshot 20200627
-%define beta beta1
+%define beta beta2
 
 %ifarch %{aarch64}
 %global optflags %{optflags} -march=armv8-a+crypto
@@ -20,7 +20,7 @@ Source100:	macros.qt6
 #Patch1:		qtbase-init-pluginpath.patch
 Patch2:		qtbase-6.2.0-aarch64-buildfix.patch
 #Patch3:		aarch64-qhash-fix-build-with-gcc.patch
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}2
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
@@ -75,7 +75,6 @@ BuildRequires:	pkgconfig(sqlite3)
 BuildRequires:	pkgconfig(libmariadb)
 BuildRequires:	pkgconfig(libpq)
 BuildRequires:	firebird-devel
-BuildRequires:	pkgconfig(fbclient)
 # For the theme only
 BuildRequires:	pkgconfig(gtk+-3.0)
 License:	LGPLv3/GPLv3/GPLv2
