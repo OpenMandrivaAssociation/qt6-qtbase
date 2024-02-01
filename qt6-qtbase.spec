@@ -75,6 +75,7 @@ BuildRequires:	pkgconfig(sqlite3)
 BuildRequires:	pkgconfig(libmariadb)
 BuildRequires:	pkgconfig(libpq)
 BuildRequires:	firebird-devel
+BuildRequires:	%mklibname -d fbclient
 # For the theme only
 BuildRequires:	pkgconfig(gtk+-3.0)
 License:	LGPLv3/GPLv3/GPLv2
