@@ -1,0 +1,204 @@
+commit 2f839a7fb6e142417d8956d6307d01b116677891
+Author: Bernhard Rosenkränzer <bero@lindev.ch>
+Date:   Thu Mar 14 04:12:40 2024 +0100
+
+    Revert "Ensure QWidget::destroy() events and attributes match hiding the widget"
+    
+    This reverts commit 0531e444a78330eb9ce22afcf9b4d2e4a8b66105.
+    
+    That commit causes dolphin to crash on startup.
+
+diff --git a/src/widgets/kernel/qwidget.cpp b/src/widgets/kernel/qwidget.cpp
+index 81c6a6f7d8..082e2592fd 100644
+--- a/src/widgets/kernel/qwidget.cpp
++++ b/src/widgets/kernel/qwidget.cpp
+@@ -8456,7 +8456,8 @@ void QWidgetPrivate::setVisible(bool visible)
+ 
+         if (!q->testAttribute(Qt::WA_WState_Hidden)) {
+             q->setAttribute(Qt::WA_WState_Hidden);
+-            hide_helper();
++            if (q->testAttribute(Qt::WA_WState_Created))
++                hide_helper();
+         }
+ 
+         // invalidate layout similar to updateGeometry()
+@@ -10924,12 +10925,10 @@ void QWidget::setParent(QWidget *parent, Qt::WindowFlags f)
+             }
+             if (recreate) {
+                 const auto windowStateBeforeDestroy = newtlw->windowState();
+-                const auto visibilityBeforeDestroy = newtlw->isVisible();
+                 newtlw->destroy();
+                 newtlw->create();
+                 Q_ASSERT(newtlw->windowHandle());
+                 newtlw->windowHandle()->setWindowStates(windowStateBeforeDestroy);
+-                QWidgetPrivate::get(newtlw)->setVisible(visibilityBeforeDestroy);
+             }
+         }
+     }
+diff --git a/tests/auto/widgets/kernel/qwidget/tst_qwidget.cpp b/tests/auto/widgets/kernel/qwidget/tst_qwidget.cpp
+index 761d341279..79476c441a 100644
+--- a/tests/auto/widgets/kernel/qwidget/tst_qwidget.cpp
++++ b/tests/auto/widgets/kernel/qwidget/tst_qwidget.cpp
+@@ -122,34 +122,6 @@ static QByteArray msgComparisonFailed(T v1, const char *op, T v2)
+     return s.toLocal8Bit();
+ }
+ 
+-template<class T> class EventSpy : public QObject
+-{
+-public:
+-    EventSpy(T *widget, QEvent::Type event)
+-        : m_widget(widget), eventToSpy(event)
+-    {
+-        if (m_widget)
+-            m_widget->installEventFilter(this);
+-    }
+-
+-    T *widget() const { return m_widget; }
+-    int count() const { return m_count; }
+-    void clear() { m_count = 0; }
+-
+-protected:
+-    bool eventFilter(QObject *object, QEvent *event) override
+-    {
+-        if (event->type() == eventToSpy)
+-            ++m_count;
+-        return  QObject::eventFilter(object, event);
+-    }
+-
+-private:
+-    T *m_widget;
+-    const QEvent::Type eventToSpy;
+-    int m_count = 0;
+-};
+-
+ Q_LOGGING_CATEGORY(lcTests, "qt.widgets.tests")
+ 
+ class tst_QWidget : public QObject
+@@ -255,7 +227,6 @@ private slots:
+ 
+     void ensureCreated();
+     void createAndDestroy();
+-    void eventsAndAttributesOnDestroy();
+     void winIdChangeEvent();
+     void persistentWinId();
+     void showNativeChild();
+@@ -5292,84 +5263,6 @@ void tst_QWidget::createAndDestroy()
+     QVERIFY(widget.internalWinId());
+ }
+ 
+-void tst_QWidget::eventsAndAttributesOnDestroy()
+-{
+-    // The events and attributes when destroying a widget should
+-    // include those of hiding the widget.
+-
+-    CreateDestroyWidget widget;
+-    EventSpy<QWidget> showEventSpy(&widget, QEvent::Show);
+-    EventSpy<QWidget> hideEventSpy(&widget, QEvent::Hide);
+-
+-    QCOMPARE(widget.testAttribute(Qt::WA_WState_Created), false);
+-    QCOMPARE(widget.testAttribute(Qt::WA_WState_Visible), false);
+-    QCOMPARE(widget.testAttribute(Qt::WA_Mapped), false);
+-
+-    widget.show();
+-    QCOMPARE(widget.testAttribute(Qt::WA_WState_Created), true);
+-    QCOMPARE(widget.testAttribute(Qt::WA_WState_Visible), true);
+-    QTRY_COMPARE(widget.testAttribute(Qt::WA_Mapped), true);
+-    QCOMPARE(showEventSpy.count(), 1);
+-    QCOMPARE(hideEventSpy.count(), 0);
+-
+-    widget.hide();
+-    QCOMPARE(widget.testAttribute(Qt::WA_WState_Created), true);
+-    QCOMPARE(widget.testAttribute(Qt::WA_WState_Visible), false);
+-    QCOMPARE(widget.testAttribute(Qt::WA_Mapped), false);
+-    QCOMPARE(showEventSpy.count(), 1);
+-    QCOMPARE(hideEventSpy.count(), 1);
+-
+-    widget.show();
+-    QCOMPARE(widget.testAttribute(Qt::WA_WState_Created), true);
+-    QCOMPARE(widget.testAttribute(Qt::WA_WState_Visible), true);
+-    QTRY_COMPARE(widget.testAttribute(Qt::WA_Mapped), true);
+-    QCOMPARE(showEventSpy.count(), 2);
+-    QCOMPARE(hideEventSpy.count(), 1);
+-
+-    widget.destroy();
+-    QCOMPARE(widget.testAttribute(Qt::WA_WState_Created), false);
+-    QCOMPARE(widget.testAttribute(Qt::WA_WState_Visible), false);
+-    QCOMPARE(widget.testAttribute(Qt::WA_Mapped), false);
+-    QCOMPARE(showEventSpy.count(), 2);
+-    QCOMPARE(hideEventSpy.count(), 2);
+-
+-    const int hideEventsAfterDestroy = hideEventSpy.count();
+-
+-    widget.create();
+-    QCOMPARE(widget.testAttribute(Qt::WA_WState_Created), true);
+-    QCOMPARE(widget.testAttribute(Qt::WA_WState_Visible), false);
+-    QCOMPARE(widget.testAttribute(Qt::WA_Mapped), false);
+-    QCOMPARE(showEventSpy.count(), 2);
+-    QCOMPARE(hideEventSpy.count(), hideEventsAfterDestroy);
+-
+-    QWidgetPrivate::get(&widget)->setVisible(true);
+-    QCOMPARE(widget.testAttribute(Qt::WA_WState_Created), true);
+-    QCOMPARE(widget.testAttribute(Qt::WA_WState_Visible), true);
+-    QTRY_COMPARE(widget.testAttribute(Qt::WA_Mapped), true);
+-    QCOMPARE(showEventSpy.count(), 3);
+-    QCOMPARE(hideEventSpy.count(), hideEventsAfterDestroy);
+-
+-    // Make sure the destroy that happens when a top level
+-    // is moved to being a child does not prevent the child
+-    // being shown again.
+-
+-    QWidget parent;
+-    QWidget child;
+-    parent.show();
+-    QVERIFY(QTest::qWaitForWindowExposed(&parent));
+-    child.show();
+-    QVERIFY(QTest::qWaitForWindowExposed(&child));
+-
+-    child.setParent(&parent);
+-    QCOMPARE(child.testAttribute(Qt::WA_WState_Created), false);
+-    QCOMPARE(child.testAttribute(Qt::WA_WState_Visible), false);
+-
+-    child.show();
+-    QCOMPARE(child.testAttribute(Qt::WA_WState_Created), true);
+-    QCOMPARE(child.testAttribute(Qt::WA_WState_Visible), true);
+-    QVERIFY(QTest::qWaitForWindowExposed(&child));
+-}
+-
+ void tst_QWidget::winIdChangeEvent()
+ {
+     {
+@@ -7168,6 +7061,34 @@ void tst_QWidget::setFocus()
+     }
+ }
+ 
++template<class T> class EventSpy : public QObject
++{
++public:
++    EventSpy(T *widget, QEvent::Type event)
++        : m_widget(widget), eventToSpy(event)
++    {
++        if (m_widget)
++            m_widget->installEventFilter(this);
++    }
++
++    T *widget() const { return m_widget; }
++    int count() const { return m_count; }
++    void clear() { m_count = 0; }
++
++protected:
++    bool eventFilter(QObject *object, QEvent *event) override
++    {
++        if (event->type() == eventToSpy)
++            ++m_count;
++        return  QObject::eventFilter(object, event);
++    }
++
++private:
++    T *m_widget;
++    const QEvent::Type eventToSpy;
++    int m_count = 0;
++};
++
+ #ifndef QT_NO_CURSOR
+ void tst_QWidget::setCursor()
+ {

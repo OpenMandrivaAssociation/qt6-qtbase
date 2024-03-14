@@ -20,12 +20,9 @@ Source100:	macros.qt6
 #Patch1:		qtbase-init-pluginpath.patch
 Patch2:		qtbase-6.2.0-aarch64-buildfix.patch
 #Patch3:		aarch64-qhash-fix-build-with-gcc.patch
-# Commit a7f052319bb6b718172c00afe1e98862db835d9a causes some applications
-# to crash on startup. Known breakages: obs-studio, vokoscreenNG, calibre
-# https://bugreports.qt.io/browse/QTBUG-122039
-# (Fixed at least for many widgets in 6.7-beta3, leaving the patch here if the problem
-# resurfaces for other widgets for now)
-#Patch4:		revert-a7f052319bb6b718172c00afe1e98862db835d9a.patch
+# Commit 0531e444a78330eb9ce22afcf9b4d2e4a8b66105 causes dolphin to crash on startup.
+# https://invent.kde.org/system/dolphin/-/issues/58
+Patch4:		revert-0531e444a78330eb9ce22afcf9b4d2e4a8b66105.patch
 Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
