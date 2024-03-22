@@ -1,5 +1,5 @@
 #define snapshot 20200627
-%define beta rc
+%define beta rc2
 
 %ifarch %{aarch64}
 %global optflags %{optflags} -march=armv8-a+crypto
