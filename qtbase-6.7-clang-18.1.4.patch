@@ -1,0 +1,12 @@
+diff -up qtbase-everywhere-src-6.7.0/src/corelib/time/qdatetime.h.omv~ qtbase-everywhere-src-6.7.0/src/corelib/time/qdatetime.h
+--- qtbase-everywhere-src-6.7.0/src/corelib/time/qdatetime.h.omv~	2024-05-01 17:56:39.748394217 +0200
++++ qtbase-everywhere-src-6.7.0/src/corelib/time/qdatetime.h	2024-05-01 17:56:49.756496067 +0200
+@@ -529,7 +529,7 @@ public:
+     QT_POST_CXX17_API_IN_EXPORTED_CLASS
+     static QDateTime fromStdLocalTime(const std::chrono::local_time<std::chrono::milliseconds> &time)
+     {
+-        QDateTime result(QDate(1970, 1, 1), QTime(0, 0, 0));
++        QDateTime result(QDate(1970, 1, 1), QTime(0, 0, 0), TransitionResolution::LegacyBehavior);
+         return result.addMSecs(time.time_since_epoch().count());
+     }
+ 
