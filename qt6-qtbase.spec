@@ -24,7 +24,7 @@ Patch2:		qtbase-6.2.0-aarch64-buildfix.patch
 # https://invent.kde.org/system/dolphin/-/issues/58
 Patch4:		revert-0531e444a78330eb9ce22afcf9b4d2e4a8b66105.patch
 Patch6:		qtbase-6.7-clang-18.1.4.patch
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}2
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
