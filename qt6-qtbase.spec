@@ -185,6 +185,9 @@ Requires: cmake(Qt6Gui)
 %dir %{_qtdir}/plugins/printsupport \
 %{_qtdir}/plugins/printsupport/libcupsprintersupport.so
 
+%define extra_devel_reqprov_PrintSupport \
+Requires: pkgconfig(cups)
+
 %define extra_devel_reqprov_Sql \
 Requires: %{name}-sql-sqlite
 
