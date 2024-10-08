@@ -6,7 +6,7 @@
 %endif
 
 Name:		qt6-qtbase
-Version:	6.7.3
+Version:	6.8.0
 %if 0%{?snapshot:1}
 # "git archive"-d from "dev" branch of git://code.qt.io/qt/qtbase.git
 Source:		qtbase-%{snapshot}.tar.zst
@@ -20,9 +20,10 @@ Source100:	macros.qt6
 #Patch1:		qtbase-init-pluginpath.patch
 Patch2:		qtbase-6.2.0-aarch64-buildfix.patch
 #Patch3:		aarch64-qhash-fix-build-with-gcc.patch
-# Commit 0531e444a78330eb9ce22afcf9b4d2e4a8b66105 causes dolphin to crash on startup.
+# In 6.7.0, commit 0531e444a78330eb9ce22afcf9b4d2e4a8b66105 causes dolphin to crash on startup.
+# Need to verify this is fixed now, or revert the patch again
 # https://invent.kde.org/system/dolphin/-/issues/58
-Patch4:		revert-0531e444a78330eb9ce22afcf9b4d2e4a8b66105.patch
+#Patch4:		revert-0531e444a78330eb9ce22afcf9b4d2e4a8b66105.patch
 Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
@@ -207,7 +208,7 @@ Requires: %{name}-sql-sqlite
 %{_qtdir}/mkspecs/modules/qt_lib_example_icons_private.pri
 
 %qt6libs Core Concurrent DBus EglFSDeviceIntegration EglFsKmsSupport EglFsKmsGbmSupport Gui Network OpenGL OpenGLWidgets PrintSupport Sql Test Widgets XcbQpa Xml
-%qt6staticlibs DeviceDiscoverySupport FbSupport ExampleIcons InputSupport KmsSupport
+%qt6staticlibs DeviceDiscoverySupport ExamplesAssetDownloader FbSupport ExampleIcons InputSupport KmsSupport
 
 %package sql-sqlite
 Summary: QtSQL plugin for accessing SQLite databases
