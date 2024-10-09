@@ -24,7 +24,9 @@ Patch2:		qtbase-6.2.0-aarch64-buildfix.patch
 # Need to verify this is fixed now, or revert the patch again
 # https://invent.kde.org/system/dolphin/-/issues/58
 #Patch4:		revert-0531e444a78330eb9ce22afcf9b4d2e4a8b66105.patch
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
+# https://bugs.kde.org/493116
+Patch5:		https://code.qt.io/cgit/qt/qtbase.git/patch/?id=2ea3abed0125d81ca4f3bacb9650db7314657332#/2ea3abed.patch
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}2
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
