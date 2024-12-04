@@ -6,7 +6,7 @@
 %endif
 
 Name:		qt6-qtbase
-Version:	6.8.0
+Version:	6.8.1
 %if 0%{?snapshot:1}
 # "git archive"-d from "dev" branch of git://code.qt.io/qt/qtbase.git
 Source:		qtbase-%{snapshot}.tar.zst
@@ -20,13 +20,7 @@ Source100:	macros.qt6
 #Patch1:		qtbase-init-pluginpath.patch
 Patch2:		qtbase-6.2.0-aarch64-buildfix.patch
 #Patch3:		aarch64-qhash-fix-build-with-gcc.patch
-# In 6.7.0, commit 0531e444a78330eb9ce22afcf9b4d2e4a8b66105 causes dolphin to crash on startup.
-# Need to verify this is fixed now, or revert the patch again
-# https://invent.kde.org/system/dolphin/-/issues/58
-#Patch4:		revert-0531e444a78330eb9ce22afcf9b4d2e4a8b66105.patch
-# https://bugs.kde.org/493116
-Patch5:		https://code.qt.io/cgit/qt/qtbase.git/patch/?id=2ea3abed0125d81ca4f3bacb9650db7314657332#/2ea3abed.patch
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}2
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
@@ -343,6 +337,7 @@ Qt %{qtmajor} build tools
 %{_qtdir}/bin/androiddeployqt%{qtmajor}
 %{_qtdir}/bin/androidtestrunner
 %{_qtdir}/libexec/qlalr
+%{_qtdir}/libexec/qt-android-runner.py
 %{_qtdir}/bin/qtpaths
 %{_qtdir}/bin/qtpaths%{qtmajor}
 %{_qtdir}/libexec/qvkgen
@@ -350,6 +345,7 @@ Qt %{qtmajor} build tools
 %{_qtdir}/libexec/sanitizer-testrunner.py
 %{_qtdir}/libexec/syncqt
 %{_qtdir}/libexec/tracepointgen
+%{_qtdir}/sbom
 
 %prep
 %autosetup -p1 -n qtbase%{!?snapshot:-everywhere-src-%{version}%{?beta:-%{beta}}}
