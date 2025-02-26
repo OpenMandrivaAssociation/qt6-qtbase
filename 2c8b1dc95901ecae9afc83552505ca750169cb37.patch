@@ -1,0 +1,99 @@
+From 2c8b1dc95901ecae9afc83552505ca750169cb37 Mon Sep 17 00:00:00 2001
+From: Thiago Macieira <thiago.macieira@intel.com>
+Date: Sat, 8 Feb 2025 14:59:39 -0800
+Subject: [PATCH] QThreadStorage: don't print the destruction ordering warning
+ on app exit
+
+This warning here was very confusing (so I'm also updating the language
+to be clearer what it means). It is here to advise users of
+QThreadStorage that they may have destroyed the object before all
+threads using the object have finished. That means there will be memory
+leaks, hence the user should fix the issue.
+
+But the one time we don't care (too much) about memory leaks is when the
+application is about to exit -- all memory is being released back to the
+OS anyway. This may happen because of Static De-Initialization Order
+Fiasco: the Q_GLOBAL_STATIC or equivalents holding QThreadStorage were
+destroyed before the QThreadData for the exit()ing thread did. That
+problem became more prevalent after the series of changes ending in
+commit 2f69a05bd0cd7ce63890f709ff3ed7a4f78acd70, because that made the
+QThreadData clean up happen very late in the execution.
+
+Unfortunately, there's no way for us to know when we're being called
+during application exit, so this is the next best thing:
+QCoreApplication::instance() does not exist. We're using a private
+function in QCoreApplication because in Qt 6.x, QCoreApplication::self
+is not atomic and reading it would be a data race.
+
+The QThread::currentThread() call was superfluous, because it was always
+true. It was a relic from Qt 3, from before we had QAdoptedThread.
+
+Fixes: QTBUG-133500
+Change-Id: I48d84d76f2b72483ed92fffdd54c6ad17e3d67d3
+Reviewed-by: Edward Welbourne <edward.welbourne@qt.io>
+Reviewed-by: Marc Mutz <marc.mutz@qt.io>
+(cherry picked from commit fd857d400a098598072ff08b0a54f4ba2589357b)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+(cherry picked from commit 56993ad55964c271dd493a3a60b737c91f31a5b5)
+---
+ src/corelib/kernel/qcoreapplication.cpp | 5 +++++
+ src/corelib/kernel/qcoreapplication_p.h | 1 +
+ src/corelib/thread/qthreadstorage.cpp   | 7 ++++---
+ 3 files changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/src/corelib/kernel/qcoreapplication.cpp b/src/corelib/kernel/qcoreapplication.cpp
+index 48c75973f7f..0aa120ee1be 100644
+--- a/src/corelib/kernel/qcoreapplication.cpp
++++ b/src/corelib/kernel/qcoreapplication.cpp
+@@ -489,6 +489,11 @@ QCoreApplicationPrivate::~QCoreApplicationPrivate()
+     QCoreApplicationPrivate::clearApplicationFilePath();
+ }
+ 
++bool QCoreApplicationPrivate::isAlive() noexcept
++{
++    return qApp != nullptr;
++}
++
+ #ifndef QT_NO_QOBJECT
+ 
+ void QCoreApplicationPrivate::cleanupThreadData()
+diff --git a/src/corelib/kernel/qcoreapplication_p.h b/src/corelib/kernel/qcoreapplication_p.h
+index 0a51a0b5de8..ad99e2d5e0e 100644
+--- a/src/corelib/kernel/qcoreapplication_p.h
++++ b/src/corelib/kernel/qcoreapplication_p.h
+@@ -64,6 +64,7 @@ public:
+ #endif
+     ~QCoreApplicationPrivate();
+ 
++    static bool isAlive() noexcept;
+     void init();
+ 
+     QString appName() const;
+diff --git a/src/corelib/thread/qthreadstorage.cpp b/src/corelib/thread/qthreadstorage.cpp
+index c2029fe1b3c..3b2d4f5c9ca 100644
+--- a/src/corelib/thread/qthreadstorage.cpp
++++ b/src/corelib/thread/qthreadstorage.cpp
+@@ -3,6 +3,7 @@
+ 
+ #include "qthreadstorage.h"
+ 
++#include "private/qcoreapplication_p.h"
+ #include "qthread.h"
+ #include "qthread_p.h"
+ #include "qmutex.h"
+@@ -156,9 +157,9 @@ void QThreadStorageData::finish(void **p)
+         locker.unlock();
+ 
+         if (!destructor) {
+-            if (QThread::currentThread())
+-                qWarning("QThreadStorage: Thread %p exited after QThreadStorage %d destroyed",
+-                         QThread::currentThread(), i);
++            if (QCoreApplicationPrivate::isAlive())
++                qWarning("QThreadStorage: entry %d destroyed before end of thread %p",
++                         i, QThread::currentThread());
+             continue;
+         }
+         destructor(q); //crash here might mean the thread exited after qthreadstorage was destroyed
+-- 
+GitLab
+

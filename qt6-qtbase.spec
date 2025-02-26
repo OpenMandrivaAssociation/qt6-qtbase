@@ -16,7 +16,7 @@ Source:		http://download.qt-project.org/%{?beta:development}%{!?beta:official}_r
 # rpm macros
 Source100:	macros.qt6
 %{load:%{S:100}}
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}2
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
@@ -84,6 +84,8 @@ qtbase-6.2.0-aarch64-buildfix.patch
 https://invent.kde.org/qt/qt/qtbase/-/commit/12d4bf1ab52748cb84894f50d437064b439e0b7d.patch
 https://invent.kde.org/qt/qt/qtbase/-/commit/2ef615228bba9a8eb282437bfb7472f925610e89.patch
 https://invent.kde.org/qt/qt/qtbase/-/commit/a43c7e58046604796aa69974ea1c5d3e2648c755.patch
+https://invent.kde.org/qt/qt/qtbase/-/commit/802beaa3f3cf18b4a6f4885b43aa071c6271648f.patch
+https://invent.kde.org/qt/qt/qtbase/-/commit/2c8b1dc95901ecae9afc83552505ca750169cb37.patch
 
 %description
 Version %{qtmajor} of the Qt framework
