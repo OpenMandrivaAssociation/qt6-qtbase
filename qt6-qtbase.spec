@@ -1,12 +1,12 @@
 #define snapshot 20200627
-#define beta rc2
+%define beta rc
 
 %ifarch %{aarch64}
 %global optflags %{optflags} -march=armv8-a+crypto
 %endif
 
 Name:		qt6-qtbase
-Version:	6.8.2
+Version:	6.9.0
 %if 0%{?snapshot:1}
 # "git archive"-d from "dev" branch of git://code.qt.io/qt/qtbase.git
 Source:		qtbase-%{snapshot}.tar.zst
@@ -16,7 +16,7 @@ Source:		http://download.qt-project.org/%{?beta:development}%{!?beta:official}_r
 # rpm macros
 Source100:	macros.qt6
 %{load:%{S:100}}
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}5
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
@@ -81,11 +81,6 @@ License:	LGPLv3/GPLv3/GPLv2
 #qtbase-init-pluginpath.patch
 qtbase-6.2.0-aarch64-buildfix.patch
 #aarch64-qhash-fix-build-with-gcc.patch
-https://invent.kde.org/qt/qt/qtbase/-/commit/12d4bf1ab52748cb84894f50d437064b439e0b7d.patch
-https://invent.kde.org/qt/qt/qtbase/-/commit/2ef615228bba9a8eb282437bfb7472f925610e89.patch
-https://invent.kde.org/qt/qt/qtbase/-/commit/a43c7e58046604796aa69974ea1c5d3e2648c755.patch
-https://invent.kde.org/qt/qt/qtbase/-/commit/802beaa3f3cf18b4a6f4885b43aa071c6271648f.patch
-https://invent.kde.org/qt/qt/qtbase/-/commit/2c8b1dc95901ecae9afc83552505ca750169cb37.patch
 
 %description
 Version %{qtmajor} of the Qt framework
@@ -202,7 +197,9 @@ Requires: %{name}-sql-sqlite
 %define extra_devel_files_Test \
 %{_qtdir}/libexec/qt-testrunner.py \
 %{_qtdir}/mkspecs/modules/qt_lib_testlib.pri \
-%{_qtdir}/mkspecs/modules/qt_lib_testlib_private.pri
+%{_qtdir}/mkspecs/modules/qt_lib_testlib_private.pri \
+%{_qtdir}/lib/cmake/Qt6TestInternalsPrivate \
+%{_qtdir}/modules/TestInternalsPrivate.json
 
 %define extra_devel_files_Widgets \
 %{_qtdir}/libexec/uic
