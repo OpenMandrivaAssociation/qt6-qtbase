@@ -16,7 +16,7 @@ Source:		http://download.qt-project.org/%{?beta:development}%{!?beta:official}_r
 # rpm macros
 Source100:	macros.qt6
 %{load:%{S:100}}
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}4
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}5
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
@@ -111,7 +111,8 @@ Requires: cmake(Qt6)
 %define extra_devel_reqprov_Gui \
 Requires: cmake(Qt6DBus) \
 Requires: pkgconfig(egl) \
-Requires: pkgconfig(glesv2)
+Requires: pkgconfig(glesv2) \
+Requires: pkgconfig(xkbcommon)
 
 %define extra_devel_reqprov_Widgets \
 Requires: cmake(Qt6Gui)
