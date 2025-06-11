@@ -6,7 +6,7 @@
 %endif
 
 Name:		qt6-qtbase
-Version:	6.9.0
+Version:	6.9.1
 %if 0%{?snapshot:1}
 # "git archive"-d from "dev" branch of git://code.qt.io/qt/qtbase.git
 Source:		qtbase-%{snapshot}.tar.zst
