@@ -1,12 +1,12 @@
 #define snapshot 20200627
-#define beta rc
+%define beta beta2
 
 %ifarch %{aarch64}
 %global optflags %{optflags} -march=armv8-a+crypto
 %endif
 
 Name:		qt6-qtbase
-Version:	6.9.1
+Version:	6.10.0
 %if 0%{?snapshot:1}
 # "git archive"-d from "dev" branch of git://code.qt.io/qt/qtbase.git
 Source:		qtbase-%{snapshot}.tar.zst
@@ -109,6 +109,9 @@ Requires: pkgconfig(egl) \
 Requires: pkgconfig(glesv2) \
 Requires: pkgconfig(xkbcommon)
 
+%define extra_devel_reqprov_Gui \
+Obsoletes: %{_lib}Qt6WaylandEglClientHwIntegration-devel < %{EVRD}
+
 %define extra_devel_reqprov_Widgets \
 Requires: cmake(Qt6Gui)
 
@@ -194,12 +197,40 @@ Requires: %{name}-sql-sqlite
 %define extra_files_Sql \
 %dir %{_qtdir}/plugins/sqldrivers
 
+# FIXME does it make sense to split some of the plugins here
+# into separate subpackages?
+%define extra_files_WaylandClient \
+%{_qtdir}/plugins/platforms/libqwayland.so \
+%dir %{_qtdir}/plugins/wayland-decoration-client \
+%{_qtdir}/plugins/wayland-decoration-client/libbradient.so \
+%dir %{_qtdir}/plugins/wayland-graphics-integration-client \
+%{_qtdir}/plugins/wayland-graphics-integration-client/libdmabuf-server.so \
+%{_qtdir}/plugins/wayland-graphics-integration-client/libdrm-egl-server.so \
+%{_qtdir}/plugins/wayland-graphics-integration-client/libqt-plugin-wayland-egl.so \
+%{_qtdir}/plugins/wayland-graphics-integration-client/libshm-emulation-server.so \
+%{_qtdir}/plugins/wayland-graphics-integration-client/libvulkan-server.so \
+%dir %{_qtdir}/plugins/wayland-shell-integration \
+%{_qtdir}/plugins/wayland-shell-integration/libfullscreen-shell-v1.so \
+%{_qtdir}/plugins/wayland-shell-integration/libwl-shell-plugin.so \
+%{_qtdir}/plugins/wayland-shell-integration/libxdg-shell.so
+
 %define extra_devel_files_Test \
 %{_qtdir}/libexec/qt-testrunner.py \
 %{_qtdir}/mkspecs/modules/qt_lib_testlib.pri \
 %{_qtdir}/mkspecs/modules/qt_lib_testlib_private.pri \
-%{_qtdir}/lib/cmake/Qt6TestInternalsPrivate \
+%{_qtdir}/lib/cmake/Qt%{qtmajor}TestInternalsPrivate \
 %{_qtdir}/modules/TestInternalsPrivate.json
+
+%define extra_devel_files_WaylandClient \
+%{_qtdir}/include/QtWaylandGlobal \
+%{_qtdir}/lib/cmake/Qt%{qtmajor}WaylandGlobalPrivate \
+%{_qtdir}/lib/cmake/Qt%{qtmajor}WaylandScannerTools \
+%{_qtdir}/libexec/qtwaylandscanner \
+%{_qtdir}/share/qt6/wayland \
+%{_qtdir}/modules/WaylandGlobalPrivate.json \
+
+%define extra_reqprov_WlShellIntegration \
+Requires: cmake(Qt%{qtmajor}WaylandClient)
 
 %define extra_devel_files_Widgets \
 %{_qtdir}/libexec/uic
@@ -208,7 +239,7 @@ Requires: %{name}-sql-sqlite
 %{_qtdir}/lib/objects-RelWithDebInfo/ExampleIconsPrivate_resources_1 \
 %{_qtdir}/mkspecs/modules/qt_lib_example_icons_private.pri
 
-%qt6libs Core Concurrent DBus EglFSDeviceIntegration EglFsKmsSupport EglFsKmsGbmSupport Gui Network OpenGL OpenGLWidgets PrintSupport Sql Test Widgets XcbQpa Xml
+%qt6libs Core Concurrent DBus EglFSDeviceIntegration EglFsKmsSupport EglFsKmsGbmSupport Gui Network OpenGL OpenGLWidgets PrintSupport Sql Test WaylandClient WlShellIntegration Widgets XcbQpa Xml
 %qt6staticlibs DeviceDiscoverySupport ExamplesAssetDownloader FbSupport ExampleIcons InputSupport KmsSupport
 
 %package sql-sqlite
