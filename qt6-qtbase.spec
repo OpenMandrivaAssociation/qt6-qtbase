@@ -107,7 +107,8 @@ Requires: cmake(Qt6)
 Requires: cmake(Qt6DBus) \
 Requires: pkgconfig(egl) \
 Requires: pkgconfig(glesv2) \
-Requires: pkgconfig(xkbcommon)
+Requires: pkgconfig(xkbcommon) \
+Requires: pkgconfig(opengl)
 
 %define extra_devel_reqprov_Gui \
 Obsoletes: %{_lib}Qt6WaylandEglClientHwIntegration-devel < %{EVRD}
