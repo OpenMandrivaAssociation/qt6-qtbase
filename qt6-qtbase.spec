@@ -16,7 +16,7 @@ Source:		http://download.qt-project.org/%{?beta:development}%{!?beta:official}_r
 # rpm macros
 Source100:	macros.qt6
 %{load:%{S:100}}
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}2
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}3
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
@@ -109,9 +109,7 @@ Requires: pkgconfig(egl) \
 Requires: pkgconfig(glesv2) \
 Requires: pkgconfig(xkbcommon) \
 Requires: pkgconfig(opengl) \
-Requires: pkgconfig(glx)
-
-%define extra_devel_reqprov_Gui \
+Requires: pkgconfig(glx) \
 Obsoletes: %{_lib}Qt6WaylandEglClientHwIntegration-devel < %{EVRD}
 
 %define extra_devel_reqprov_Widgets \
