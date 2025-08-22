@@ -1,5 +1,5 @@
 #define snapshot 20200627
-%define beta beta2
+%define beta beta3
 
 %ifarch %{aarch64}
 %global optflags %{optflags} -march=armv8-a+crypto
@@ -16,7 +16,7 @@ Source:		http://download.qt-project.org/%{?beta:development}%{!?beta:official}_r
 # rpm macros
 Source100:	macros.qt6
 %{load:%{S:100}}
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}3
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
