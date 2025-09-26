@@ -1,5 +1,5 @@
 #define snapshot 20200627
-%define beta beta3
+%define beta rc
 
 %ifarch %{aarch64}
 %global optflags %{optflags} -march=armv8-a+crypto
@@ -11,7 +11,7 @@ Version:	6.10.0
 # "git archive"-d from "dev" branch of git://code.qt.io/qt/qtbase.git
 Source:		qtbase-%{snapshot}.tar.zst
 %else
-Source:		http://download.qt-project.org/%{?beta:development}%{!?beta:official}_releases/qt/%(echo %{version}|cut -d. -f1-2)/%{version}%{?beta:-%{beta}}/submodules/qtbase-everywhere-src-%{version}%{?beta:-%{beta}}.tar.xz
+Source:		https://download.qt.io/%{?beta:development}%{!?beta:official}_releases/qt/%(echo %{version}|cut -d. -f1-2)/%{version}%{?beta:-%{beta}}/submodules/qtbase-everywhere-src-%{version}%{?beta:-%{beta}}.tar.xz
 %endif
 # rpm macros
 Source100:	macros.qt6
