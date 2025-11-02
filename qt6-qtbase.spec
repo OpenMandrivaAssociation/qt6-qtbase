@@ -16,7 +16,7 @@ Source:		https://download.qt.io/%{?beta:development}%{!?beta:official}_releases/
 # rpm macros
 Source100:	macros.qt6
 %{load:%{S:100}}
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}2
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
@@ -228,9 +228,6 @@ Requires: %{name}-sql-sqlite
 %{_qtdir}/libexec/qtwaylandscanner \
 %{_qtdir}/share/qt6/wayland \
 %{_qtdir}/modules/WaylandGlobalPrivate.json \
-
-%define extra_reqprov_WlShellIntegration \
-Requires: cmake(Qt%{qtmajor}WaylandClient)
 
 %define extra_devel_files_Widgets \
 %{_qtdir}/libexec/uic
