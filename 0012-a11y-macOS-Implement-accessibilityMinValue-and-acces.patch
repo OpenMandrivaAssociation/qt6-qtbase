@@ -1,0 +1,53 @@
+From 16fc299956988af0bd1c77b6a860279e6fe4922e Mon Sep 17 00:00:00 2001
+From: Julian Greilich <j.greilich@gmx.de>
+Date: Wed, 3 Sep 2025 15:13:00 +0200
+Subject: [PATCH 012/553] a11y macOS: Implement accessibilityMinValue and
+ accessibilityMaxValue
+
+Use the ValueInterface to provide accessibilityMinValue and
+accessibilityMaxValue.
+
+Task-number: QTBUG-139712
+Pick-to: 6.9 6.8
+Change-Id: I774997fe90d457ac67604ec89187a20befee6570
+Reviewed-by: Volker Hilsheimer <volker.hilsheimer@qt.io>
+(cherry picked from commit 9f2fbc962b1ad29bc054764b719fd4cee9654b0e)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../cocoa/qcocoaaccessibilityelement.mm       | 20 +++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/src/plugins/platforms/cocoa/qcocoaaccessibilityelement.mm b/src/plugins/platforms/cocoa/qcocoaaccessibilityelement.mm
+index d8c769c6299..e3d5f5d9c29 100644
+--- a/src/plugins/platforms/cocoa/qcocoaaccessibilityelement.mm
++++ b/src/plugins/platforms/cocoa/qcocoaaccessibilityelement.mm
+@@ -723,6 +723,26 @@ static void convertLineOffset(QAccessibleTextInterface *text, int *line, int *of
+     return nil;
+ }
+ 
++
++- (id) accessibilityMinValue {
++    if (QAccessibleInterface *iface = self.qtInterface) {
++        if (iface->valueInterface()) {
++            return iface->valueInterface()->minimumValue().toString().toNSString();
++        }
++    }
++    return nil;
++}
++
++
++- (id) accessibilityMaxValue {
++    if (QAccessibleInterface *iface = self.qtInterface) {
++        if (iface->valueInterface()) {
++            return iface->valueInterface()->maximumValue().toString().toNSString();
++        }
++    }
++    return nil;
++}
++
+ - (NSInteger) accessibilityNumberOfCharacters {
+     if (QAccessibleInterface *iface = self.qtInterface) {
+         if (QAccessibleTextInterface *text = iface->textInterface())
+-- 
+2.51.2
+

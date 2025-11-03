@@ -1,0 +1,37 @@
+From 5b568650b66276af97b67b71a5f17fa94b440826 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Lefebvre?= <frederic.lefebvre@qt.io>
+Date: Thu, 28 Aug 2025 12:06:38 +0200
+Subject: [PATCH 498/553] Remove redundant calls in
+ tst_QWindow::enterLeaveOnWindowShowHide
+
+tst_QWindow::enterLeaveOnWindowShowHide include multiple calls to
+requestActivate() after a window is shown. This call is superfluous for the current test and should be removed.
+
+Remove the unnecessary requestActivate() calls to simplify the code.
+Amends 79ac43053798763828d51c79f6368465b1db1c87.
+
+Task-number: QTBUG-139705
+Pick-to: 6.8 6.5
+Change-Id: I69549e67ce621d5e933d3049491be28062cc4993
+Reviewed-by: Volker Hilsheimer <volker.hilsheimer@qt.io>
+(cherry picked from commit 8036ab33fe6aa3901573164b31a4453a39bb0cf7)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ tests/auto/gui/kernel/qwindow/tst_qwindow.cpp | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/tests/auto/gui/kernel/qwindow/tst_qwindow.cpp b/tests/auto/gui/kernel/qwindow/tst_qwindow.cpp
+index e85bfa5eca4..5ab9cd6a33d 100644
+--- a/tests/auto/gui/kernel/qwindow/tst_qwindow.cpp
++++ b/tests/auto/gui/kernel/qwindow/tst_qwindow.cpp
+@@ -3242,7 +3242,6 @@ void tst_QWindow::enterLeaveOnWindowShowHide()
+         QSKIP("We can't move the cursor");
+ 
+     window.show();
+-    window.requestActivate();
+     QVERIFY(QTest::qWaitForWindowActive(&window));
+ 
+     ++expectedEnter;
+-- 
+2.51.2
+

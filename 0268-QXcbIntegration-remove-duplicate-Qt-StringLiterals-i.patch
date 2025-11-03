@@ -1,0 +1,35 @@
+From 6b11371bc7afc70bc711833288573d430f823c9f Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Thu, 2 Oct 2025 14:15:57 +0200
+Subject: [PATCH 268/553] QXcbIntegration: remove duplicate Qt::StringLiterals
+ import
+
+There's already one at the top of the file, after QT_BEGIN_NAMESPACE,
+and it was there already when this line was added.
+
+Amends 90ad4d10efea131ad569b1350b8150bbd66c179d.
+
+Pick-to: 6.8 6.5
+Change-Id: Ib90212093d07f93558bc28ee50326d362390d119
+Reviewed-by: Liang Qi <liang.qi@qt.io>
+(cherry picked from commit 02e4bf3e1e519a6bf81728f3576f575ef4433538)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/plugins/platforms/xcb/qxcbintegration.cpp | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/plugins/platforms/xcb/qxcbintegration.cpp b/src/plugins/platforms/xcb/qxcbintegration.cpp
+index 8dca7e676bb..67242c0c001 100644
+--- a/src/plugins/platforms/xcb/qxcbintegration.cpp
++++ b/src/plugins/platforms/xcb/qxcbintegration.cpp
+@@ -337,7 +337,6 @@ QAbstractEventDispatcher *QXcbIntegration::createEventDispatcher() const
+     return QXcbEventDispatcher::createEventDispatcher(connection());
+ }
+ 
+-using namespace Qt::Literals::StringLiterals;
+ static const auto xsNetCursorBlink = "Net/CursorBlink"_ba;
+ static const auto xsNetCursorBlinkTime = "Net/CursorBlinkTime"_ba;
+ static const auto xsNetDoubleClickTime = "Net/DoubleClickTime"_ba;
+-- 
+2.51.2
+

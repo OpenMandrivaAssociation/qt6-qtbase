@@ -1,0 +1,74 @@
+From e9d1fb9a6291f3038cf48ac34bafb220a35c893a Mon Sep 17 00:00:00 2001
+From: Assam Boudjelthia <assam.boudjelthia@qt.io>
+Date: Tue, 16 Sep 2025 19:07:35 +0300
+Subject: [PATCH 235/553] Android: call handleUiModeChange only when the uiMode
+ has changed
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+handleUiModeChange is currently called whenever onConfigurationChanged
+is called, that can be for irrelevant cases like orientation change.
+So check the configuration diff and only call it if uiMode changes.
+
+Task-number: QTBUG-137248
+Pick-to: 6.8
+Change-Id: I8df118404585b5e4273a441db9806549093eae02
+Reviewed-by: Tor Arne Vestbø <tor.arne.vestbo@qt.io>
+(cherry picked from commit e8ee8aca4d968dabfc15dd6cfc4f8e2b07ca2372)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../jar/src/org/qtproject/qt/android/QtActivityBase.java      | 4 +++-
+ .../jar/src/org/qtproject/qt/android/QtActivityDelegate.java  | 2 +-
+ .../src/org/qtproject/qt/android/QtActivityDelegateBase.java  | 4 +++-
+ 3 files changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/src/android/jar/src/org/qtproject/qt/android/QtActivityBase.java b/src/android/jar/src/org/qtproject/qt/android/QtActivityBase.java
+index aa85b70eb00..783c49682a1 100644
+--- a/src/android/jar/src/org/qtproject/qt/android/QtActivityBase.java
++++ b/src/android/jar/src/org/qtproject/qt/android/QtActivityBase.java
+@@ -198,9 +198,11 @@ public class QtActivityBase extends Activity
+     public void onConfigurationChanged(Configuration newConfig)
+     {
+         super.onConfigurationChanged(newConfig);
+-        m_delegate.handleUiModeChange(newConfig.uiMode & Configuration.UI_MODE_NIGHT_MASK);
+ 
+         int diff = newConfig.diff(m_prevConfig);
++        if ((diff & ActivityInfo.CONFIG_UI_MODE) != 0)
++            m_delegate.handleUiModeChange();
++
+         if ((diff & ActivityInfo.CONFIG_LOCALE) != 0)
+             QtNative.updateLocale();
+ 
+diff --git a/src/android/jar/src/org/qtproject/qt/android/QtActivityDelegate.java b/src/android/jar/src/org/qtproject/qt/android/QtActivityDelegate.java
+index da423e36df1..118845efcec 100644
+--- a/src/android/jar/src/org/qtproject/qt/android/QtActivityDelegate.java
++++ b/src/android/jar/src/org/qtproject/qt/android/QtActivityDelegate.java
+@@ -142,7 +142,7 @@ class QtActivityDelegate extends QtActivityDelegateBase
+                                   new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                                              ViewGroup.LayoutParams.MATCH_PARENT));
+ 
+-        handleUiModeChange(m_activity.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK);
++        handleUiModeChange();
+ 
+         m_displayManager.initDisplayProperties();
+ 
+diff --git a/src/android/jar/src/org/qtproject/qt/android/QtActivityDelegateBase.java b/src/android/jar/src/org/qtproject/qt/android/QtActivityDelegateBase.java
+index d0e572addfb..1c5cad8d904 100644
+--- a/src/android/jar/src/org/qtproject/qt/android/QtActivityDelegateBase.java
++++ b/src/android/jar/src/org/qtproject/qt/android/QtActivityDelegateBase.java
+@@ -94,8 +94,10 @@ abstract class QtActivityDelegateBase
+         hideSplashScreen(0);
+     }
+ 
+-    void handleUiModeChange(int uiMode)
++    void handleUiModeChange()
+     {
++        Configuration config = m_activity.getResources().getConfiguration();
++        int uiMode = config.uiMode & Configuration.UI_MODE_NIGHT_MASK;
+         // QTBUG-108365
+         if (Build.VERSION.SDK_INT >= 30) {
+             // Since 29 version we are using Theme_DeviceDefault_DayNight
+-- 
+2.51.2
+

@@ -1,0 +1,52 @@
+From d90bc868aea5a5faafffb381298f1267a18c97b1 Mon Sep 17 00:00:00 2001
+From: Toni Saario <toni.saario@qt.io>
+Date: Mon, 4 Aug 2025 12:33:00 +0300
+Subject: [PATCH 163/553] Coin: Add update repo instructions
+
+These tell Coin the repos that the commands will require. Otherwise
+there is possibility that those repositories are out of date.
+
+Pick-to: 6.9 6.8
+Change-Id: Ie61b5faa6f321b666f3f6a829ba4d333cb3eb6f1
+Reviewed-by: Jarek Kobus <jaroslaw.kobus@qt.io>
+Reviewed-by: Alexandru Croitor <alexandru.croitor@qt.io>
+(cherry picked from commit 729f339720d11d5c63755239bb13d4ed6a1efce1)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ coin/instructions/coin_build_doc_tools.yaml | 4 ++++
+ coin/instructions/prepare_license_test.yaml | 4 ++++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/coin/instructions/coin_build_doc_tools.yaml b/coin/instructions/coin_build_doc_tools.yaml
+index 783b86cf352..b1774f20533 100644
+--- a/coin/instructions/coin_build_doc_tools.yaml
++++ b/coin/instructions/coin_build_doc_tools.yaml
+@@ -13,6 +13,10 @@ instructions:
+     variableName: QT_CI_DOC_TOOLS_INSTALL_DIR
+     variableValue: "{{.BuildDir}}/doc_tools_build/install"
+ 
++  # Tell Coin to fetch latest refs of required repos.
++  - type: UpdateRepo
++    repos: [qt/qt5, qt/qttools, qt/qtbase, qt/qtshadertools, qt/qtdeclarative, qt/qtsvg, qt/qtimageformats, qt/qtactiveqt, qt/qtlanguageserver]
++
+   - type: ExecuteCommand
+     command: "{{.Env.ENV_PREFIX}} cmake -P {{.SourceDir}}/cmake/QtBuildStaticDocToolsScript.cmake"
+     executeCommandArgumentSplitingBehavior: SplitAfterVariableSubstitution
+diff --git a/coin/instructions/prepare_license_test.yaml b/coin/instructions/prepare_license_test.yaml
+index 52cd0c38be6..9936646b745 100644
+--- a/coin/instructions/prepare_license_test.yaml
++++ b/coin/instructions/prepare_license_test.yaml
+@@ -17,6 +17,10 @@ instructions:
+         env_var: TESTED_MODULE_BRANCH_COIN
+         contains_value: "tqtc/"
+ 
++    # Tell Coin to fetch latest refs of required repos.
++    - type: UpdateRepo
++      repos: [qt/qtqa]
++
+     # The command must not have whitespace directly after any piping,
+     # as whitespace directly after pipes will be interpreted as part of the command.
+     - type: ExecuteCommand
+-- 
+2.51.2
+

@@ -1,0 +1,43 @@
+From 13ddcc46d3d43c75025eb1e28c80109d798d9732 Mon Sep 17 00:00:00 2001
+From: Joerg Bornemann <joerg.bornemann@qt.io>
+Date: Tue, 7 Oct 2025 16:24:54 +0200
+Subject: [PATCH 386/553] Fix crash in QWidgetWindow::handleMouseEvent
+
+User code that calls
+    qApp->processEvents();
+in context menu actions could lead to accesses of deleted memory.
+
+The reason was that the QWidgetWindow object was deleted as an effect of
+the event delivery in handleMouseEvents, and later accesses to object
+members in this method crashed.
+
+Pick-to: 6.8
+Fixes: QTBUG-138419
+Fixes: QTBUG-140132
+Change-Id: Ia61e4380b29333875de9e1202c363d99d3f79e2a
+Reviewed-by: Oliver Wolff <oliver.wolff@qt.io>
+Reviewed-by: Friedemann Kleint <Friedemann.Kleint@qt.io>
+(cherry picked from commit b92724a1be2475dac052308e5c75e7bf52813fb8)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/widgets/kernel/qwidgetwindow.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/widgets/kernel/qwidgetwindow.cpp b/src/widgets/kernel/qwidgetwindow.cpp
+index 737ccb0e807..622f1548756 100644
+--- a/src/widgets/kernel/qwidgetwindow.cpp
++++ b/src/widgets/kernel/qwidgetwindow.cpp
+@@ -591,6 +591,10 @@ void QWidgetWindow::handleMouseEvent(QMouseEvent *event)
+             }
+         }
+ 
++        // Event delivery above might have destroyed this object. See QTBUG-138419.
++        if (self.isNull())
++            return;
++
+         if (QApplication::activePopupWidget() != activePopupWidget
+             && QApplicationPrivate::replayMousePress
+             && QGuiApplicationPrivate::platformIntegration()->styleHint(QPlatformIntegration::ReplayMousePressOutsidePopup).toBool()) {
+-- 
+2.51.2
+

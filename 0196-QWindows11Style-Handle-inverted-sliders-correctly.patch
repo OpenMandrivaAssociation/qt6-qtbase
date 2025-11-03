@@ -1,0 +1,53 @@
+From 137aeab134187a856d932c7122a4f28182ecafc3 Mon Sep 17 00:00:00 2001
+From: Johannes Grunenberg <nerixdev@outlook.de>
+Date: Tue, 23 Sep 2025 22:47:33 +0200
+Subject: [PATCH 196/553] QWindows11Style: Handle inverted sliders correctly
+
+QSliders with `setInvertedAppearance(true)` didn't show the blue groove
+and ticks correctly. With this change, the highlighted groove is on the
+right side if a hozizontal slider is inverted and on the top side if a
+vertical slider is inverted.
+Note that `upsideDown` is true for non-inverted vertical sliders but
+false for non-inverted horizontal sliders.
+
+Change-Id: I8c75dbc1006349209316fce58a5ec383221a916f
+Reviewed-by: Christian Ehrlicher <ch.ehrlicher@gmx.de>
+(cherry picked from commit 99616081f191ad9d5ab93eef30b760c2087f46df)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/plugins/styles/modernwindows/qwindows11style.cpp | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/src/plugins/styles/modernwindows/qwindows11style.cpp b/src/plugins/styles/modernwindows/qwindows11style.cpp
+index 53f0d43994a..d05147fa4f9 100644
+--- a/src/plugins/styles/modernwindows/qwindows11style.cpp
++++ b/src/plugins/styles/modernwindows/qwindows11style.cpp
+@@ -358,9 +358,11 @@ void QWindows11Style::drawComplexControl(ComplexControl control, const QStyleOpt
+                     rightRect = QRect(handlePos.x(), rect.top(), (rect.width() - handlePos.x()), rect.height());
+                 } else {
+                     rect = QRect(rect.center().x() - 2, slrect.top(), 4, slrect.height() - 5);
+-                    rightRect = QRect(rect.left(), rect.top() + 1, rect.width(), (handlePos.y() - rect.top()));
+-                    leftRect = QRect(rect.left(), handlePos.y(), rect.width(), (rect.height() - handlePos.y()));
++                    leftRect = QRect(rect.left(), rect.top() + 1, rect.width(), (handlePos.y() - rect.top()));
++                    rightRect = QRect(rect.left(), handlePos.y(), rect.width(), (rect.height() - handlePos.y()));
+                 }
++                if (slider->upsideDown)
++                    qSwap(leftRect, rightRect);
+ 
+                 painter->setPen(Qt::NoPen);
+                 painter->setBrush(calculateAccentColor(option));
+@@ -404,8 +406,9 @@ void QWindows11Style::drawComplexControl(ComplexControl control, const QStyleOpt
+                         break;
+                     const int v_ = qMin(v, slider->maximum);
+                     int tickLength = (v_ == slider->minimum || v_ >= slider->maximum) ? 4 : 3;
+-                    pos = QStyle::sliderPositionFromValue(slider->minimum, slider->maximum,
+-                                                          v_, available) + fudge;
++                    pos = QStyle::sliderPositionFromValue(slider->minimum, slider->maximum, v_,
++                                                          available, slider->upsideDown);
++                    pos += fudge;
+                     if (slider->orientation == Qt::Horizontal) {
+                         if (ticks & QSlider::TicksAbove) {
+                             lines.append(QLineF(pos, tickOffset - 1 - bothOffset + 0.5,
+-- 
+2.51.2
+

@@ -1,0 +1,65 @@
+From 0741ebfcabae003a44faa9ca6084d7e7b0de0150 Mon Sep 17 00:00:00 2001
+From: Ahmad Samir <a.samirh78@gmail.com>
+Date: Mon, 20 Oct 2025 16:00:21 +0300
+Subject: [PATCH 492/553] tst_QDirListing: pre-sort two expected QStringListS
+
+By invoking "sort alphabetically" in any decent text editor... this
+simplifies the test, and reduces the size of the next patch in the
+chain.
+
+Not picking to 6.5 because QDirListing doesn't exist there.
+
+Pick-to: 6.8
+Change-Id: I42ed2dcbb9c23c1a72305f202091a6fa09ebfbaa
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit a1d720d5009cb7f2bc9732c9df50ec3213065da3)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../corelib/io/qdirlisting/tst_qdirlisting.cpp | 18 ++++++++----------
+ 1 file changed, 8 insertions(+), 10 deletions(-)
+
+diff --git a/tests/auto/corelib/io/qdirlisting/tst_qdirlisting.cpp b/tests/auto/corelib/io/qdirlisting/tst_qdirlisting.cpp
+index 69049674242..adcdb588b01 100644
+--- a/tests/auto/corelib/io/qdirlisting/tst_qdirlisting.cpp
++++ b/tests/auto/corelib/io/qdirlisting/tst_qdirlisting.cpp
+@@ -770,14 +770,13 @@ void tst_QDirListing::uncPaths()
+ void tst_QDirListing::hiddenFiles()
+ {
+     QStringList expected = {
+-        "hiddenDirs_hiddenFiles/normalFile"_L1,
++        "hiddenDirs_hiddenFiles/.hiddenDirectory/.hiddenFile"_L1,
++        "hiddenDirs_hiddenFiles/.hiddenDirectory/normalFile"_L1,
+         "hiddenDirs_hiddenFiles/.hiddenFile"_L1,
+-        "hiddenDirs_hiddenFiles/normalDirectory/normalFile"_L1,
+         "hiddenDirs_hiddenFiles/normalDirectory/.hiddenFile"_L1,
+-        "hiddenDirs_hiddenFiles/.hiddenDirectory/normalFile"_L1,
+-        "hiddenDirs_hiddenFiles/.hiddenDirectory/.hiddenFile"_L1,
++        "hiddenDirs_hiddenFiles/normalDirectory/normalFile"_L1,
++        "hiddenDirs_hiddenFiles/normalFile"_L1,
+     };
+-    expected.sort();
+ 
+     constexpr auto flags = ItFlag::ExcludeDirs | ItFlag::IncludeHidden | ItFlag::Recursive;
+     QStringList list;
+@@ -794,14 +793,13 @@ void tst_QDirListing::hiddenFiles()
+ void tst_QDirListing::hiddenDirs()
+ {
+     QStringList expected = {
+-        "hiddenDirs_hiddenFiles/normalDirectory"_L1,
+-        "hiddenDirs_hiddenFiles/normalDirectory/subdir"_L1,
+-        "hiddenDirs_hiddenFiles/normalDirectory/.hidden-subdir"_L1,
+         "hiddenDirs_hiddenFiles/.hiddenDirectory"_L1,
+-        "hiddenDirs_hiddenFiles/.hiddenDirectory/subdir"_L1,
+         "hiddenDirs_hiddenFiles/.hiddenDirectory/.hidden-subdir"_L1,
++        "hiddenDirs_hiddenFiles/.hiddenDirectory/subdir"_L1,
++        "hiddenDirs_hiddenFiles/normalDirectory"_L1,
++        "hiddenDirs_hiddenFiles/normalDirectory/.hidden-subdir"_L1,
++        "hiddenDirs_hiddenFiles/normalDirectory/subdir"_L1,
+     };
+-    expected.sort();
+ 
+     constexpr auto flags = ItFlag::ExcludeFiles | ItFlag::IncludeHidden | ItFlag::Recursive;
+     QStringList list;
+-- 
+2.51.2
+

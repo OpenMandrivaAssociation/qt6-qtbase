@@ -1,0 +1,37 @@
+From bb45746e798f92cec6699de4f2b64e1542cb66f8 Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Fri, 12 Sep 2025 09:36:08 +0200
+Subject: [PATCH 136/553] util/unicode: remove properties(char16_t) declaration
+ here, too
+
+Amends 772b62c91e27d357048a1d2ae1962b5901862e76.
+
+The amended commit removed the definition from both the generator and
+the generated code, but only removed the declaration from the
+generated code, not the generator.
+
+Pick-to: 6.10.0
+Change-Id: I2f41aad9777a8c27f80edb9b7ef7a97e1871ffbb
+Reviewed-by: Ahmad Samir <a.samirh78@gmail.com>
+(cherry picked from commit ed237ace6789b428a4b0f2d679265a2a237ba3e3)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ util/unicode/main.cpp | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/util/unicode/main.cpp b/util/unicode/main.cpp
+index b8d3e27e742..7fcf1fbe863 100644
+--- a/util/unicode/main.cpp
++++ b/util/unicode/main.cpp
+@@ -1015,8 +1015,6 @@ static const char *property_string =
+     "};\n\n"
+     "Q_DECL_CONST_FUNCTION\n"
+     "Q_CORE_EXPORT const Properties * QT_FASTCALL properties(char32_t ucs4) noexcept;\n"
+-    "Q_DECL_CONST_FUNCTION\n"
+-    "Q_CORE_EXPORT const Properties * QT_FASTCALL properties(char16_t ucs2) noexcept;\n"
+     "\n";
+ 
+ static const char *methods =
+-- 
+2.51.2
+

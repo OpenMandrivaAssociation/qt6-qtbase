@@ -1,0 +1,47 @@
+From 0f8fa55b7cd4211fed51899454aa7c23781dc0dc Mon Sep 17 00:00:00 2001
+From: Timur Pocheptsov <timur.pocheptsov@qt.io>
+Date: Tue, 16 Sep 2025 10:12:04 +0200
+Subject: [PATCH 421/553] QMacStyle: set NSStepperCell's control size to 'mini'
+
+On macOS 26 this thing became rather large, not fitting into the
+simple clipping rectangle of a spinbox (in a native app such a stepper is
+taller than its controlled input, e.g. date/time edit). In Qt, with clipping
+applied, this looks not so nice; but by always setting the cell's control size
+to 'mini', we can have a properly looking spinbox, similar to what it was before.
+
+Fixes: QTBUG-140134
+Pick-to: 6.9 6.8 6.5
+Change-Id: I4c3798e84e602aceead5770963fde66e9c106e53
+Reviewed-by: Richard Moe Gustavsen <richard.gustavsen@qt.io>
+(cherry picked from commit b1a7a9d4f437c905df8368742b4189f1e8cea311)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/plugins/styles/mac/qmacstyle_mac.mm | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/plugins/styles/mac/qmacstyle_mac.mm b/src/plugins/styles/mac/qmacstyle_mac.mm
+index 5ba6f3e1649..0b05a31ca5c 100644
+--- a/src/plugins/styles/mac/qmacstyle_mac.mm
++++ b/src/plugins/styles/mac/qmacstyle_mac.mm
+@@ -5849,6 +5849,9 @@ void QMacStyle::drawComplexControl(ComplexControl cc, const QStyleOptionComplex
+                 const auto aquaSize = d->effectiveAquaSizeConstrain(opt, widget);
+                 const auto cw = QMacStylePrivate::CocoaControl(QMacStylePrivate::Stepper, aquaSize);
+                 NSStepperCell *cell = static_cast<NSStepperCell *>(d->cocoaCell(cw));
++                const auto controlSize = cell.controlSize;
++                if (qt_apple_runningWithLiquidGlass())
++                    cell.controlSize = NSControlSizeMini;
+                 cell.enabled = (sb->state & State_Enabled);
+ 
+                 const CGRect newRect = [cell drawingRectForBounds:updown.toCGRect()];
+@@ -5869,6 +5872,8 @@ void QMacStyle::drawComplexControl(ComplexControl cc, const QStyleOptionComplex
+                     [cell stopTracking:pressPoint at:pressPoint inView:d->backingStoreNSView mouseIsUp:NO];
+ 
+                 d->restoreNSGraphicsContext(cg);
++                if (qt_apple_runningWithLiquidGlass())
++                    cell.controlSize = controlSize;
+             }
+         }
+         break;
+-- 
+2.51.2
+

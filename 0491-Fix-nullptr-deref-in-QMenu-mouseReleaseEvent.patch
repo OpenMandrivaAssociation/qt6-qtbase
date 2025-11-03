@@ -1,0 +1,33 @@
+From 5b68416c59f20c400d7f15666a9a367929752f16 Mon Sep 17 00:00:00 2001
+From: Axel Spoerl <axel.spoerl@qt.io>
+Date: Mon, 20 Oct 2025 12:06:28 +0200
+Subject: [PATCH 491/553] Fix nullptr deref in QMenu::mouseReleaseEvent()
+
+879eb2c08094a70683488d56520efd3a4cf1b086 introduced a nulltr deref.
+Amend the patch to fix it.
+
+Coverity-Id: 896788
+Change-Id: Ic05db9f5bfb67ece01a0e030400697d97712646e
+Reviewed-by: Marc Mutz <marc.mutz@qt.io>
+(cherry picked from commit 8e89eef49934dd43117934795874104bc2bfd489)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/widgets/widgets/qmenu.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/widgets/widgets/qmenu.cpp b/src/widgets/widgets/qmenu.cpp
+index aa10a2dae5e..9b224fd4a7a 100644
+--- a/src/widgets/widgets/qmenu.cpp
++++ b/src/widgets/widgets/qmenu.cpp
+@@ -2945,7 +2945,7 @@ void QMenu::mouseReleaseEvent(QMouseEvent *e)
+ #endif
+                 d->activateAction(action, QAction::Trigger);
+         }
+-    } else if ((!action || action->isEnabled()) && !action->isSeparator()) {
++    } else if (!action || (action->isEnabled() && !action->isSeparator())) {
+         d->hideUpToMenuBar();
+     }
+ }
+-- 
+2.51.2
+

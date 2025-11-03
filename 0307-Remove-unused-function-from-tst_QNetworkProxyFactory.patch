@@ -1,0 +1,55 @@
+From 267aab333cdfd85c9e1e45925f02145676c3b26b Mon Sep 17 00:00:00 2001
+From: Edward Welbourne <edward.welbourne@qt.io>
+Date: Mon, 6 Oct 2025 16:36:49 +0200
+Subject: [PATCH 307/553] Remove unused function from tst_QNetworkProxyFactory
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Its call to QString::arg() with a QFlags parameter (which needs cast
+to int, or custom support in some manner) blocked a fix to
+QTBUG-138471, then I discovered it was unused in any case. Removing it
+solves the problem.
+
+Task-number: QTBUG-138471
+Change-Id: I977f35a615d07aa9c319bacb1d44ddfd3b86ddc5
+Reviewed-by: Mårten Nordheim <marten.nordheim@qt.io>
+(cherry picked from commit 56982c045fd912a5428f30a693e416653226780e)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../tst_qnetworkproxyfactory.cpp                     | 12 ------------
+ 1 file changed, 12 deletions(-)
+
+diff --git a/tests/auto/network/kernel/qnetworkproxyfactory/tst_qnetworkproxyfactory.cpp b/tests/auto/network/kernel/qnetworkproxyfactory/tst_qnetworkproxyfactory.cpp
+index 7e8fb80fc5e..88c8a15f77c 100644
+--- a/tests/auto/network/kernel/qnetworkproxyfactory/tst_qnetworkproxyfactory.cpp
++++ b/tests/auto/network/kernel/qnetworkproxyfactory/tst_qnetworkproxyfactory.cpp
+@@ -48,7 +48,6 @@ private slots:
+     void genericSystemProxy_data();
+ 
+ private:
+-    QString formatProxyName(const QNetworkProxy & proxy) const;
+     QDebugProxyFactory *factory;
+ };
+ 
+@@ -60,17 +59,6 @@ tst_QNetworkProxyFactory::tst_QNetworkProxyFactory()
+     QNetworkProxyFactory::setApplicationProxyFactory(factory);
+ }
+ 
+-QString tst_QNetworkProxyFactory::formatProxyName(const QNetworkProxy & proxy) const
+-{
+-    QString proxyName;
+-    if (!proxy.user().isNull())
+-        proxyName.append(QString("%1:%2@").arg(proxy.user(), proxy.password()));
+-    proxyName.append(QString("%1:%2").arg(proxy.hostName()).arg(proxy.port()));
+-    proxyName.append(QString(" (type=%1, capabilities=%2)").arg(proxy.type()).arg(proxy.capabilities()));
+-
+-    return proxyName;
+-}
+-
+ void tst_QNetworkProxyFactory::systemProxyForQuery_data()
+ {
+     QTest::addColumn<int>("type");
+-- 
+2.51.2
+

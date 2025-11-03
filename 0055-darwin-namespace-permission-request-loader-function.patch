@@ -1,0 +1,57 @@
+From b9e4a02a60c92cf753b0906f289f04310d2eae4f Mon Sep 17 00:00:00 2001
+From: Tim Blechmann <tim.blechmann@qt.io>
+Date: Mon, 21 Jul 2025 15:05:51 +0800
+Subject: [PATCH 055/553] darwin: namespace permission request loader function
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The dummy function that's used to force the loading of objective-c
+classes from a static permission plugin was not properly namespaced. We
+name mangle it by appending the qt namespace.
+
+Task-number: QTBUG-138543
+Change-Id: If8f634720fe1efac8626d4b429397bf463089f98
+Reviewed-by: Tor Arne Vestbø <tor.arne.vestbo@qt.io>
+(cherry picked from commit 714d9dd6d151226ab30d8c43e4c6573293368f6f)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ cmake/QtPluginHelpers.cmake                               | 6 +++++-
+ src/corelib/platform/darwin/qdarwinpermissionplugin_p_p.h | 4 +++-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/cmake/QtPluginHelpers.cmake b/cmake/QtPluginHelpers.cmake
+index 47ad4f33c5c..00114bf0306 100644
+--- a/cmake/QtPluginHelpers.cmake
++++ b/cmake/QtPluginHelpers.cmake
+@@ -613,7 +613,11 @@ function(qt_internal_add_darwin_permission_plugin permission)
+     set_property(TARGET ${plugin_target} APPEND PROPERTY
+         EXPORT_PROPERTIES _qt_darwin_permissison_separate_request
+     )
+-    set(permission_request_symbol "_QDarwin${permission}PermissionRequest")
++    if (QT_NAMESPACE)
++        set(permission_request_symbol "_QDarwin${permission}PermissionRequest_${QT_NAMESPACE}")
++    else()
++        set(permission_request_symbol "_QDarwin${permission}PermissionRequest")
++    endif()
+     set(permission_request_flag "-Wl,-u,${permission_request_symbol}")
+     set(has_usage_description_property "_qt_has_${plugin_target}_usage_description")
+     set(has_usage_description_genex "$<BOOL:$<TARGET_PROPERTY:${has_usage_description_property}>>")
+diff --git a/src/corelib/platform/darwin/qdarwinpermissionplugin_p_p.h b/src/corelib/platform/darwin/qdarwinpermissionplugin_p_p.h
+index 649af06507a..ad4877d5d04 100644
+--- a/src/corelib/platform/darwin/qdarwinpermissionplugin_p_p.h
++++ b/src/corelib/platform/darwin/qdarwinpermissionplugin_p_p.h
+@@ -61,7 +61,9 @@ QT_END_NAMESPACE
+ 
+ // Request
+ #if defined(BUILDING_PERMISSION_REQUEST)
+-extern "C" void PERMISSION_PLUGIN_NAME(Request)() {}
++// dummy symbol to be resolved by the linker to force loading of static library
++// (compare -Wl,-u)
++extern "C" void QT_MANGLE_NAMESPACE(PERMISSION_PLUGIN_NAME(Request))() { }
+ #endif
+ 
+ // -------------------------------------------------------
+-- 
+2.51.2
+

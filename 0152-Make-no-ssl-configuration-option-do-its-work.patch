@@ -1,0 +1,67 @@
+From c5b08724512da694b8b188fc69c507e1c815f0ca Mon Sep 17 00:00:00 2001
+From: Timur Pocheptsov <timur.pocheptsov@qt.io>
+Date: Wed, 17 Sep 2025 13:40:27 +0200
+Subject: [PATCH 152/553] Make -no-ssl configuration option do its work
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+We have QT_FEATURE_ssl dependent on one of QT_FEATURE_(openssl/securetransport/schannel),
+but it's also possible to provide -no-ssl option to the configure script. This essentially
+disables/switches OFF QT_FEATURE_ssl, but it does not affect QT_FEATURE_whatevertls,
+which has its own 'no' option, like -no-securetransport or -no-openssl. This potentially
+leaves us with inconsistent source code checks for features, which are assuming QT_CONFIG(openssl)
+also implies QT_CONFIG(ssl). To resolve this problem, make dtls and TLS plugins require
+QT_FEATURE_ssl (in addition to QT_FEATURE_openssl/securetransport/schannel).
+
+Fixes: QTBUG-140203
+Pick-to: 6.9 6.8 6.5
+Change-Id: I276d952283eb7a67ba7b9196a0a5a400b9504656
+Reviewed-by: Mårten Nordheim <marten.nordheim@qt.io>
+Reviewed-by: Edward Welbourne <edward.welbourne@qt.io>
+(cherry picked from commit d3272f9670d81fa57966b1ac044813becb334552)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/network/configure.cmake    | 2 +-
+ src/plugins/tls/CMakeLists.txt | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/network/configure.cmake b/src/network/configure.cmake
+index 980f097e7e8..baadf23dbd7 100644
+--- a/src/network/configure.cmake
++++ b/src/network/configure.cmake
+@@ -245,7 +245,7 @@ qt_feature("dtls" PUBLIC
+     SECTION "Networking"
+     LABEL "DTLS"
+     PURPOSE "Provides a DTLS implementation"
+-    CONDITION QT_FEATURE_openssl AND QT_FEATURE_udpsocket AND TEST_dtls
++    CONDITION QT_FEATURE_ssl AND QT_FEATURE_openssl AND QT_FEATURE_udpsocket AND TEST_dtls
+ )
+ qt_feature("ocsp" PUBLIC
+     SECTION "Networking"
+diff --git a/src/plugins/tls/CMakeLists.txt b/src/plugins/tls/CMakeLists.txt
+index 91b9267123f..c577a529b8b 100644
+--- a/src/plugins/tls/CMakeLists.txt
++++ b/src/plugins/tls/CMakeLists.txt
+@@ -1,15 +1,15 @@
+ # Copyright (C) 2022 The Qt Company Ltd.
+ # SPDX-License-Identifier: BSD-3-Clause
+ 
+-if(QT_FEATURE_securetransport)
++if(QT_FEATURE_securetransport AND QT_FEATURE_ssl)
+     add_subdirectory(securetransport)
+ endif()
+ 
+-if (QT_FEATURE_openssl OR QT_FEATURE_openssl_linked)
++if ((QT_FEATURE_openssl OR QT_FEATURE_openssl_linked) AND QT_FEATURE_ssl)
+     add_subdirectory(openssl)
+ endif()
+ 
+-if (QT_FEATURE_schannel)
++if (QT_FEATURE_schannel AND QT_FEATURE_ssl)
+     add_subdirectory(schannel)
+ endif()
+ 
+-- 
+2.51.2
+

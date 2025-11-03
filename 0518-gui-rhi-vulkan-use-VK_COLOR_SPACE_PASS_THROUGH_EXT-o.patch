@@ -1,0 +1,74 @@
+From 999f4db5e6b162bc3a1424d696a64efc159e06b4 Mon Sep 17 00:00:00 2001
+From: Xaver Hugl <xaver.hugl@kde.org>
+Date: Tue, 21 Oct 2025 16:26:52 +0200
+Subject: [PATCH 518/553] gui/rhi,vulkan: use VK_COLOR_SPACE_PASS_THROUGH_EXT
+ on Wayland
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+On Wayland, only one color management surface can be created at a time without
+triggering a protocol error, and we create one ourselves in some situations.
+To avoid this problem, use VK_COLOR_SPACE_PASS_THROUGH_EXT when supported,
+so that the driver doesn't create a color management surface as well.
+
+Change-Id: Ie93ea02f1a8c2205a948f680cc3c985ccee4b057
+Reviewed-by: David Redondo <qt@david-redondo.de>
+Reviewed-by: Błażej Szczygieł <mumei6102@gmail.com>
+(cherry picked from commit 5d0a64f5c0670e40d5b7034853d2677d7a2a97a5)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/gui/rhi/qrhivulkan.cpp       | 12 ++++++++++++
+ src/gui/vulkan/qvulkanwindow.cpp | 13 +++++++++++++
+ 2 files changed, 25 insertions(+)
+
+diff --git a/src/gui/rhi/qrhivulkan.cpp b/src/gui/rhi/qrhivulkan.cpp
+index ca7aadadead..69478d7d64b 100644
+--- a/src/gui/rhi/qrhivulkan.cpp
++++ b/src/gui/rhi/qrhivulkan.cpp
+@@ -8822,6 +8822,18 @@ bool QVkSwapChain::ensureSurface()
+             if (ok) {
+                 colorFormat = formats[i].format;
+                 colorSpace = formats[i].colorSpace;
++#if QT_CONFIG(wayland)
++                // On Wayland, only one color management surface can be created at a time without
++                // triggering a protocol error, and we create one ourselves in some situations.
++                // To avoid this problem, use VK_COLOR_SPACE_PASS_THROUGH_EXT when supported,
++                // so that the driver doesn't create a color management surface as well.
++                const bool hasPassThrough = std::any_of(formats.begin(), formats.end(), [this](const VkSurfaceFormatKHR &fmt) {
++                    return fmt.format == colorFormat && fmt.colorSpace == VK_COLOR_SPACE_PASS_THROUGH_EXT;
++                });
++                if (hasPassThrough) {
++                    colorSpace = VK_COLOR_SPACE_PASS_THROUGH_EXT;
++                }
++#endif
+                 break;
+             }
+         }
+diff --git a/src/gui/vulkan/qvulkanwindow.cpp b/src/gui/vulkan/qvulkanwindow.cpp
+index a1457006888..1e52e460d38 100644
+--- a/src/gui/vulkan/qvulkanwindow.cpp
++++ b/src/gui/vulkan/qvulkanwindow.cpp
+@@ -871,6 +871,19 @@ void QVulkanWindowPrivate::init()
+         }
+     }
+ 
++#if QT_CONFIG(wayland)
++    // On Wayland, only one color management surface can be created at a time without
++    // triggering a protocol error, and we create one ourselves in some situations.
++    // To avoid this problem, use VK_COLOR_SPACE_PASS_THROUGH_EXT when supported,
++    // so that the driver doesn't create a color management surface as well.
++    const bool hasPassthrough = std::any_of(formats.cbegin(), formats.cend(), [this](const VkSurfaceFormatKHR &format) {
++        return format.format == colorFormat && format.colorSpace == VK_COLOR_SPACE_PASS_THROUGH_EXT;
++    });
++    if (hasPassthrough) {
++        colorSpace = VK_COLOR_SPACE_PASS_THROUGH_EXT;
++    }
++#endif
++
+     const VkFormat dsFormatCandidates[] = {
+         VK_FORMAT_D24_UNORM_S8_UINT,
+         VK_FORMAT_D32_SFLOAT_S8_UINT,
+-- 
+2.51.2
+

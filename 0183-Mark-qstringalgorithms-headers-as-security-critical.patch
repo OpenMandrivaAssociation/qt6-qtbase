@@ -1,0 +1,59 @@
+From e6e64660582e40e4dbb32926de0829a2a394d878 Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Mon, 22 Sep 2025 15:03:25 +0200
+Subject: [PATCH 183/553] Mark qstringalgorithms headers as security-critical
+
+Both qstringalgorithms.h and _p.h contain non-trivial implementation,
+so they cannot be considered significant-only by way of
+trivial-impl-only if QString itself is security-critical.
+
+Ditto qbytearrayalgorithms.h.
+
+Task-number: QTBUG-135195
+Pick-to: 6.8
+Change-Id: I6d96b089004ae7141f255f4912084c92a8728d66
+Reviewed-by: Ivan Solovev <ivan.solovev@qt.io>
+(cherry picked from commit ac677df5dfdcdbffc86f4e882f2ae372e194bc78)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/text/qbytearrayalgorithms.h | 1 +
+ src/corelib/text/qstringalgorithms.h    | 1 +
+ src/corelib/text/qstringalgorithms_p.h  | 1 +
+ 3 files changed, 3 insertions(+)
+
+diff --git a/src/corelib/text/qbytearrayalgorithms.h b/src/corelib/text/qbytearrayalgorithms.h
+index de7eca4fa2b..403d88d4973 100644
+--- a/src/corelib/text/qbytearrayalgorithms.h
++++ b/src/corelib/text/qbytearrayalgorithms.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2021 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:critical reason:data-parser
+ 
+ #ifndef QBYTEARRAYALGORITHMS_H
+ #define QBYTEARRAYALGORITHMS_H
+diff --git a/src/corelib/text/qstringalgorithms.h b/src/corelib/text/qstringalgorithms.h
+index 404eb79e70c..895054728a6 100644
+--- a/src/corelib/text/qstringalgorithms.h
++++ b/src/corelib/text/qstringalgorithms.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2017 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com, author Marc Mutz <marc.mutz@kdab.com>
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:critical reason:data-parser
+ 
+ #ifndef QSTRINGALGORITHMS_H
+ #define QSTRINGALGORITHMS_H
+diff --git a/src/corelib/text/qstringalgorithms_p.h b/src/corelib/text/qstringalgorithms_p.h
+index 04f2f4300f0..d88a85b34cf 100644
+--- a/src/corelib/text/qstringalgorithms_p.h
++++ b/src/corelib/text/qstringalgorithms_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 Intel Corporation.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:critical reason:data-parser
+ 
+ #ifndef QSTRINGALGORITHMS_P_H
+ #define QSTRINGALGORITHMS_P_H
+-- 
+2.51.2
+

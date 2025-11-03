@@ -1,0 +1,104 @@
+From fd53d9e758996baa51f192f1746325f3f30e4bcd Mon Sep 17 00:00:00 2001
+From: Ahmad Samir <a.samirh78@gmail.com>
+Date: Mon, 13 Oct 2025 02:04:01 +0300
+Subject: [PATCH 446/553] tst_QSettings: split the testEscapes() test:
+ unescapedKeys
+
+Easier to debug.
+
+Use example.org instead of software.org, the latter is regitered and we
+shouldn't use it in tests.
+
+Pick-to: 6.8 6.5
+Change-Id: I62eb098305491095a86ec8c8a72eeb8ca7ff6b09
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit e8aedc9fa0b7a5c45c5de8f2e2e08576ac0974b7)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../corelib/io/qsettings/tst_qsettings.cpp    | 49 +++++++++++++------
+ 1 file changed, 35 insertions(+), 14 deletions(-)
+
+diff --git a/tests/auto/corelib/io/qsettings/tst_qsettings.cpp b/tests/auto/corelib/io/qsettings/tst_qsettings.cpp
+index 79782d25e9c..c981dc366b0 100644
+--- a/tests/auto/corelib/io/qsettings/tst_qsettings.cpp
++++ b/tests/auto/corelib/io/qsettings/tst_qsettings.cpp
+@@ -186,6 +186,8 @@ private slots:
+     void testEscapes();
+     void testEscapedKeys_data();
+     void testEscapedKeys();
++    void testUnescapedKeys_data();
++    void testUnescapedKeys();
+     void testNormalizedKey_data();
+     void testNormalizedKey();
+     void testVariantTypes_data() { populateWithFormats(); }
+@@ -2832,11 +2834,6 @@ void tst_QSettings::testEscapes()
+ {
+     QSettings settings(QSettings::UserScope, "software.org", "KillerAPP");
+ 
+-#define testUnescapedKey(escKey, plainKey, reescKey) \
+-    QCOMPARE(iniUnescapedKey(escKey), QString(plainKey)); \
+-    QCOMPARE(iniEscapedKey(plainKey), QByteArray(reescKey)); \
+-    QCOMPARE(iniUnescapedKey(reescKey), QString(plainKey));
+-
+ #define testEscapedStringList(plainStrList, escStrList) \
+     { \
+         QStringList plainList(plainStrList); \
+@@ -2872,15 +2869,6 @@ void tst_QSettings::testEscapes()
+         QCOMPARE(v.toString(), QString(vStr)); \
+     }
+ 
+-    testUnescapedKey("", "", "");
+-    testUnescapedKey("%20", " ", "%20");
+-    testUnescapedKey("/alpha/beta", "/alpha/beta", "\\alpha\\beta");
+-    testUnescapedKey("\\alpha\\beta", "/alpha/beta", "\\alpha\\beta");
+-    testUnescapedKey("%5Calpha%5Cbeta", "\\alpha\\beta", "%5Calpha%5Cbeta");
+-    testUnescapedKey("%", "%", "%25");
+-    testUnescapedKey("%f%!%%%%1x%x1%U%Uz%U123%U1234%1234%", QString("%f%!%%%%1x%x1%U%Uz%U123") + QChar(0x1234) + "\x12" + "34%",
+-                     "%25f%25%21%25%25%25%251x%25x1%25U%25Uz%25U123%U1234%1234%25");
+-
+     testEscapedStringList("", "");
+     testEscapedStringList(" ", "\" \"");
+     testEscapedStringList(";", "\";\"");
+@@ -2971,6 +2959,39 @@ void tst_QSettings::testEscapedKeys()
+     QCOMPARE(iniUnescapedKey(escKey), plainKey);
+ }
+ 
++void tst_QSettings::testUnescapedKeys_data()
++{
++    QTest::addColumn<QByteArray>("escKey");
++    QTest::addColumn<QString>("plainKey");
++    QTest::addColumn<QByteArray>("reescKey");
++
++    QTest::newRow("empty-string") << ""_ba << u""_s << ""_ba;
++    QTest::newRow("space") << "%20"_ba << u" "_s << "%20"_ba;
++    QTest::newRow("%") << "%"_ba << u"%"_s << "%25"_ba;
++
++    QTest::newRow("/alpha/beta")     << "/alpha/beta"_ba     << "/alpha/beta" << "\\alpha\\beta"_ba;
++    QTest::newRow("\\alpha\\beta")   << "\\alpha\\beta"_ba   << "/alpha/beta" << "\\alpha\\beta"_ba;
++    QTest::newRow("%5Calpha%5Cbeta") << "%5Calpha%5Cbeta"_ba << "\\alpha\\beta" << "%5Calpha%5Cbeta"_ba;
++
++    QTest::newRow("many-percent")
++        << "%f%!%%%%1x%x1%U%Uz%U123%U1234%1234%"_ba
++        << QString("%f%!%%%%1x%x1%U%Uz%U123"_L1 + QChar(0x1234) + "\x12" + "34%")
++        << "%25f%25%21%25%25%25%251x%25x1%25U%25Uz%25U123%U1234%1234%25"_ba;
++}
++
++void tst_QSettings::testUnescapedKeys()
++{
++    QFETCH(QByteArray, escKey);
++    QFETCH(QString, plainKey);
++    QFETCH(QByteArray, reescKey);
++
++    QSettings settings(QSettings::UserScope, "example.org", "KillerAPP");
++
++    QCOMPARE(iniUnescapedKey(escKey), plainKey);
++    QCOMPARE(iniEscapedKey(plainKey), reescKey);
++    QCOMPARE(iniUnescapedKey(reescKey), plainKey);
++}
++
+ #endif
+ 
+ void tst_QSettings::testCaseSensitivity()
+-- 
+2.51.2
+

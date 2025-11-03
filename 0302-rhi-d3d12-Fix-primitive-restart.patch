@@ -1,0 +1,43 @@
+From 970f7f876b8c9bf221a760583d30dadd02f0b53a Mon Sep 17 00:00:00 2001
+From: Laszlo Agocs <laszlo.agocs@qt.io>
+Date: Tue, 16 Sep 2025 13:40:52 +0200
+Subject: [PATCH 302/553] rhi: d3d12: Fix primitive restart
+
+Unlike D3D11, it seems one has to explicitly enable
+0xFFFFFFFF as the primitive restart value, as 0
+means disabled.
+
+Fixes: QTBUG-137219
+Pick-to: 6.9 6.8
+Change-Id: I7fbee138ef93bde89af16ab97c8f54e9fd687e9d
+Reviewed-by: Andy Nichols <andy.nichols@qt.io>
+(cherry picked from commit a3214c5745985a76222681a0c64297f5e1ed311a)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/gui/rhi/qrhid3d12.cpp | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/gui/rhi/qrhid3d12.cpp b/src/gui/rhi/qrhid3d12.cpp
+index 72bbe736bcb..d37b08f300f 100644
+--- a/src/gui/rhi/qrhid3d12.cpp
++++ b/src/gui/rhi/qrhid3d12.cpp
+@@ -6154,6 +6154,7 @@ bool QD3D12GraphicsPipeline::create()
+     struct {
+         QD3D12PipelineStateSubObject<ID3D12RootSignature *, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_ROOT_SIGNATURE> rootSig;
+         QD3D12PipelineStateSubObject<D3D12_INPUT_LAYOUT_DESC, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_INPUT_LAYOUT> inputLayout;
++        QD3D12PipelineStateSubObject<D3D12_INDEX_BUFFER_STRIP_CUT_VALUE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_IB_STRIP_CUT_VALUE> primitiveRestartValue;
+         QD3D12PipelineStateSubObject<D3D12_PRIMITIVE_TOPOLOGY_TYPE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_PRIMITIVE_TOPOLOGY> primitiveTopology;
+         QD3D12PipelineStateSubObject<D3D12_SHADER_BYTECODE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_VS> VS;
+         QD3D12PipelineStateSubObject<D3D12_SHADER_BYTECODE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_HS> HS;
+@@ -6212,6 +6213,8 @@ bool QD3D12GraphicsPipeline::create()
+     stream.inputLayout.object.NumElements = inputDescs.count();
+     stream.inputLayout.object.pInputElementDescs = inputDescs.isEmpty() ? nullptr : inputDescs.constData();
+ 
++    stream.primitiveRestartValue.object = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_0xFFFFFFFF;
++
+     stream.primitiveTopology.object = toD3DTopologyType(m_topology);
+     topology = toD3DTopology(m_topology, m_patchControlPointCount);
+ 
+-- 
+2.51.2
+

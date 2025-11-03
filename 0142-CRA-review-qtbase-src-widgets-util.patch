@@ -1,0 +1,284 @@
+From 24d4ef070e44829da03488bcd88d123437b53d4f Mon Sep 17 00:00:00 2001
+From: MohammadHossein Qanbari <mohammad.qanbari@qt.io>
+Date: Tue, 16 Sep 2025 18:08:38 +0200
+Subject: [PATCH 142/553] CRA review: qtbase/src/widgets/util/
+
+No data parsing or critical security level is found.
+
+QUIP: 23
+Fixes: QTBUG-135743
+Pick-to: 6.9 6.8
+Change-Id: I441b02d890c116b55e932b02b0ba7d095eb3127b
+Reviewed-by: Volker Hilsheimer <volker.hilsheimer@qt.io>
+(cherry picked from commit 11d9250503253ef7fea78f83c561e0d525d83f80)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/widgets/util/qcolormap.cpp           | 1 +
+ src/widgets/util/qcolormap.h             | 1 +
+ src/widgets/util/qcompleter.cpp          | 1 +
+ src/widgets/util/qcompleter.h            | 1 +
+ src/widgets/util/qcompleter_p.h          | 1 +
+ src/widgets/util/qflickgesture.cpp       | 1 +
+ src/widgets/util/qflickgesture_p.h       | 1 +
+ src/widgets/util/qscroller.cpp           | 1 +
+ src/widgets/util/qscroller.h             | 1 +
+ src/widgets/util/qscroller_p.h           | 1 +
+ src/widgets/util/qscrollerproperties.cpp | 1 +
+ src/widgets/util/qscrollerproperties.h   | 1 +
+ src/widgets/util/qscrollerproperties_p.h | 1 +
+ src/widgets/util/qsystemtrayicon.cpp     | 1 +
+ src/widgets/util/qsystemtrayicon.h       | 1 +
+ src/widgets/util/qsystemtrayicon_p.h     | 1 +
+ src/widgets/util/qsystemtrayicon_qpa.cpp | 1 +
+ src/widgets/util/qsystemtrayicon_x11.cpp | 1 +
+ src/widgets/util/qundogroup.h            | 1 +
+ src/widgets/util/qundostack.h            | 1 +
+ src/widgets/util/qundoview.cpp           | 1 +
+ src/widgets/util/qundoview.h             | 1 +
+ 22 files changed, 22 insertions(+)
+
+diff --git a/src/widgets/util/qcolormap.cpp b/src/widgets/util/qcolormap.cpp
+index 08f892b109c..9e8813896d4 100644
+--- a/src/widgets/util/qcolormap.cpp
++++ b/src/widgets/util/qcolormap.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qcolormap.h"
+ #include "qcolor.h"
+diff --git a/src/widgets/util/qcolormap.h b/src/widgets/util/qcolormap.h
+index 3a187e1191b..d3b55f16fcd 100644
+--- a/src/widgets/util/qcolormap.h
++++ b/src/widgets/util/qcolormap.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QCOLORMAP_H
+ #define QCOLORMAP_H
+diff --git a/src/widgets/util/qcompleter.cpp b/src/widgets/util/qcompleter.cpp
+index 2e78b0ee04e..220f600ea41 100644
+--- a/src/widgets/util/qcompleter.cpp
++++ b/src/widgets/util/qcompleter.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ /*!
+     \class QCompleter
+diff --git a/src/widgets/util/qcompleter.h b/src/widgets/util/qcompleter.h
+index 9d20c9ae092..660c0d5035b 100644
+--- a/src/widgets/util/qcompleter.h
++++ b/src/widgets/util/qcompleter.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QCOMPLETER_H
+ #define QCOMPLETER_H
+diff --git a/src/widgets/util/qcompleter_p.h b/src/widgets/util/qcompleter_p.h
+index a88996f1809..42147fd825a 100644
+--- a/src/widgets/util/qcompleter_p.h
++++ b/src/widgets/util/qcompleter_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QCOMPLETER_P_H
+ #define QCOMPLETER_P_H
+diff --git a/src/widgets/util/qflickgesture.cpp b/src/widgets/util/qflickgesture.cpp
+index bbe9ddbce82..a05781cd439 100644
+--- a/src/widgets/util/qflickgesture.cpp
++++ b/src/widgets/util/qflickgesture.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qgesture.h"
+ #include "qapplication.h"
+diff --git a/src/widgets/util/qflickgesture_p.h b/src/widgets/util/qflickgesture_p.h
+index e8306b77e8d..b64c907dbb3 100644
+--- a/src/widgets/util/qflickgesture_p.h
++++ b/src/widgets/util/qflickgesture_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QFLICKGESTURE_P_H
+ #define QFLICKGESTURE_P_H
+diff --git a/src/widgets/util/qscroller.cpp b/src/widgets/util/qscroller.cpp
+index 9cdbb385fe2..72cf4c676d1 100644
+--- a/src/widgets/util/qscroller.cpp
++++ b/src/widgets/util/qscroller.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qevent.h"
+ #include "qwidget.h"
+diff --git a/src/widgets/util/qscroller.h b/src/widgets/util/qscroller.h
+index fe926bc50d8..93b13a098a5 100644
+--- a/src/widgets/util/qscroller.h
++++ b/src/widgets/util/qscroller.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSCROLLER_H
+ #define QSCROLLER_H
+diff --git a/src/widgets/util/qscroller_p.h b/src/widgets/util/qscroller_p.h
+index aadf58704dd..20e04b408c1 100644
+--- a/src/widgets/util/qscroller_p.h
++++ b/src/widgets/util/qscroller_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSCROLLER_P_H
+ #define QSCROLLER_P_H
+diff --git a/src/widgets/util/qscrollerproperties.cpp b/src/widgets/util/qscrollerproperties.cpp
+index ff8b695f61d..4cd9f1f9a52 100644
+--- a/src/widgets/util/qscrollerproperties.cpp
++++ b/src/widgets/util/qscrollerproperties.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QPointer>
+ #include <QObject>
+diff --git a/src/widgets/util/qscrollerproperties.h b/src/widgets/util/qscrollerproperties.h
+index ad301a6ad62..2ef47e02b37 100644
+--- a/src/widgets/util/qscrollerproperties.h
++++ b/src/widgets/util/qscrollerproperties.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSCROLLERPROPERTIES_H
+ #define QSCROLLERPROPERTIES_H
+diff --git a/src/widgets/util/qscrollerproperties_p.h b/src/widgets/util/qscrollerproperties_p.h
+index 1ff5de3f117..40c834548b2 100644
+--- a/src/widgets/util/qscrollerproperties_p.h
++++ b/src/widgets/util/qscrollerproperties_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSCROLLERPROPERTIES_P_H
+ #define QSCROLLERPROPERTIES_P_H
+diff --git a/src/widgets/util/qsystemtrayicon.cpp b/src/widgets/util/qsystemtrayicon.cpp
+index cd098eaffe0..901f9d36ab3 100644
+--- a/src/widgets/util/qsystemtrayicon.cpp
++++ b/src/widgets/util/qsystemtrayicon.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qsystemtrayicon.h"
+ #include "qsystemtrayicon_p.h"
+diff --git a/src/widgets/util/qsystemtrayicon.h b/src/widgets/util/qsystemtrayicon.h
+index 0a77ba03b7a..9e2d277eb93 100644
+--- a/src/widgets/util/qsystemtrayicon.h
++++ b/src/widgets/util/qsystemtrayicon.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSYSTEMTRAYICON_H
+ #define QSYSTEMTRAYICON_H
+diff --git a/src/widgets/util/qsystemtrayicon_p.h b/src/widgets/util/qsystemtrayicon_p.h
+index d93da8bd6ca..af7921259af 100644
+--- a/src/widgets/util/qsystemtrayicon_p.h
++++ b/src/widgets/util/qsystemtrayicon_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSYSTEMTRAYICON_P_H
+ #define QSYSTEMTRAYICON_P_H
+diff --git a/src/widgets/util/qsystemtrayicon_qpa.cpp b/src/widgets/util/qsystemtrayicon_qpa.cpp
+index 63b24873db3..bd46ecd854c 100644
+--- a/src/widgets/util/qsystemtrayicon_qpa.cpp
++++ b/src/widgets/util/qsystemtrayicon_qpa.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qsystemtrayicon_p.h"
+ 
+diff --git a/src/widgets/util/qsystemtrayicon_x11.cpp b/src/widgets/util/qsystemtrayicon_x11.cpp
+index f316a5953ce..f5308fcf7ea 100644
+--- a/src/widgets/util/qsystemtrayicon_x11.cpp
++++ b/src/widgets/util/qsystemtrayicon_x11.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qtwidgetsglobal.h"
+ #if QT_CONFIG(label)
+diff --git a/src/widgets/util/qundogroup.h b/src/widgets/util/qundogroup.h
+index 379e03d5b1b..b776cbc1b5c 100644
+--- a/src/widgets/util/qundogroup.h
++++ b/src/widgets/util/qundogroup.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #if 0
+ // syncqt: header is already part of QtGui/QtGui
+diff --git a/src/widgets/util/qundostack.h b/src/widgets/util/qundostack.h
+index c291303803f..2e5ed8514de 100644
+--- a/src/widgets/util/qundostack.h
++++ b/src/widgets/util/qundostack.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #if 0
+ // syncqt: header is already part of QtGui/QtGui
+diff --git a/src/widgets/util/qundoview.cpp b/src/widgets/util/qundoview.cpp
+index 9c78c6d0757..7be4afe3bf5 100644
+--- a/src/widgets/util/qundoview.cpp
++++ b/src/widgets/util/qundoview.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qundoview.h"
+ 
+diff --git a/src/widgets/util/qundoview.h b/src/widgets/util/qundoview.h
+index 2d011b961ca..ae634c6b190 100644
+--- a/src/widgets/util/qundoview.h
++++ b/src/widgets/util/qundoview.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QUNDOVIEW_H
+ #define QUNDOVIEW_H
+-- 
+2.51.2
+

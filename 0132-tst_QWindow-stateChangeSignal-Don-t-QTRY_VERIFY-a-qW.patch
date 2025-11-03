@@ -1,0 +1,36 @@
+From 6b7c3967f9d3a2972002304cd814862335fe3e32 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tor=20Arne=20Vestb=C3=B8?= <tor.arne.vestbo@qt.io>
+Date: Wed, 17 Sep 2025 14:01:40 +0200
+Subject: [PATCH 132/553] tst_QWindow::stateChangeSignal: Don't QTRY_VERIFY a
+ qWaitFor
+
+A qWaitFor already tries for 5000ms, spinning the event loop in the
+process. Wrapping that in a QTRY_VERIFY resulted in a 4-5 minute
+wait when the waited expression never happened, instead of the
+normal 5000ms timeout.
+
+Pick-to: 6.9 6.8
+Change-Id: I8e59a73ccdb3007c4969d69e3bd09a35c34ea73d
+Reviewed-by: Axel Spoerl <axel.spoerl@qt.io>
+(cherry picked from commit f38dd8159078761ae25a8b438da1fd95c9a12243)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ tests/auto/gui/kernel/qwindow/tst_qwindow.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/auto/gui/kernel/qwindow/tst_qwindow.cpp b/tests/auto/gui/kernel/qwindow/tst_qwindow.cpp
+index 7a92176e715..e85bfa5eca4 100644
+--- a/tests/auto/gui/kernel/qwindow/tst_qwindow.cpp
++++ b/tests/auto/gui/kernel/qwindow/tst_qwindow.cpp
+@@ -3106,7 +3106,7 @@ void tst_QWindow::stateChangeSignal()
+     // - wait for signal spy to have reached target count
+     // - extract state from signal and compare to target
+ #define CHECK_STATE(State)\
+-    QTRY_VERIFY(QTest::qWaitFor([&w](){return (w.windowState() == State); }));\
++    QVERIFY(QTest::qWaitFor([&w](){return (w.windowState() == State); }));\
+     CHECK_SIGNAL(State)
+ #define CHECK_SIGNAL(State)\
+     QTRY_COMPARE(spy.count(), signalCount);\
+-- 
+2.51.2
+

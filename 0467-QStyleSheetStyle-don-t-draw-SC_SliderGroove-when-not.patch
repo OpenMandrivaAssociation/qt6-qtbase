@@ -1,0 +1,72 @@
+From 74063980af988a11afed54554f7b61d38df62c2f Mon Sep 17 00:00:00 2001
+From: Christian Ehrlicher <ch.ehrlicher@gmx.de>
+Date: Sat, 18 Oct 2025 09:09:27 +0200
+Subject: [PATCH 467/553] QStyleSheetStyle: don't draw SC_SliderGroove when not
+ asked for
+
+The rules for QSlider: add/sub-page where drawn even though
+SC_SliderGroove was not given.
+
+Fixes: QTBUG-141157
+Change-Id: Ibdb22e18588c54f0f59be37fd6a430e74e0df762
+Reviewed-by: Axel Spoerl <axel.spoerl@qt.io>
+(cherry picked from commit 1f5a45116232cbebbc9504614dcb0a6dc6f330c7)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/widgets/styles/qstylesheetstyle.cpp | 35 ++++++++++++-------------
+ 1 file changed, 17 insertions(+), 18 deletions(-)
+
+diff --git a/src/widgets/styles/qstylesheetstyle.cpp b/src/widgets/styles/qstylesheetstyle.cpp
+index 572bce37eb1..fda3b8978bc 100644
+--- a/src/widgets/styles/qstylesheetstyle.cpp
++++ b/src/widgets/styles/qstylesheetstyle.cpp
+@@ -3422,29 +3422,28 @@ void QStyleSheetStyle::drawComplexControl(ComplexControl cc, const QStyleOptionC
+             }
+ 
+             QRect gr = subControlRect(cc, opt, SC_SliderGroove, w);
+-            if (slider->subControls & SC_SliderGroove) {
++            if (slider->subControls & SC_SliderGroove)
+                 grooveSubRule.drawRule(p, gr);
+-            }
+ 
+             if (slider->subControls & SC_SliderHandle) {
+                 QRect hr = subControlRect(cc, opt, SC_SliderHandle, w);
+ 
+-                QRenderRule subRule1 = renderRule(w, opt, PseudoElement_SliderSubPage);
+-                if (subRule1.hasDrawable()) {
+-                    QRect r(gr.topLeft(),
+-                            slider->orientation == Qt::Horizontal
+-                                ? QPoint(hr.x()+hr.width()/2, gr.y()+gr.height() - 1)
+-                                : QPoint(gr.x()+gr.width() - 1, hr.y()+hr.height()/2));
+-                    subRule1.drawRule(p, r);
+-                }
+-
+-                QRenderRule subRule2 = renderRule(w, opt, PseudoElement_SliderAddPage);
+-                if (subRule2.hasDrawable()) {
+-                    QRect r(slider->orientation == Qt::Horizontal
+-                                ? QPoint(hr.x()+hr.width()/2+1, gr.y())
+-                                : QPoint(gr.x(), hr.y()+hr.height()/2+1),
+-                            gr.bottomRight());
+-                    subRule2.drawRule(p, r);
++                if (slider->subControls & SC_SliderGroove) {
++                    const bool isHor = slider->orientation == Qt::Horizontal;
++                    QRenderRule subRule1 = renderRule(w, opt, PseudoElement_SliderSubPage);
++                    if (subRule1.hasDrawable()) {
++                        QRect r(gr.topLeft(),
++                                isHor ? QPoint(hr.x() + hr.width() / 2, gr.y() + gr.height() - 1)
++                                      : QPoint(gr.x() + gr.width() - 1, hr.y() + hr.height() / 2));
++                        subRule1.drawRule(p, r);
++                    }
++                    QRenderRule subRule2 = renderRule(w, opt, PseudoElement_SliderAddPage);
++                    if (subRule2.hasDrawable()) {
++                        QRect r(isHor ? QPoint(hr.x() + hr.width() / 2 + 1, gr.y())
++                                      : QPoint(gr.x(), hr.y() + hr.height() / 2 + 1),
++                                gr.bottomRight());
++                        subRule2.drawRule(p, r);
++                    }
+                 }
+ 
+                 handleSubRule.drawRule(p, handleSubRule.boxRect(hr, Margin));
+-- 
+2.51.2
+

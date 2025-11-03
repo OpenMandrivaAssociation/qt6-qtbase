@@ -1,0 +1,48 @@
+From 59932759cfeb2b8e8a773ba727aed5e75c113d59 Mon Sep 17 00:00:00 2001
+From: Allan Sandfeld Jensen <allan.jensen@qt.io>
+Date: Thu, 9 Oct 2025 10:43:06 +0200
+Subject: [PATCH 332/553] Make rectfill consistent for RGBx8888
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Change-Id: I14e880c4f7e8b97ab6086e505f5353fa6a8d83d8
+Pick-to: 6.8 6.5
+Reviewed-by: Tor Arne Vestbø <tor.arne.vestbo@qt.io>
+(cherry picked from commit 603973b813bb1e85d8f871cc2d7e0102218fa71c)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/gui/painting/qdrawhelper.cpp | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/src/gui/painting/qdrawhelper.cpp b/src/gui/painting/qdrawhelper.cpp
+index 8aefba86ee7..adee8ab6cb5 100644
+--- a/src/gui/painting/qdrawhelper.cpp
++++ b/src/gui/painting/qdrawhelper.cpp
+@@ -6162,6 +6162,14 @@ static void qt_rectfill_nonpremul_argb32(QRasterBuffer *rasterBuffer,
+                          color.unpremultiplied().toArgb32(), x, y, width, height, rasterBuffer->bytesPerLine());
+ }
+ 
++static void qt_rectfill_rgbx(QRasterBuffer *rasterBuffer,
++                             int x, int y, int width, int height,
++                             const QRgba64 &color)
++{
++    qt_rectfill<quint32>(reinterpret_cast<quint32 *>(rasterBuffer->buffer()),
++                         ARGB2RGBA(color.toArgb32() | 0xff000000), x, y, width, height, rasterBuffer->bytesPerLine());
++}
++
+ static void qt_rectfill_rgba(QRasterBuffer *rasterBuffer,
+                              int x, int y, int width, int height,
+                              const QRgba64 &color)
+@@ -6353,7 +6361,7 @@ DrawHelper qDrawHelper[] =
+         qt_bitmapblit_rgba8888,
+         qt_alphamapblit_generic,
+         qt_alphargbblit_generic,
+-        qt_rectfill_rgba
++        qt_rectfill_rgbx
+     },
+     // Format_RGBA8888
+     {
+-- 
+2.51.2
+

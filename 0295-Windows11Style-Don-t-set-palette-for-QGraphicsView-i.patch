@@ -1,0 +1,41 @@
+From c4076cf0a416702a67519c83d546921e382ce241 Mon Sep 17 00:00:00 2001
+From: Christian Ehrlicher <ch.ehrlicher@gmx.de>
+Date: Fri, 28 Feb 2025 21:37:30 +0100
+Subject: [PATCH 295/553] Windows11Style: Don't set palette for QGraphicsView
+ in polish()
+
+Don't set QPalette::Base for QGraphicsView in polish(QWidget*) as it is
+not needed and only makes trouble when switching between light and dark
+mode.
+
+Pick-to: 6.9 6.8
+Task-number: QTBUG-130480
+Change-Id: I30a8a899fb7ed7dc32c23090d7ee70e6df809ab6
+Reviewed-by: Wladimir Leuschner <wladimir.leuschner@qt.io>
+(cherry picked from commit 697d66435229250c38dd45216c897be84c043d01)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/plugins/styles/modernwindows/qwindows11style.cpp | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/src/plugins/styles/modernwindows/qwindows11style.cpp b/src/plugins/styles/modernwindows/qwindows11style.cpp
+index d2053865132..745d7063ef0 100644
+--- a/src/plugins/styles/modernwindows/qwindows11style.cpp
++++ b/src/plugins/styles/modernwindows/qwindows11style.cpp
+@@ -2252,12 +2252,9 @@ void QWindows11Style::polish(QWidget* widget)
+             QLineEdit *le = cb->lineEdit();
+             le->setFrame(false);
+         }
+-    } else if (qobject_cast<QGraphicsView *>(widget) && !qobject_cast<QTextEdit *>(widget)) {
+-        QPalette pal = widget->palette();
+-        pal.setColor(QPalette::Base, pal.window().color());
+-        widget->setPalette(pal);
+     } else if (const auto *scrollarea = qobject_cast<QAbstractScrollArea *>(widget);
+                scrollarea
++               && !qobject_cast<QGraphicsView *>(widget)
+ #if QT_CONFIG(mdiarea)
+                && !qobject_cast<QMdiArea *>(widget)
+ #endif
+-- 
+2.51.2
+

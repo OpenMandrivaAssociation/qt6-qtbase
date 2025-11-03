@@ -1,0 +1,296 @@
+From e7b5181242ce56923e97aad312c5ae355a90997d Mon Sep 17 00:00:00 2001
+From: Liang Qi <liang.qi@qt.io>
+Date: Thu, 25 Sep 2025 10:02:52 +0200
+Subject: [PATCH 262/553] CRA review: plugins/platforms/directfb/*
+
+We trust the OS, so none of this code is security critical.
+
+QUIP: 23
+Fixes: QTBUG-135708
+Pick-to: 6.8
+Change-Id: Id6919575a4c954bb9e2df77164d4f1a8536f344c
+Reviewed-by: Volker Hilsheimer <volker.hilsheimer@qt.io>
+(cherry picked from commit aff8767a374332893604509cbc4cc272f5484e4d)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/plugins/platforms/directfb/main.cpp                   | 1 +
+ src/plugins/platforms/directfb/qdirectfb_egl.cpp          | 1 +
+ src/plugins/platforms/directfb/qdirectfb_egl.h            | 1 +
+ src/plugins/platforms/directfb/qdirectfbbackingstore.cpp  | 1 +
+ src/plugins/platforms/directfb/qdirectfbbackingstore.h    | 1 +
+ src/plugins/platforms/directfb/qdirectfbblitter.cpp       | 1 +
+ src/plugins/platforms/directfb/qdirectfbblitter.h         | 1 +
+ src/plugins/platforms/directfb/qdirectfbconvenience.cpp   | 1 +
+ src/plugins/platforms/directfb/qdirectfbconvenience.h     | 1 +
+ src/plugins/platforms/directfb/qdirectfbcursor.cpp        | 1 +
+ src/plugins/platforms/directfb/qdirectfbcursor.h          | 1 +
+ src/plugins/platforms/directfb/qdirectfbeglhooks.h        | 1 +
+ src/plugins/platforms/directfb/qdirectfbeglhooks_stub.cpp | 1 +
+ src/plugins/platforms/directfb/qdirectfbglcontext.cpp     | 1 +
+ src/plugins/platforms/directfb/qdirectfbglcontext.h       | 1 +
+ src/plugins/platforms/directfb/qdirectfbinput.cpp         | 1 +
+ src/plugins/platforms/directfb/qdirectfbinput.h           | 1 +
+ src/plugins/platforms/directfb/qdirectfbintegration.cpp   | 1 +
+ src/plugins/platforms/directfb/qdirectfbintegration.h     | 1 +
+ src/plugins/platforms/directfb/qdirectfbscreen.cpp        | 1 +
+ src/plugins/platforms/directfb/qdirectfbscreen.h          | 1 +
+ src/plugins/platforms/directfb/qdirectfbwindow.cpp        | 1 +
+ src/plugins/platforms/directfb/qdirectfbwindow.h          | 1 +
+ 23 files changed, 23 insertions(+)
+
+diff --git a/src/plugins/platforms/directfb/main.cpp b/src/plugins/platforms/directfb/main.cpp
+index 46186961545..12cae459143 100644
+--- a/src/plugins/platforms/directfb/main.cpp
++++ b/src/plugins/platforms/directfb/main.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <qpa/qplatformintegrationplugin.h>
+ #include "qdirectfbintegration.h"
+diff --git a/src/plugins/platforms/directfb/qdirectfb_egl.cpp b/src/plugins/platforms/directfb/qdirectfb_egl.cpp
+index 28cf8b610a9..34ef90cb1ce 100644
+--- a/src/plugins/platforms/directfb/qdirectfb_egl.cpp
++++ b/src/plugins/platforms/directfb/qdirectfb_egl.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qdirectfb_egl.h"
+ #include "qdirectfbwindow.h"
+diff --git a/src/plugins/platforms/directfb/qdirectfb_egl.h b/src/plugins/platforms/directfb/qdirectfb_egl.h
+index 7dfdb4997e7..38afd2f37bb 100644
+--- a/src/plugins/platforms/directfb/qdirectfb_egl.h
++++ b/src/plugins/platforms/directfb/qdirectfb_egl.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QDIRECTFB_EGL_H
+ #define QDIRECTFB_EGL_H
+diff --git a/src/plugins/platforms/directfb/qdirectfbbackingstore.cpp b/src/plugins/platforms/directfb/qdirectfbbackingstore.cpp
+index 05b7cb09f12..c3f3fb8b2cc 100644
+--- a/src/plugins/platforms/directfb/qdirectfbbackingstore.cpp
++++ b/src/plugins/platforms/directfb/qdirectfbbackingstore.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qdirectfbbackingstore.h"
+ #include "qdirectfbintegration.h"
+diff --git a/src/plugins/platforms/directfb/qdirectfbbackingstore.h b/src/plugins/platforms/directfb/qdirectfbbackingstore.h
+index 625b672a401..eca4b35489e 100644
+--- a/src/plugins/platforms/directfb/qdirectfbbackingstore.h
++++ b/src/plugins/platforms/directfb/qdirectfbbackingstore.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QWINDOWSURFACE_DIRECTFB_H
+ #define QWINDOWSURFACE_DIRECTFB_H
+diff --git a/src/plugins/platforms/directfb/qdirectfbblitter.cpp b/src/plugins/platforms/directfb/qdirectfbblitter.cpp
+index c93e48ead76..02450ce8b30 100644
+--- a/src/plugins/platforms/directfb/qdirectfbblitter.cpp
++++ b/src/plugins/platforms/directfb/qdirectfbblitter.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qdirectfbblitter.h"
+ #include "qdirectfbconvenience.h"
+diff --git a/src/plugins/platforms/directfb/qdirectfbblitter.h b/src/plugins/platforms/directfb/qdirectfbblitter.h
+index 6183859613a..60cb16d0f73 100644
+--- a/src/plugins/platforms/directfb/qdirectfbblitter.h
++++ b/src/plugins/platforms/directfb/qdirectfbblitter.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QDIRECTFBBLITTER_H
+ #define QDIRECTFBBLITTER_H
+diff --git a/src/plugins/platforms/directfb/qdirectfbconvenience.cpp b/src/plugins/platforms/directfb/qdirectfbconvenience.cpp
+index 9efcdd42c77..881a233e694 100644
+--- a/src/plugins/platforms/directfb/qdirectfbconvenience.cpp
++++ b/src/plugins/platforms/directfb/qdirectfbconvenience.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qdirectfbconvenience.h"
+ #include "qdirectfbblitter.h"
+diff --git a/src/plugins/platforms/directfb/qdirectfbconvenience.h b/src/plugins/platforms/directfb/qdirectfbconvenience.h
+index dc657f384e6..0a5e13634e8 100644
+--- a/src/plugins/platforms/directfb/qdirectfbconvenience.h
++++ b/src/plugins/platforms/directfb/qdirectfbconvenience.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QDIRECTFBCONVENIENCE_H
+ #define QDIRECTFBCONVENIENCE_H
+diff --git a/src/plugins/platforms/directfb/qdirectfbcursor.cpp b/src/plugins/platforms/directfb/qdirectfbcursor.cpp
+index 1e036694986..55de3043ca9 100644
+--- a/src/plugins/platforms/directfb/qdirectfbcursor.cpp
++++ b/src/plugins/platforms/directfb/qdirectfbcursor.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qdirectfbcursor.h"
+ #include "qdirectfbconvenience.h"
+diff --git a/src/plugins/platforms/directfb/qdirectfbcursor.h b/src/plugins/platforms/directfb/qdirectfbcursor.h
+index 21a8f4353d9..0b8d088d217 100644
+--- a/src/plugins/platforms/directfb/qdirectfbcursor.h
++++ b/src/plugins/platforms/directfb/qdirectfbcursor.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QDIRECTFBCURSOR_H
+ #define QDIRECTFBCURSOR_H
+diff --git a/src/plugins/platforms/directfb/qdirectfbeglhooks.h b/src/plugins/platforms/directfb/qdirectfbeglhooks.h
+index dc3db5fbb5a..ea7bf328d51 100644
+--- a/src/plugins/platforms/directfb/qdirectfbeglhooks.h
++++ b/src/plugins/platforms/directfb/qdirectfbeglhooks.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QDIRECTFBEGL_HOOKS_H
+ #define QDIRECTFBEGL_HOOKS_H
+diff --git a/src/plugins/platforms/directfb/qdirectfbeglhooks_stub.cpp b/src/plugins/platforms/directfb/qdirectfbeglhooks_stub.cpp
+index 174ae89d32a..f7b9607e699 100644
+--- a/src/plugins/platforms/directfb/qdirectfbeglhooks_stub.cpp
++++ b/src/plugins/platforms/directfb/qdirectfbeglhooks_stub.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qdirectfbeglhooks.h"
+ 
+diff --git a/src/plugins/platforms/directfb/qdirectfbglcontext.cpp b/src/plugins/platforms/directfb/qdirectfbglcontext.cpp
+index 374df119216..23f56b9aacd 100644
+--- a/src/plugins/platforms/directfb/qdirectfbglcontext.cpp
++++ b/src/plugins/platforms/directfb/qdirectfbglcontext.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qdirectfbglcontext.h"
+ 
+diff --git a/src/plugins/platforms/directfb/qdirectfbglcontext.h b/src/plugins/platforms/directfb/qdirectfbglcontext.h
+index 424b45b0340..85987920370 100644
+--- a/src/plugins/platforms/directfb/qdirectfbglcontext.h
++++ b/src/plugins/platforms/directfb/qdirectfbglcontext.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QDIRECTFBGLCONTEXT_H
+ #define QDIRECTFBGLCONTEXT_H
+diff --git a/src/plugins/platforms/directfb/qdirectfbinput.cpp b/src/plugins/platforms/directfb/qdirectfbinput.cpp
+index c5aacad6cc5..1c7a073396d 100644
+--- a/src/plugins/platforms/directfb/qdirectfbinput.cpp
++++ b/src/plugins/platforms/directfb/qdirectfbinput.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qdirectfbinput.h"
+ #include "qdirectfbconvenience.h"
+diff --git a/src/plugins/platforms/directfb/qdirectfbinput.h b/src/plugins/platforms/directfb/qdirectfbinput.h
+index 02175abc7bb..916c18df443 100644
+--- a/src/plugins/platforms/directfb/qdirectfbinput.h
++++ b/src/plugins/platforms/directfb/qdirectfbinput.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QDIRECTFBINPUT_H
+ #define QDIRECTFBINPUT_H
+diff --git a/src/plugins/platforms/directfb/qdirectfbintegration.cpp b/src/plugins/platforms/directfb/qdirectfbintegration.cpp
+index f705f66c16e..33568cb843e 100644
+--- a/src/plugins/platforms/directfb/qdirectfbintegration.cpp
++++ b/src/plugins/platforms/directfb/qdirectfbintegration.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qdirectfbintegration.h"
+ #include "qdirectfbbackingstore.h"
+diff --git a/src/plugins/platforms/directfb/qdirectfbintegration.h b/src/plugins/platforms/directfb/qdirectfbintegration.h
+index b472e15ae75..05679ddc285 100644
+--- a/src/plugins/platforms/directfb/qdirectfbintegration.h
++++ b/src/plugins/platforms/directfb/qdirectfbintegration.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPLATFORMINTEGRATION_DIRECTFB_H
+ #define QPLATFORMINTEGRATION_DIRECTFB_H
+diff --git a/src/plugins/platforms/directfb/qdirectfbscreen.cpp b/src/plugins/platforms/directfb/qdirectfbscreen.cpp
+index b98c7b5aecb..610f16c15ae 100644
+--- a/src/plugins/platforms/directfb/qdirectfbscreen.cpp
++++ b/src/plugins/platforms/directfb/qdirectfbscreen.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qdirectfbscreen.h"
+ #include "qdirectfbcursor.h"
+diff --git a/src/plugins/platforms/directfb/qdirectfbscreen.h b/src/plugins/platforms/directfb/qdirectfbscreen.h
+index cbcb6a55da6..27236c0ff65 100644
+--- a/src/plugins/platforms/directfb/qdirectfbscreen.h
++++ b/src/plugins/platforms/directfb/qdirectfbscreen.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QDIRECTFBSCREEN_H
+ #define QDIRECTFBSCREEN_H
+diff --git a/src/plugins/platforms/directfb/qdirectfbwindow.cpp b/src/plugins/platforms/directfb/qdirectfbwindow.cpp
+index 63fd1f426d7..9493f024e48 100644
+--- a/src/plugins/platforms/directfb/qdirectfbwindow.cpp
++++ b/src/plugins/platforms/directfb/qdirectfbwindow.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qdirectfbwindow.h"
+ #include "qdirectfbbackingstore.h"
+diff --git a/src/plugins/platforms/directfb/qdirectfbwindow.h b/src/plugins/platforms/directfb/qdirectfbwindow.h
+index f05038d8cab..a111c0c0da9 100644
+--- a/src/plugins/platforms/directfb/qdirectfbwindow.h
++++ b/src/plugins/platforms/directfb/qdirectfbwindow.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QDIRECTFBWINDOW_H
+ #define QDIRECTFBWINDOW_H
+-- 
+2.51.2
+

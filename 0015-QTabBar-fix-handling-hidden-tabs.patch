@@ -1,0 +1,121 @@
+From 531bcae7d414593b6f4697daa23ec76e48eabccc Mon Sep 17 00:00:00 2001
+From: Christian Ehrlicher <ch.ehrlicher@gmx.de>
+Date: Fri, 5 Sep 2025 21:28:47 +0200
+Subject: [PATCH 015/553] QTabBar: fix handling hidden tabs
+
+Hidden tabs were not properly handled within normalizedScrollRect() and
+makeVisible() which lead to ui glitches and disable left/right buttons
+even though there are more buttons available.
+
+Account for hidden tabs in calculating the scroll rect.
+Since the glitch is purely graphical, it can't be autotested.
+
+Pick-to: 6.9 6.8
+Fixes: QTBUG-102020
+Fixes: QTBUG-139791
+Task-number: QTBUG-63038
+Change-Id: I989f483320f9baa5e79069dd3f0d8b06812fcbd0
+Reviewed-by: Axel Spoerl <axel.spoerl@qt.io>
+(cherry picked from commit af0319ceb6c8ed8be501f27f8faf105b0b88cf50)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/widgets/widgets/qtabbar.cpp | 29 ++++++++++++++++++++---------
+ src/widgets/widgets/qtabbar_p.h |  6 ++++++
+ 2 files changed, 26 insertions(+), 9 deletions(-)
+
+diff --git a/src/widgets/widgets/qtabbar.cpp b/src/widgets/widgets/qtabbar.cpp
+index 53d13ca2855..450b4eaf0d6 100644
+--- a/src/widgets/widgets/qtabbar.cpp
++++ b/src/widgets/widgets/qtabbar.cpp
+@@ -618,8 +618,11 @@ QRect QTabBarPrivate::normalizedScrollRect(int index)
+             bottomEdge = scrollButtonRightRect.top();
+         }
+ 
++        const auto lastTab = lastVisibleTab();
++        if (!lastTab)
++            return {};
+         bool tearTopVisible = index != 0 && topEdge != -scrollOffset;
+-        bool tearBottomVisible = index != tabList.size() - 1 && bottomEdge != tabList.constLast()->rect.bottom() + 1 - scrollOffset;
++        bool tearBottomVisible = index != tabList.size() - 1 && bottomEdge != lastTab->rect.bottom() + 1 - scrollOffset;
+         if (tearTopVisible && !tearLeftRect.isNull())
+             topEdge = tearLeftRect.bottom() + 1;
+         if (tearBottomVisible && !tearRightRect.isNull())
+@@ -649,8 +652,11 @@ QRect QTabBarPrivate::normalizedScrollRect(int index)
+             rightEdge = scrollButtonRightRect.left();
+         }
+ 
++        const auto lastTab = lastVisibleTab();
++        if (!lastTab)
++            return {};
+         bool tearLeftVisible = index != 0 && leftEdge != -scrollOffset;
+-        bool tearRightVisible = index != tabList.size() - 1 && rightEdge != tabList.constLast()->rect.right() + 1 - scrollOffset;
++        bool tearRightVisible = index != tabList.size() - 1 && rightEdge != lastTab->rect.right() + 1 - scrollOffset;
+         if (tearLeftVisible && !tearLeftRect.isNull())
+             leftEdge = tearLeftRect.right() + 1;
+         if (tearRightVisible && !tearRightRect.isNull())
+@@ -675,13 +681,14 @@ void QTabBarPrivate::makeVisible(int index)
+     if (!validIndex(index))
+         return;
+ 
++    const auto lastTab = lastVisibleTab();
+     const QRect tabRect = tabList.at(index)->rect;
+     const int oldScrollOffset = scrollOffset;
+     const bool horiz = !verticalTabs(shape);
+     const int available = horiz ? q->width() : q->height();
+     const int tabStart = horiz ? tabRect.left() : tabRect.top();
+     const int tabEnd = horiz ? tabRect.right() : tabRect.bottom();
+-    const int lastTabEnd = horiz ? tabList.constLast()->rect.right() : tabList.constLast()->rect.bottom();
++    const int lastTabEnd = lastTab ? (horiz ? lastTab->rect.right() : lastTab->rect.bottom()) : 0;
+     const QRect scrollRect = normalizedScrollRect(index);
+     const QRect entireScrollRect = normalizedScrollRect(0); // ignore tears
+     const int scrolledTabBarStart = qMax(1, scrollRect.left() + scrollOffset);
+@@ -798,19 +805,23 @@ void QTabBarPrivate::scrollTabs()
+     const bool horizontal = !verticalTabs(shape);
+     const QRect scrollRect = normalizedScrollRect().translated(scrollOffset, 0);
+ 
+-    int i = -1;
+-
+     if (sender == leftB) {
+-        for (i = tabList.size() - 1; i >= 0; --i) {
+-            int start = horizontal ? tabList.at(i)->rect.left() : tabList.at(i)->rect.top();
++        for (qsizetype i = tabList.size() - 1; i >= 0; --i) {
++            const auto *tab = tabList.at(i);
++            if (!tab->visible)
++                continue;
++            int start = horizontal ? tab->rect.left() : tab->rect.top();
+             if (start < scrollRect.left()) {
+                 makeVisible(i);
+                 return;
+             }
+         }
+     } else if (sender == rightB) {
+-        for (i = 0; i < tabList.size(); ++i) {
+-            const auto tabRect = tabList.at(i)->rect;
++        for (qsizetype i = 0; i < tabList.size(); ++i) {
++            const auto *tab = tabList.at(i);
++            if (!tab->visible)
++                continue;
++            const auto &tabRect = tab->rect;
+             int start = horizontal ? tabRect.left() : tabRect.top();
+             int end = horizontal ? tabRect.right() : tabRect.bottom();
+             if (end > scrollRect.right() && start > scrollOffset) {
+diff --git a/src/widgets/widgets/qtabbar_p.h b/src/widgets/widgets/qtabbar_p.h
+index 996396c74aa..78804cf4c60 100644
+--- a/src/widgets/widgets/qtabbar_p.h
++++ b/src/widgets/widgets/qtabbar_p.h
+@@ -207,6 +207,12 @@ public:
+     void initBasicStyleOption(QStyleOptionTab *option, int tabIndex) const;
+ 
+     void makeVisible(int index);
++    const Tab *lastVisibleTab() const
++    {
++        auto it = std::find_if(tabList.rbegin(), tabList.rend(),
++                               [](const Tab *tab) { return tab->visible; });
++        return it == tabList.rend() ? nullptr : *it;
++    }
+ 
+     // shared by tabwidget and qtabbar
+     static void initStyleBaseOption(QStyleOptionTabBarBase *optTabBase, QTabBar *tabbar, QSize size)
+-- 
+2.51.2
+

@@ -1,0 +1,40 @@
+From 92f05bbc1a7d7b820fa9308eb7eafb6a870ce702 Mon Sep 17 00:00:00 2001
+From: Assam Boudjelthia <assam.boudjelthia@qt.io>
+Date: Tue, 9 Sep 2025 21:11:49 +0300
+Subject: [PATCH 033/553] Android: add docs to
+ QtActivity.appendApplicationParameters()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Pick-to: 6.9 6.8
+Change-Id: Icefdaa0a51aa8fcfb792f6b6265493b4fd890123
+Reviewed-by: Tor Arne Vestbø <tor.arne.vestbo@qt.io>
+(cherry picked from commit 40b7f9745674028029bb7e67d6ff55ff5b4c3ba4)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../jar/src/org/qtproject/qt/android/QtActivityBase.java  | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/src/android/jar/src/org/qtproject/qt/android/QtActivityBase.java b/src/android/jar/src/org/qtproject/qt/android/QtActivityBase.java
+index 8b060e9d457..aa85b70eb00 100644
+--- a/src/android/jar/src/org/qtproject/qt/android/QtActivityBase.java
++++ b/src/android/jar/src/org/qtproject/qt/android/QtActivityBase.java
+@@ -57,8 +57,12 @@ public class QtActivityBase extends Activity
+         }
+     }
+ 
+-    // Append any parameters to your application.
+-    // Either a whitespace or a tab is accepted as a separator between parameters.
++    /**
++     * Adds parameters to the list of arguments that will be passed to the
++     * native Qt application's main() function.
++     *
++     * Either a whitespace or a tab is accepted as a separator.
++     */
+     /**unused*/
+     @SuppressWarnings("unused")
+     public void appendApplicationParameters(String params)
+-- 
+2.51.2
+

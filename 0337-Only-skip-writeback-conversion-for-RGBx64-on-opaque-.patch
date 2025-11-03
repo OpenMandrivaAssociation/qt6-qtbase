@@ -1,0 +1,47 @@
+From 1e605b6e00574dd0e8c4ecbe70079221c35a2ead Mon Sep 17 00:00:00 2001
+From: Allan Sandfeld Jensen <allan.jensen@qt.io>
+Date: Thu, 9 Oct 2025 12:40:31 +0200
+Subject: [PATCH 337/553] Only skip writeback conversion for RGBx64 on opaque
+ sources
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Anything transparent needs to be unpremultiplied and masked.
+
+Fixes: QTBUG-131923
+Pick-to: 6.8 6.5
+Change-Id: Ib60f3f257c86aaa8f894393b57dd49d69f73dc87
+Reviewed-by: Tor Arne Vestbø <tor.arne.vestbo@qt.io>
+(cherry picked from commit 68d001150080e0b1fdb11243fa0e22ff633fe21b)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/gui/painting/qdrawhelper.cpp | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/gui/painting/qdrawhelper.cpp b/src/gui/painting/qdrawhelper.cpp
+index adee8ab6cb5..9563a14789e 100644
+--- a/src/gui/painting/qdrawhelper.cpp
++++ b/src/gui/painting/qdrawhelper.cpp
+@@ -802,7 +802,7 @@ static DestStoreProc64 destStoreProc64[] =
+     destStore64,        // Format_A2RGB30_Premultiplied
+     destStore64,        // Format_Alpha8
+     destStore64Gray8,   // Format_Grayscale8
+-    nullptr,            // Format_RGBX64
++    destStore64,        // Format_RGBX64
+     destStore64RGBA64,  // Format_RGBA64
+     nullptr,            // Format_RGBA64_Premultiplied
+     destStore64Gray16,  // Format_Grayscale16
+@@ -3904,6 +3904,9 @@ static inline Operator getOperator(const QSpanData *data, const QT_FT_Span *span
+     op.destStore64 = destStoreProc64[data->rasterBuffer->format];
+     op.funcSolid64 = functionForModeSolid64[op.mode];
+     op.func64 = functionForMode64[op.mode];
++    // RGBx64 do not need conversion on writeback if all pixels are opaque
++    if (data->rasterBuffer->format == QImage::Format_RGBX64 && solidSource)
++        op.destStore64 = nullptr;
+ #else
+     op.destStore64 = nullptr;
+     op.funcSolid64 = nullptr;
+-- 
+2.51.2
+

@@ -1,0 +1,82 @@
+From 4692c4f3b456a52708c3d1e9cc22204135b52ea4 Mon Sep 17 00:00:00 2001
+From: Ahmad Samir <a.samirh78@gmail.com>
+Date: Tue, 7 Oct 2025 19:47:23 +0300
+Subject: [PATCH 347/553] tests/auto/*/itemmodels: port away from QPair
+
+Pick-to: 6.8 6.5
+Task-number: QTBUG-115841
+Change-Id: If7f8f09d544f922ef8bc57f045a4b9443634103e
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit 7cc5de61b8b4fc428ca659f46e67ad95fa279c0d)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../qabstractitemmodel/tst_qabstractitemmodel.cpp          | 4 ++--
+ .../qitemselectionmodel/tst_qitemselectionmodel.cpp        | 4 ++--
+ .../qsortfilterproxymodel/tst_qsortfilterproxymodel.cpp    | 7 ++-----
+ 3 files changed, 6 insertions(+), 9 deletions(-)
+
+diff --git a/tests/auto/corelib/itemmodels/qabstractitemmodel/tst_qabstractitemmodel.cpp b/tests/auto/corelib/itemmodels/qabstractitemmodel/tst_qabstractitemmodel.cpp
+index 8a2643c0f36..bcb0e2d7f89 100644
+--- a/tests/auto/corelib/itemmodels/qabstractitemmodel/tst_qabstractitemmodel.cpp
++++ b/tests/auto/corelib/itemmodels/qabstractitemmodel/tst_qabstractitemmodel.cpp
+@@ -514,8 +514,8 @@ void tst_QAbstractItemModel::match()
+     QCOMPARE(res.size(), 3);
+ }
+ 
+-typedef QPair<int, int> Position;
+-typedef QList<QPair<int, int> > Selection;
++using Position = std::pair<int, int>;
++using Selection = QList<Position>;
+ typedef QList<QList<QString> > StringTable;
+ typedef QList<QString> StringTableRow;
+ 
+diff --git a/tests/auto/corelib/itemmodels/qitemselectionmodel/tst_qitemselectionmodel.cpp b/tests/auto/corelib/itemmodels/qitemselectionmodel/tst_qitemselectionmodel.cpp
+index a21c98134b3..fd881d3bef4 100644
+--- a/tests/auto/corelib/itemmodels/qitemselectionmodel/tst_qitemselectionmodel.cpp
++++ b/tests/auto/corelib/itemmodels/qitemselectionmodel/tst_qitemselectionmodel.cpp
+@@ -104,7 +104,7 @@ QDataStream &operator<<(QDataStream &, const QModelIndexList &);
+ QDataStream &operator>>(QDataStream &, QModelIndexList &);
+ 
+ typedef QList<int> IntList;
+-typedef QPair<int, int> IntPair;
++using IntPair = std::pair<int, int>;
+ typedef QList<IntPair> PairList;
+ 
+ class QStreamHelper: public QAbstractItemModel
+@@ -1674,7 +1674,7 @@ void tst_QItemSelectionModel::removeColumns()
+ }
+ 
+ typedef QList<IntList> IntListList;
+-typedef QPair<IntPair, IntPair> IntPairPair;
++using IntPairPair = std::pair<IntPair, IntPair>;
+ typedef QList<IntPairPair> IntPairPairList;
+ 
+ void tst_QItemSelectionModel::modelLayoutChanged_data()
+diff --git a/tests/auto/corelib/itemmodels/qsortfilterproxymodel/tst_qsortfilterproxymodel.cpp b/tests/auto/corelib/itemmodels/qsortfilterproxymodel/tst_qsortfilterproxymodel.cpp
+index a53b34170ac..ce381f8762c 100644
+--- a/tests/auto/corelib/itemmodels/qsortfilterproxymodel/tst_qsortfilterproxymodel.cpp
++++ b/tests/auto/corelib/itemmodels/qsortfilterproxymodel/tst_qsortfilterproxymodel.cpp
+@@ -19,7 +19,7 @@
+ 
+ Q_LOGGING_CATEGORY(lcItemModels, "qt.corelib.tests.itemmodels")
+ 
+-using IntPair = QPair<int, int>;
++using IntPair = std::pair<int, int>;
+ using IntList = QList<int>;
+ using IntPairList = QList<IntPair>;
+ 
+@@ -2377,10 +2377,7 @@ void tst_QSortFilterProxyModel::sortFilterRole()
+     proxy.setSourceModel(&model);
+     model.insertColumns(0, 1);
+ 
+-    const QList<QPair<QVariant, QVariant>>
+-        sourceItems({QPair<QVariant, QVariant>("b", 3),
+-                     QPair<QVariant, QVariant>("c", 2),
+-                     QPair<QVariant, QVariant>("a", 1)});
++    const QList<std::pair<QVariant, QVariant>> sourceItems = {{"b", 3}, {"c", 2}, {"a", 1}};
+ 
+     const QList<int> orderedItems({2, 1});
+ 
+-- 
+2.51.2
+

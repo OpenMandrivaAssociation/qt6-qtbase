@@ -1,0 +1,213 @@
+From 7cc16e0d1590d7e1e95da71f418e3e6fcb1672ef Mon Sep 17 00:00:00 2001
+From: Rami Potinkara <rami.potinkara@qt.io>
+Date: Wed, 3 Sep 2025 09:37:08 +0300
+Subject: [PATCH 488/553] Android: bump Android target API level to 36
+
+This patch updates
+-Target API level to 36 into build tools
+-Target API level to 36 in build.gradle files
+-Target API level to 36 and build tools to 36 for auto tests
+-SDK Build tool revision according to minimum supported API
+level to 28.0.3 (Android 9) from 23.0.2 (Android 6)
+
+Task-number: QTBUG-138551
+Task-number: QTBUG-138549
+Change-Id: I1b50f91669afb4b096c8924dbcc24f6333ef3166
+Reviewed-by: Assam Boudjelthia <assam.boudjelthia@qt.io>
+---
+ cmake/QtPublicAndroidHelpers.cmake                    |  2 +-
+ mkspecs/android-clang/qmake.conf                      |  2 +-
+ mkspecs/features/android/sdk.prf                      |  2 +-
+ qmake/doc/src/qmake-manual.qdoc                       |  2 +-
+ src/android/jar/build.gradle                          |  2 +-
+ src/corelib/doc/src/cmake/cmake-properties.qdoc       |  4 ++--
+ src/network/android/jar/build.gradle                  |  2 +-
+ .../networkinformation/android/jar/build.gradle       |  2 +-
+ src/tools/androiddeployqt/main.cpp                    |  2 +-
+ .../other/android/deployment_settings/CMakeLists.txt  | 11 ++++++-----
+ .../tst_android_deployment_settings.cpp               |  4 ++--
+ 11 files changed, 18 insertions(+), 17 deletions(-)
+
+diff --git a/cmake/QtPublicAndroidHelpers.cmake b/cmake/QtPublicAndroidHelpers.cmake
+index 30ffec43ad8..dbaf01f0359 100644
+--- a/cmake/QtPublicAndroidHelpers.cmake
++++ b/cmake/QtPublicAndroidHelpers.cmake
+@@ -67,7 +67,7 @@ function(_qt_internal_locate_android_jar)
+     # This variable specifies the API level used for building Java code, it can be the same as Qt
+     # for Android's maximum supported Android version or higher.
+     if(NOT QT_ANDROID_API_USED_FOR_JAVA)
+-        set(QT_ANDROID_API_USED_FOR_JAVA "android-35")
++        set(QT_ANDROID_API_USED_FOR_JAVA "android-36")
+     endif()
+ 
+     set(jar_location "${ANDROID_SDK_ROOT}/platforms/${QT_ANDROID_API_USED_FOR_JAVA}/android.jar")
+diff --git a/mkspecs/android-clang/qmake.conf b/mkspecs/android-clang/qmake.conf
+index dd3b6a1d88c..47c0b88e9fc 100644
+--- a/mkspecs/android-clang/qmake.conf
++++ b/mkspecs/android-clang/qmake.conf
+@@ -44,7 +44,7 @@ isEmpty(ALL_ANDROID_ABIS): ALL_ANDROID_ABIS = arm64-v8a armeabi-v7a x86_64 x86
+ CONFIG += $$ANDROID_PLATFORM
+ 
+ ANDROID_MIN_SDK_VERSION = $$replace(ANDROID_PLATFORM, "android-", "")
+-ANDROID_TARGET_SDK_VERSION = 35
++ANDROID_TARGET_SDK_VERSION = 36
+ 
+ NDK_LLVM_PATH    = $$NDK_ROOT/toolchains/llvm/prebuilt/$$NDK_HOST
+ QMAKE_CC         = $$NDK_LLVM_PATH/bin/clang
+diff --git a/mkspecs/features/android/sdk.prf b/mkspecs/features/android/sdk.prf
+index 6fd1d666e02..39c557890af 100644
+--- a/mkspecs/features/android/sdk.prf
++++ b/mkspecs/features/android/sdk.prf
+@@ -1,6 +1,6 @@
+ ANDROID_API_USED_FOR_JAVA = $$(ANDROID_API_VERSION)
+ isEmpty(ANDROID_API_USED_FOR_JAVA): ANDROID_API_USED_FOR_JAVA = $$API_VERSION
+-isEmpty(ANDROID_API_USED_FOR_JAVA): ANDROID_API_USED_FOR_JAVA = android-35
++isEmpty(ANDROID_API_USED_FOR_JAVA): ANDROID_API_USED_FOR_JAVA = android-36
+ 
+ ANDROID_JAR_FILE = $$ANDROID_SDK_ROOT/platforms/$$ANDROID_API_USED_FOR_JAVA/android.jar
+ !exists($$ANDROID_JAR_FILE) {
+diff --git a/qmake/doc/src/qmake-manual.qdoc b/qmake/doc/src/qmake-manual.qdoc
+index d604818fb69..e1a65d87bfa 100644
+--- a/qmake/doc/src/qmake-manual.qdoc
++++ b/qmake/doc/src/qmake-manual.qdoc
+@@ -1089,7 +1089,7 @@
+     \note This variable applies only to Android targets.
+ 
+     Specifies the target Android API level for the project. By default, this
+-    variable is set to API level 35.
++    variable is set to API level 36.
+ 
+     \section1 ANDROID_VERSION_CODE
+ 
+diff --git a/src/android/jar/build.gradle b/src/android/jar/build.gradle
+index 74ecff6b75f..54512f6f4b3 100644
+--- a/src/android/jar/build.gradle
++++ b/src/android/jar/build.gradle
+@@ -23,7 +23,7 @@ repositories {
+ }
+ 
+ android {
+-    compileSdk 35
++    compileSdk 36
+     namespace = "org.qtproject.qt.android"
+ 
+     defaultConfig {
+diff --git a/src/corelib/doc/src/cmake/cmake-properties.qdoc b/src/corelib/doc/src/cmake/cmake-properties.qdoc
+index 50cfc131cfe..946d4188770 100644
+--- a/src/corelib/doc/src/cmake/cmake-properties.qdoc
++++ b/src/corelib/doc/src/cmake/cmake-properties.qdoc
+@@ -239,7 +239,7 @@ precedence over this CMake property.
+ 
+ \badcode
+ set_target_properties(${target} PROPERTIES
+-    QT_ANDROID_COMPILE_SDK_VERSION 35
++    QT_ANDROID_COMPILE_SDK_VERSION 36
+ )
+ \endcode
+ 
+@@ -247,7 +247,7 @@ The following format also works:
+ 
+ \badcode
+ set_target_properties(${target} PROPERTIES
+- QT_ANDROID_COMPILE_SDK_VERSION "android-35"
++ QT_ANDROID_COMPILE_SDK_VERSION "android-36"
+ )
+ \endcode
+ 
+diff --git a/src/network/android/jar/build.gradle b/src/network/android/jar/build.gradle
+index f1f470b6635..580e15b92f6 100644
+--- a/src/network/android/jar/build.gradle
++++ b/src/network/android/jar/build.gradle
+@@ -23,7 +23,7 @@ repositories {
+ }
+ 
+ android {
+-    compileSdk 35
++    compileSdk 36
+ 
+     defaultConfig {
+         minSdkVersion 28
+diff --git a/src/plugins/networkinformation/android/jar/build.gradle b/src/plugins/networkinformation/android/jar/build.gradle
+index f1f470b6635..580e15b92f6 100644
+--- a/src/plugins/networkinformation/android/jar/build.gradle
++++ b/src/plugins/networkinformation/android/jar/build.gradle
+@@ -23,7 +23,7 @@ repositories {
+ }
+ 
+ android {
+-    compileSdk 35
++    compileSdk 36
+ 
+     defaultConfig {
+         minSdkVersion 28
+diff --git a/src/tools/androiddeployqt/main.cpp b/src/tools/androiddeployqt/main.cpp
+index d0f876c68c7..72c636557be 100644
+--- a/src/tools/androiddeployqt/main.cpp
++++ b/src/tools/androiddeployqt/main.cpp
+@@ -173,7 +173,7 @@ struct Options
+     QString versionName;
+     QString versionCode;
+     QByteArray minSdkVersion{"28"};
+-    QByteArray targetSdkVersion{"35"};
++    QByteArray targetSdkVersion{"36"};
+ 
+     // lib c++ path
+     QString stdCppPath;
+diff --git a/tests/auto/other/android/deployment_settings/CMakeLists.txt b/tests/auto/other/android/deployment_settings/CMakeLists.txt
+index cd11c2c5e9d..a2dce940596 100644
+--- a/tests/auto/other/android/deployment_settings/CMakeLists.txt
++++ b/tests/auto/other/android/deployment_settings/CMakeLists.txt
+@@ -33,11 +33,11 @@ set_target_properties(${target} PROPERTIES
+     my_package_source_dir "path/to/source/dir"
+     my_libs_property "some/path/to/lib2.so;some/path/to/lib3.so"
+     my_plugins_property "some/path/to/plugin2.so;some/path/to/plugin3.so"
+-
+-    QT_ANDROID_SDK_BUILD_TOOLS_REVISION "23.0.2"
++    # Below build tools should match to minimum supported OS API level version
++    QT_ANDROID_SDK_BUILD_TOOLS_REVISION "28.0.3"
+     QT_ANDROID_MIN_SDK_VERSION "1"
+     QT_ANDROID_TARGET_SDK_VERSION "2"
+-    QT_ANDROID_COMPILE_SDK_VERSION "35"
++    QT_ANDROID_COMPILE_SDK_VERSION "36"
+     QT_ANDROID_APP_NAME "Android Deployment Settings Test"
+     QT_ANDROID_PACKAGE_NAME "org.qtproject.android_deployment_settings_test"
+     QT_ANDROID_DEPLOYMENT_DEPENDENCIES "dep1.so;dep2.so;dep3.so"
+@@ -61,10 +61,11 @@ qt6_policy(SET QTP0002 OLD)
+ set(target tst_android_deployment_settings_old)
+ qt6_add_executable(${target} MANUAL_FINALIZATION EXCLUDE_FROM_ALL noop.cpp)
+ set_target_properties(${target} PROPERTIES
+-    QT_ANDROID_SDK_BUILD_TOOLS_REVISION "23.0.2"
++    # Below build tools should match to minimum supported OS API level version
++    QT_ANDROID_SDK_BUILD_TOOLS_REVISION "28.0.3"
+     QT_ANDROID_MIN_SDK_VERSION "1"
+     QT_ANDROID_TARGET_SDK_VERSION "2"
+-    QT_ANDROID_COMPILE_SDK_VERSION "35"
++    QT_ANDROID_COMPILE_SDK_VERSION "36"
+     QT_ANDROID_APP_NAME "Android Deployment Settings Test"
+     QT_ANDROID_PACKAGE_NAME "org.qtproject.android_deployment_settings_test"
+     QT_ANDROID_DEPLOYMENT_DEPENDENCIES "dep1.so;dep2.so;dep3.so"
+diff --git a/tests/auto/other/android/deployment_settings/tst_android_deployment_settings.cpp b/tests/auto/other/android/deployment_settings/tst_android_deployment_settings.cpp
+index 1687ed9de92..ae5007fbcd2 100644
+--- a/tests/auto/other/android/deployment_settings/tst_android_deployment_settings.cpp
++++ b/tests/auto/other/android/deployment_settings/tst_android_deployment_settings.cpp
+@@ -60,7 +60,7 @@ void tst_android_deployment_settings::DeploymentSettings_data()
+     QTest::addColumn<QString>("value");
+ 
+     QTest::newRow("sdkBuildToolsRevision") << "sdkBuildToolsRevision"
+-                                           << "23.0.2";
++                                           << "28.0.3";
+     QTest::newRow("deployment-dependencies") << "deployment-dependencies"
+                                              << "dep1.so,dep2.so,dep3.so";
+     QTest::newRow("android-extra-plugins")
+@@ -78,7 +78,7 @@ void tst_android_deployment_settings::DeploymentSettings_data()
+     QTest::newRow("android-target-sdk-version") << "android-target-sdk-version"
+                                                 << "2";
+     QTest::newRow("android-compile-sdk-version") << "android-compile-sdk-version"
+-                                                << "35";
++                                                << "36";
+     QTest::newRow("android-package-name") << "android-package-name"
+                                           << "org.qtproject.android_deployment_settings_test";
+     QTest::newRow("android-app-name") << "android-app-name"
+-- 
+2.51.2
+

@@ -1,0 +1,42 @@
+From e0a759944f3f8a1b3781b54660cd295f1877dda8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?M=C3=A5rten=20Nordheim?= <marten.nordheim@qt.io>
+Date: Mon, 13 Oct 2025 12:13:26 +0200
+Subject: [PATCH 427/553] Schannel: encode the peer name for SNI
+
+Server Name Identification.
+
+We were just passing it to Schannel's API, which took a utf-16 string
+and then forwarded it to the network without changes. So instead
+we specifically pass it through QUrl and request it to encode any
+Unicode characters.
+
+Fixes: QTBUG-141061
+Fixes: QTBUG-113028
+Pick-to: 6.8
+Change-Id: I33679c68e8e984deb92ff117bf5dd9d4fa4e351b
+Reviewed-by: Timur Pocheptsov <timur.pocheptsov@qt.io>
+(cherry picked from commit 69e1037be2d6023c0693e26ad8cf489a51e1712b)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/plugins/tls/schannel/qtls_schannel.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/plugins/tls/schannel/qtls_schannel.cpp b/src/plugins/tls/schannel/qtls_schannel.cpp
+index 12c2625f39d..667f2d8a6c3 100644
+--- a/src/plugins/tls/schannel/qtls_schannel.cpp
++++ b/src/plugins/tls/schannel/qtls_schannel.cpp
+@@ -1238,9 +1238,10 @@ bool TlsCryptographSchannel::createContext()
+     };
+ #endif
+ 
++    const QString encodedTargetName = QUrl::fromUserInput(targetName()).host(QUrl::EncodeUnicode);
+     auto status = InitializeSecurityContext(&credentialHandle, // phCredential
+                                             nullptr, // phContext
+-                                            const_reinterpret_cast<SEC_WCHAR *>(targetName().utf16()), // pszTargetName
++                                            const_reinterpret_cast<SEC_WCHAR *>(encodedTargetName.utf16()), // pszTargetName
+                                             contextReq, // fContextReq
+                                             0, // Reserved1
+                                             0, // TargetDataRep (unused)
+-- 
+2.51.2
+

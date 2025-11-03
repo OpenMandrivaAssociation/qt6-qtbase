@@ -1,0 +1,59 @@
+From dbcf62c312704a94639433ac3e23024aee6d7eff Mon Sep 17 00:00:00 2001
+From: Ahmad Samir <a.samirh78@gmail.com>
+Date: Thu, 2 Oct 2025 21:18:24 +0300
+Subject: [PATCH 429/553] QJsonParseError: fix clang -Wshorten-64-to-32
+ warnings
+
+Change it to qint64 in Qt7, as requested in code review, so as to make
+it easier to extend it in the future.
+
+Pick-to: 6.8 6.5
+Change-Id: If893d719dd0457fac46fdd37ff95ce95222b1858
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit ca725e1465fcc6d71b25c414aa9a0f0c3faad1d5)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/serialization/qjsonparseerror.h | 4 +++-
+ src/corelib/serialization/qjsonparser.cpp   | 4 +++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/src/corelib/serialization/qjsonparseerror.h b/src/corelib/serialization/qjsonparseerror.h
+index 803b04c53b6..d8fc94448e6 100644
+--- a/src/corelib/serialization/qjsonparseerror.h
++++ b/src/corelib/serialization/qjsonparseerror.h
+@@ -7,6 +7,7 @@
+ 
+ #include <QtCore/qtconfigmacros.h>
+ #include <QtCore/qtcoreexports.h>
++#include <QtCore/qtypes.h>
+ 
+ QT_BEGIN_NAMESPACE
+ 
+@@ -34,7 +35,8 @@ struct Q_CORE_EXPORT QJsonParseError
+ 
+     QString errorString() const;
+ 
+-    int offset = -1;
++    std::conditional_t<QT_VERSION_MAJOR < 7, int, qint64>
++    offset = -1;
+     ParseError error = NoError;
+ };
+ 
+diff --git a/src/corelib/serialization/qjsonparser.cpp b/src/corelib/serialization/qjsonparser.cpp
+index df266a76c79..779287adb1d 100644
+--- a/src/corelib/serialization/qjsonparser.cpp
++++ b/src/corelib/serialization/qjsonparser.cpp
+@@ -321,7 +321,9 @@ QCborValue Parser::parse(QJsonParseError *error)
+ error:
+     container.reset();
+     if (error) {
+-        error->offset = json - head;
++        using OffType = decltype(error->offset);
++        error->offset = OffType(json - head);
++        Q_ASSERT(error->offset == json - head);
+         error->error  = lastError;
+     }
+     return QCborValue();
+-- 
+2.51.2
+

@@ -1,0 +1,56 @@
+From 0e1cf08fee9047e3bde9484641385e8ec2f277bd Mon Sep 17 00:00:00 2001
+From: Edward Welbourne <edward.welbourne@qt.io>
+Date: Wed, 10 Sep 2025 10:08:14 +0200
+Subject: [PATCH 242/553] Fix duplicate test-data tag warningsin tst_QVariant
+
+Include "QVariant(" + ... + ")" wrapping round pairElements() test
+rows with QVariant data, so that (4,5) and (QVariant(4),QVariant(5))
+are distinct.  Amends 64dc886db7af.
+
+Replace a duplicate EnumTest_Enum3::EnumTest_Enum3_value test-case for
+enums() with one omitting the type-name prefix.  Amends 64dc886db7af.
+
+Both amended commits were new in 6.5.
+
+Pick-to: 6.8 6.5
+Change-Id: I8d08d9b2a8ee3b6fe5870598d260e5785304f336
+Reviewed-by: Dimitrios Apostolou <jimis@qt.io>
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit f79245495bb8fde3b581da35f2e4357e41e7018f)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ tests/auto/corelib/kernel/qvariant/tst_qvariant.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/auto/corelib/kernel/qvariant/tst_qvariant.cpp b/tests/auto/corelib/kernel/qvariant/tst_qvariant.cpp
+index 222fab888a9..9afd084cbd0 100644
+--- a/tests/auto/corelib/kernel/qvariant/tst_qvariant.cpp
++++ b/tests/auto/corelib/kernel/qvariant/tst_qvariant.cpp
+@@ -5235,7 +5235,7 @@ void tst_QVariant::pairElements_data()
+         if constexpr (std::is_integral_v<T> || std::is_floating_point_v<T>) {
+             return QString::number(value);
+         } else if constexpr (std::is_same_v<T, QVariant>) {
+-            return value.toString();
++            return u"QVariant(" + value.toString() + u')';
+         } else {
+             return value;
+         }
+@@ -5383,6 +5383,7 @@ void tst_QVariant::enums_data()
+     ADD(EnumTest_Enum0_negValue);
+     ADD(EnumTest_Enum1_value);
+     ADD(EnumTest_Enum1_bigValue);
++    ADD(EnumTest_Enum3_value);
+     ADD(EnumTest_Enum3::EnumTest_Enum3_value);
+     ADD(EnumTest_Enum3::EnumTest_Enum3_bigValue);
+     ADD(EnumTest_Enum4::EnumTest_Enum4_value);
+@@ -5391,7 +5392,6 @@ void tst_QVariant::enums_data()
+     ADD(EnumTest_Enum6::EnumTest_Enum6_value);
+     ADD(EnumTest_Enum7::EnumTest_Enum7_value);
+     ADD(EnumTest_Enum8::EnumTest_Enum8_value);
+-    ADD(EnumTest_Enum3::EnumTest_Enum3_value);
+ #undef ADD
+ }
+ 
+-- 
+2.51.2
+

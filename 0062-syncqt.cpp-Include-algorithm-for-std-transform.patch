@@ -1,0 +1,29 @@
+From dd334cff891c6db83d16113bcb86fc7a8da7c337 Mon Sep 17 00:00:00 2001
+From: Albert Astals Cid <aacid@kde.org>
+Date: Wed, 3 Sep 2025 20:45:59 +0200
+Subject: [PATCH 062/553] syncqt.cpp: Include <algorithm> for std::transform
+
+Pick-to: 6.9 6.8 6.5
+Change-Id: Iaa843db962614a131c5cb9a25b206dcab3220309
+Reviewed-by: Marc Mutz <marc.mutz@qt.io>
+(cherry picked from commit 15553fb6215947545aa827bea154dbc12a0bb86c)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/tools/syncqt/main.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/tools/syncqt/main.cpp b/src/tools/syncqt/main.cpp
+index 3e48b6e820b..f7546ea04bf 100644
+--- a/src/tools/syncqt/main.cpp
++++ b/src/tools/syncqt/main.cpp
+@@ -15,6 +15,7 @@
+  * pre-defined list of header files.
+  */
+ 
++#include <algorithm>
+ #include <iostream>
+ #include <fstream>
+ #include <string>
+-- 
+2.51.2
+

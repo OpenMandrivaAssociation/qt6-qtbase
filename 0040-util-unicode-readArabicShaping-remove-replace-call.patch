@@ -1,0 +1,46 @@
+From 1cb40b10b2f28c46d77b32cb6c0c761744cb5286 Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Wed, 27 Aug 2025 16:56:40 +0200
+Subject: [PATCH 040/553] util/unicode: readArabicShaping(): remove replace()
+ call
+
+All users of the split()ed value handle intervening whitespace
+already:
+
+- fields[0] is piped through parseHexRange(), which does
+
+- fields[1] has trimmed() called on it before lookup and all
+  age_map values are space-free (cf. initAgeMap())
+
+As a consequence, we can accept the line by reference to const
+QByteArray now.
+
+Amends the start of the public history.
+
+Pick-to: 6.9 6.8 6.5
+Change-Id: I1d371af33bc0b1c1b2bf28bbd3cbaf6820f8b4e8
+Reviewed-by: Ahmad Samir <a.samirh78@gmail.com>
+(cherry picked from commit 079b97b7acfca9dd6348962e154492ccc382c6a5)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ util/unicode/main.cpp | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/util/unicode/main.cpp b/util/unicode/main.cpp
+index 68fcd9280c7..c8c3383702b 100644
+--- a/util/unicode/main.cpp
++++ b/util/unicode/main.cpp
+@@ -1608,9 +1608,7 @@ static void readArabicShaping()
+ static void readDerivedAge()
+ {
+     readUnicodeFile("DerivedAge.txt",
+-                    [] (QByteArray &line, int lineNo) {
+-        line.replace(" ", "");
+-
++                    [] (const QByteArray &line, int lineNo) {
+         QList<QByteArray> l = line.split(';');
+         Q_ASSERT(l.size() == 2);
+ 
+-- 
+2.51.2
+

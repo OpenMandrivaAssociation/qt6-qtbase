@@ -1,0 +1,35 @@
+From 442f3de85d332fa64d84a99fb2d74642a2aeeef2 Mon Sep 17 00:00:00 2001
+From: Ahmad Samir <a.samirh78@gmail.com>
+Date: Tue, 16 Sep 2025 14:40:58 +0300
+Subject: [PATCH 145/553] plugins/platforms/wayland: fix AutoMoc warning
+
+AutoMoc: src/plugins/platforms/wayland/qwaylandwindowmanagerintegration_p.h:
+note: No relevant classes found. No output generated.
+
+The class doesn't inherit from QObject, and so doesn't have any signals
+or slots.
+
+Amends 4a57ddd3ba0551a3b144cc53c4b48d9b454e96a0, which is only in 6.10
+(this file was copied from qtwayland to qtbase?).
+
+Change-Id: I9f702807574072099a96f4057a91e624ddca9c70
+Reviewed-by: David Redondo <qt@david-redondo.de>
+(cherry picked from commit 6755d9ad447807626713f9378a340794aadf30b0)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../platforms/wayland/qwaylandwindowmanagerintegration.cpp      | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/src/plugins/platforms/wayland/qwaylandwindowmanagerintegration.cpp b/src/plugins/platforms/wayland/qwaylandwindowmanagerintegration.cpp
+index 9668491d2f3..ff5d464ab24 100644
+--- a/src/plugins/platforms/wayland/qwaylandwindowmanagerintegration.cpp
++++ b/src/plugins/platforms/wayland/qwaylandwindowmanagerintegration.cpp
+@@ -65,5 +65,3 @@ void QWaylandWindowManagerIntegration::openUrl(const QUrl &url)
+ }
+ 
+ QT_END_NAMESPACE
+-
+-#include "moc_qwaylandwindowmanagerintegration_p.cpp"
+-- 
+2.51.2
+

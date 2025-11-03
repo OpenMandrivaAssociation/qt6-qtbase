@@ -1,0 +1,45 @@
+From 77a4d8ab8e82256e5152f1155eb89c2fd104bef3 Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Fri, 26 Sep 2025 09:59:31 +0200
+Subject: [PATCH 218/553] Mark Unicode data explicitly not security-critical
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The qt_attribution.json file did not contain the "SecurityCritical"
+key, so its value defaults to false. Explicitly include the key with
+value false to indicate that it wasn't merely forgotten.
+
+Task-number: QTBUG-135195
+Pick-to: 6.8
+Change-Id: I1ea3cb3c990365822bd3f53a00ecf1c0d6b79ffb
+Reviewed-by: Kai Köhne <kai.koehne@qt.io>
+(cherry picked from commit 61a9510eac1bed6f61fa69316f82491fe824c9d5)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/text/qt_attribution.json | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/corelib/text/qt_attribution.json b/src/corelib/text/qt_attribution.json
+index d6075b72438..1ab62ae8e9a 100644
+--- a/src/corelib/text/qt_attribution.json
++++ b/src/corelib/text/qt_attribution.json
+@@ -4,6 +4,7 @@
+     "Name": "Unicode Character Database (UCD)",
+     "QDocModule": "qtcore",
+     "QtUsage": "Qt Core uses data obtained from UCD files for working with characters and strings.",
++    "SecurityCritical": false,
+     "Comment": {
+         "Files": "For update, see qtbase/util/unicode/README",
+         "General": "no relevant CPE and PURL found"
+@@ -27,6 +28,7 @@
+     "Name": "Unicode Common Locale Data Repository (CLDR)",
+     "QDocModule": "qtcore",
+     "QtUsage": "Used in Qt Core (QTimeZone, QLocale).",
++    "SecurityCritical": false,
+     "Comment": {
+         "Files": "For update, see qtbase/util/locale_database/cldr2qlocalexml.py",
+         "General": "no relevant CPE and PURL found"
+-- 
+2.51.2
+

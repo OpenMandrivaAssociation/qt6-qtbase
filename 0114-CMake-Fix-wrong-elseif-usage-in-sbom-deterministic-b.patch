@@ -1,0 +1,34 @@
+From 93c7b78c595427ad08c73cf02d1452ebb77fdcb3 Mon Sep 17 00:00:00 2001
+From: Alexandru Croitor <alexandru.croitor@qt.io>
+Date: Thu, 4 Sep 2025 16:26:29 +0200
+Subject: [PATCH 114/553] CMake: Fix wrong elseif usage in sbom deterministic
+ build setup
+
+Should just be an else.
+
+Task-number: QTBUG-134894
+Pick-to: 6.9 6.8
+Change-Id: Iea39dd98fd94d5bec9df85f8299ce6820db81f1d
+Reviewed-by: Joerg Bornemann <joerg.bornemann@qt.io>
+(cherry picked from commit 6980c6d88e2b24a49d755ff46fc1f54c184faab1)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ cmake/QtPublicSbomHelpers.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cmake/QtPublicSbomHelpers.cmake b/cmake/QtPublicSbomHelpers.cmake
+index 0b5d837fa15..73276e5a8c7 100644
+--- a/cmake/QtPublicSbomHelpers.cmake
++++ b/cmake/QtPublicSbomHelpers.cmake
+@@ -533,7 +533,7 @@ function(_qt_internal_sbom_setup_fake_deterministic_build)
+ 
+     if(QT_SBOM_FAKE_DETERMINISTIC_BUILD)
+         set(value "ON")
+-    elseif()
++    else()
+         set(value "OFF")
+     endif()
+ 
+-- 
+2.51.2
+

@@ -1,0 +1,122 @@
+From 36cc1cbf3c7081874b4fae523f05c1d853b00945 Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Fri, 24 Oct 2025 13:38:08 +0200
+Subject: [PATCH 516/553] QUnicodeTools: don't look up surrogate line-break
+ properties
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+We know they're SG, so don't go through the properties trie, hard-code
+the result.
+
+As a defense against changes, add checks to the generator and
+tst_QUnicodeTools.
+
+This is in preparation of porting getLineBreaks() to QStringIterator.
+
+Pick-to: 6.8 6.5
+Change-Id: Ib3567398ba56f7ad3ce6fbca81f6b0f40379ee7d
+Reviewed-by: Mårten Nordheim <marten.nordheim@qt.io>
+(cherry picked from commit 8fc7655e5d91cbe6b8bc9910558f92ddccb7c9a9)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/text/qunicodetools.cpp             | 18 ++++++++++++------
+ .../text/qunicodetools/tst_qunicodetools.cpp   | 12 ++++++++++++
+ util/unicode/main.cpp                          |  2 ++
+ 3 files changed, 26 insertions(+), 6 deletions(-)
+
+diff --git a/src/corelib/text/qunicodetools.cpp b/src/corelib/text/qunicodetools.cpp
+index 862bd2cd0e9..d8f4d374322 100644
+--- a/src/corelib/text/qunicodetools.cpp
++++ b/src/corelib/text/qunicodetools.cpp
+@@ -767,17 +767,19 @@ static void getLineBreaks(const char16_t *string, qsizetype len, QCharAttributes
+                 // even after spaces.
+                 //   × [\p{Pf}&QU] ( SP | GL | WJ | CL | QU | CP | EX | IS
+                 //     | SY | BK | CR | LF | NL | ZW | eot)
+-                auto nncls = QUnicodeTables::LineBreak_LF;
+-
+-                if (i + 1 < len) {
++                const auto nncls = [&] {
++                    if (i + 1 >= len)
++                        return QUnicodeTables::LineBreak_LF;
+                     char32_t c = string[i + 1];
+                     if (QChar::isHighSurrogate(c) && i + 2 < len) {
+                         ushort low = string[i + 2];
+                         if (QChar::isLowSurrogate(low))
+                             c = QChar::surrogateToUcs4(c, low);
++                        else
++                            return QUnicodeTables::LineBreak_SG; // all surrogates
+                     }
+-                    nncls = QUnicodeTables::lineBreakClass(c);
+-                }
++                    return QUnicodeTables::lineBreakClass(c);
++                }();
+ 
+                 constexpr QUnicodeTables::LineBreakClass lb15b[] = {
+                         QUnicodeTables::LineBreak_SP,    QUnicodeTables::LineBreak_GL,
+@@ -867,13 +869,17 @@ static void getLineBreaks(const char16_t *string, qsizetype len, QCharAttributes
+             // ‘subtract .5’.
+             if (Q_UNLIKELY(lcls == QUnicodeTables::LineBreak_SP)) {
+                 if (i + 1 < len) {
++                    constexpr char32_t Invalid = ~U'\0';
+                     char32_t ch = string[i + 1];
+                     if (QChar::isHighSurrogate(ch) && i + 2 < len) {
+                         ushort low = string[i + 2];
+                         if (QChar::isLowSurrogate(low))
+                             ch = QChar::surrogateToUcs4(ch, low);
++                        else
++                            ch = Invalid;
+                     }
+-                    if (QUnicodeTables::lineBreakClass(ch) == QUnicodeTables::LineBreak_NU) {
++                    if (ch != Invalid // surrogates won't match (ensured by util/unicode)
++                        && QUnicodeTables::lineBreakClass(ch) == QUnicodeTables::LineBreak_NU) {
+                         attributes[pos].lineBreak = true;
+                         goto next;
+                     }
+diff --git a/tests/auto/corelib/text/qunicodetools/tst_qunicodetools.cpp b/tests/auto/corelib/text/qunicodetools/tst_qunicodetools.cpp
+index abb7497928a..a6a0ef2f26d 100644
+--- a/tests/auto/corelib/text/qunicodetools/tst_qunicodetools.cpp
++++ b/tests/auto/corelib/text/qunicodetools/tst_qunicodetools.cpp
+@@ -12,6 +12,7 @@ class tst_QUnicodeTools : public QObject
+ {
+     Q_OBJECT
+ private slots:
++    void allSurrogatesHaveLineBreakClassSG();
+     void lineBreakClass();
+     void graphemeBreakClass_data();
+     void graphemeBreakClass();
+@@ -21,6 +22,17 @@ private slots:
+     void sentenceBreakClass();
+ };
+ 
++void tst_QUnicodeTools::allSurrogatesHaveLineBreakClassSG()
++{
++    char32_t c;
++    auto printOnFail = qScopeGuard([&] { qDebug() << c; });
++    for (c = 0; c <= QChar::LastValidCodePoint; ++c) {
++        if (QChar::isSurrogate(c))
++            QCOMPARE_EQ(QUnicodeTables::lineBreakClass(c), QUnicodeTables::LineBreak_SG);
++    }
++    printOnFail.dismiss();
++}
++
+ void tst_QUnicodeTools::lineBreakClass()
+ {
+     QVERIFY(QUnicodeTables::lineBreakClass(0x0029) == QUnicodeTables::LineBreak_CP);
+diff --git a/util/unicode/main.cpp b/util/unicode/main.cpp
+index d303a369812..ab45a87e802 100644
+--- a/util/unicode/main.cpp
++++ b/util/unicode/main.cpp
+@@ -1821,6 +1821,8 @@ static void readLineBreak()
+             loc.die("Unassigned line break class \"%.*s\"", qPrintableView(l[1]));
+ 
+         for (int codepoint = from; codepoint <= to; ++codepoint) {
++            if (QChar::isSurrogate(codepoint) && lb != LineBreak_SG)
++                loc.die("Surrogate with line-break class != SG, fix line-break detection in QUnicodeTools");
+             UnicodeData &d = UnicodeData::valueRef(codepoint);
+             d.p.lineBreakClass = lb;
+         }
+-- 
+2.51.2
+

@@ -1,0 +1,60 @@
+From f247a3d598bb187087edfa3ba2814089eaa555ba Mon Sep 17 00:00:00 2001
+From: Giuseppe D'Angelo <giuseppe.dangelo@kdab.com>
+Date: Thu, 4 Sep 2025 07:08:35 +0200
+Subject: [PATCH 153/553] QFuture: allow implicit conversion from QFuture<T> to
+ QFuture<void>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This is a form of type erasure and therefore should be implicit: a
+function `f(QFuture<void>)` should be callable as `f(future)` for any
+`QFuture<T> future`. Drop the `explicit`. This is also in line with the
+existing converting assignment operator.
+
+Pick-to: 6.9 6.8
+Fixes: QTBUG-139790
+Change-Id: Ib63edf197285cce2c95a28b0308ddc7256e4af2b
+Reviewed-by: Mårten Nordheim <marten.nordheim@qt.io>
+Reviewed-by: Ivan Solovev <ivan.solovev@qt.io>
+(cherry picked from commit 0f20882c48f439d9cb4fa9d6b6bc310176e8d3b8)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/thread/qfuture.h                      | 2 +-
+ tests/auto/corelib/thread/qfuture/tst_qfuture.cpp | 6 +++++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/src/corelib/thread/qfuture.h b/src/corelib/thread/qfuture.h
+index 063135f350e..d927983adf4 100644
+--- a/src/corelib/thread/qfuture.h
++++ b/src/corelib/thread/qfuture.h
+@@ -45,7 +45,7 @@ public:
+     }
+ 
+     template<typename U, typename V = T, typename = QtPrivate::EnableForVoid<V>>
+-    explicit QFuture(const QFuture<U> &other) : d(other.d)
++    QFuture(const QFuture<U> &other) : d(other.d)
+     {
+     }
+ 
+diff --git a/tests/auto/corelib/thread/qfuture/tst_qfuture.cpp b/tests/auto/corelib/thread/qfuture/tst_qfuture.cpp
+index 5f28281a43f..76fcee11b7b 100644
+--- a/tests/auto/corelib/thread/qfuture/tst_qfuture.cpp
++++ b/tests/auto/corelib/thread/qfuture/tst_qfuture.cpp
+@@ -791,8 +791,12 @@ void tst_QFuture::futureToVoid()
+     p.setProgressValue(42);
+     p.finish();
+ 
+-    QFuture<void> voidFuture = QFuture<void>(future);
++    QFuture<void> voidFuture = future;
+     QCOMPARE(voidFuture.progressValue(), 42);
++
++    QFuture<void> voidFuture2;
++    voidFuture2 = future;
++    QCOMPARE(voidFuture2.progressValue(), 42);
+ }
+ 
+ class IntResult : public QFutureInterface<int>
+-- 
+2.51.2
+

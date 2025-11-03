@@ -1,0 +1,69 @@
+From 84928f186d302abf6a8a090c12e0f1c271cb570b Mon Sep 17 00:00:00 2001
+From: Thiago Macieira <thiago.macieira@intel.com>
+Date: Thu, 2 Oct 2025 21:11:49 -0700
+Subject: [PATCH 484/553] tst_QHostAddress: extend qHash testing
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Just in case.
+
+Pick-to: 6.8 6.5
+Change-Id: I7999cb84e00bbc5b3bbbfffdc534f2c3e9925959
+Reviewed-by: Mårten Nordheim <marten.nordheim@qt.io>
+(cherry picked from commit cc48b0f204a9a3157eab4a9726d90936e3a2f8fc)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../kernel/qhostaddress/tst_qhostaddress.cpp   | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
+
+diff --git a/tests/auto/network/kernel/qhostaddress/tst_qhostaddress.cpp b/tests/auto/network/kernel/qhostaddress/tst_qhostaddress.cpp
+index bbeb445096d..7417f0648e4 100644
+--- a/tests/auto/network/kernel/qhostaddress/tst_qhostaddress.cpp
++++ b/tests/auto/network/kernel/qhostaddress/tst_qhostaddress.cpp
+@@ -283,6 +283,7 @@ void tst_QHostAddress::specialAddresses()
+     QFETCH(QHostAddress::SpecialAddress, address);
+     QFETCH(bool, result);
+     QCOMPARE(QHostAddress(text) == address, result);
++    size_t seed = QHashSeed::globalSeed();
+ 
+     //check special address equal to itself (QTBUG-22898), note two overloads of operator==
+     QVERIFY(QHostAddress(address) == QHostAddress(address));
+@@ -296,11 +297,19 @@ void tst_QHostAddress::specialAddresses()
+         QHostAddress ha;
+         ha.setAddress(address);
+         QVERIFY(ha == address);
++        QCOMPARE(qHash(ha, seed), qHash(QHostAddress(address), seed));
++        QCOMPARE(qHash(ha, 0), qHash(QHostAddress(address), 0));
+     }
+ 
+     QHostAddress setter;
+     setter.setAddress(text);
+-    QCOMPARE(setter == address, result);
++    if (result) {
++        QCOMPARE(setter, address);
++        QCOMPARE(qHash(setter, seed), qHash(QHostAddress(address), seed));
++        QCOMPARE(qHash(setter, 0), qHash(QHostAddress(address), 0));
++    } else {
++        QCOMPARE_NE(setter, address);
++    }
+ }
+ 
+ 
+@@ -332,8 +341,11 @@ void tst_QHostAddress::compare()
+ 
+     QCOMPARE(first == second, result);
+     QCOMPARE(second == first, result);
+-    if (result == true)
+-        QCOMPARE(qHash(first), qHash(second));
++    if (result == true) {
++        size_t seed = QHashSeed::globalSeed();
++        QCOMPARE(qHash(first, seed), qHash(second, seed));
++        QCOMPARE(qHash(first, 0), qHash(second, 0));
++    }
+ }
+ 
+ void tst_QHostAddress::isEqual_data()
+-- 
+2.51.2
+

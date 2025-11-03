@@ -1,0 +1,55 @@
+From 8a132a837bc6476d2f0716570890ffb7eaf8ca73 Mon Sep 17 00:00:00 2001
+From: Friedemann Kleint <Friedemann.Kleint@qt.io>
+Date: Tue, 7 Oct 2025 15:58:26 +0200
+Subject: [PATCH 314/553] Windows QPA: Fix flicker when moving Windows with
+ High DPI scaling
+
+Change 8d7826442bf889364ab39cf54c6f4617891d0bd7 did not take High DPI
+scaling into account when checking for plain moves. Rewrite the code
+using native window geometry to avoid rounding errors as suggested in
+the report.
+
+Fixes: QTBUG-132285
+Task-number: QTBUG-115992
+Change-Id: Iae751f46b1e398bfce7f8a37e4c10b31e258247a
+Reviewed-by: Oliver Wolff <oliver.wolff@qt.io>
+(cherry picked from commit f9795bf4ee9fe1d451c56305c9ef0c6a0c2889df)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/plugins/platforms/windows/qwindowswindow.cpp | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/src/plugins/platforms/windows/qwindowswindow.cpp b/src/plugins/platforms/windows/qwindowswindow.cpp
+index 5781ac77f32..8d821cc5fdf 100644
+--- a/src/plugins/platforms/windows/qwindowswindow.cpp
++++ b/src/plugins/platforms/windows/qwindowswindow.cpp
+@@ -2924,6 +2924,17 @@ void QWindowsWindow::propagateSizeHints()
+     qCDebug(lcQpaWindow) << __FUNCTION__ << this << window();
+ }
+ 
++static bool isResize(const WINDOWPOS *windowPos)
++{
++    bool result = false;
++    if ((windowPos->flags & SWP_NOSIZE) == 0) {
++        RECT rect;
++        GetWindowRect(windowPos->hwnd, &rect);
++        result = rect.right - rect.left != windowPos->cx || rect.bottom - rect.top != windowPos->cy;
++    }
++    return result;
++}
++
+ bool QWindowsWindow::handleGeometryChangingMessage(MSG *message, const QWindow *qWindow, const QMargins &margins)
+ {
+     auto *windowPos = reinterpret_cast<WINDOWPOS *>(message->lParam);
+@@ -2936,7 +2947,7 @@ bool QWindowsWindow::handleGeometryChangingMessage(MSG *message, const QWindow *
+     // Check the suggestedGeometry against the current one to only discard during
+     // resize, and not a plain move. We also look for SWP_NOSIZE since that, too,
+     // implies an identical size, and comparing QRects wouldn't work with null cx/cy
+-    if (!(windowPos->flags & SWP_NOSIZE) && suggestedGeometry.size() != qWindow->geometry().size())
++    if (isResize(windowPos))
+         windowPos->flags |= SWP_NOCOPYBITS;
+ 
+     if ((windowPos->flags & SWP_NOZORDER) == 0) {
+-- 
+2.51.2
+

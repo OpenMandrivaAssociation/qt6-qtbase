@@ -1,0 +1,156 @@
+From 1d81844656730011c9f3a2cc8f342a042d99b763 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?M=C3=A5rten=20Nordheim?= <marten.nordheim@qt.io>
+Date: Tue, 16 Sep 2025 17:08:17 +0200
+Subject: [PATCH 128/553] Http: Improve error string when there is no reason
+ phrase
+
+The reason phrase is optional, and in http2+ it is not included at all.
+So when we generate the error string as 'server replied: %2' it ends
+up being unnatural and ugly, and certainly not fit for display.
+
+To improve that, whenever there is no reason phrase, we instead
+generate the string like 'server replied with status code %2'
+and output the status code instead, which is included.
+
+Fixes: QTBUG-140126
+Pick-to: 6.9 6.8
+Change-Id: Ife3ed920f6e1a15d83e5cd5dc9b0568fb195b642
+Reviewed-by: Timur Pocheptsov <timur.pocheptsov@qt.io>
+Reviewed-by: Mate Barany <mate.barany@qt.io>
+(cherry picked from commit cdd0b0b860b632b899091e63bcecf02446b94662)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/network/access/qhttpthreaddelegate.cpp    | 35 ++++++++-----
+ .../qnetworkreply/tst_qnetworkreply.cpp       | 49 +++++++++++++++++++
+ 2 files changed, 73 insertions(+), 11 deletions(-)
+
+diff --git a/src/network/access/qhttpthreaddelegate.cpp b/src/network/access/qhttpthreaddelegate.cpp
+index 6055e2a4ae5..784323756dd 100644
+--- a/src/network/access/qhttpthreaddelegate.cpp
++++ b/src/network/access/qhttpthreaddelegate.cpp
+@@ -488,6 +488,21 @@ void QHttpThreadDelegate::readyReadSlot()
+     }
+ }
+ 
++static QString makeServerErrorString(int code, const QUrl &url, const QString &reasonPhrase)
++{
++    QString msg;
++    if (!reasonPhrase.isEmpty()) {
++        msg = QLatin1StringView(QT_TRANSLATE_NOOP("QNetworkReply",
++                                                  "Error transferring %1 - server replied: %2"))
++                      .arg(url.toString(), reasonPhrase);
++    } else {
++        msg = QLatin1StringView(QT_TRANSLATE_NOOP("QNetworkReply",
++                                                  "Error transferring %1 - server replied with status code %2"))
++                      .arg(url.toString(), QString::number(code));
++    }
++    return msg;
++}
++
+ void QHttpThreadDelegate::finishedSlot()
+ {
+     if (!httpReply)
+@@ -509,12 +524,11 @@ void QHttpThreadDelegate::finishedSlot()
+ #endif
+ 
+     if (httpReply->statusCode() >= 400) {
+-            // it's an error reply
+-            QString msg = QLatin1StringView(QT_TRANSLATE_NOOP("QNetworkReply",
+-                                                              "Error transferring %1 - server replied: %2"));
+-            msg = msg.arg(httpRequest.url().toString(), httpReply->reasonPhrase());
+-            emit error(statusCodeFromHttp(httpReply->statusCode(), httpRequest.url()), msg);
+-        }
++        // it's an error reply
++        QString msg = makeServerErrorString(httpReply->statusCode(), httpRequest.url(),
++                                            httpReply->reasonPhrase());
++        emit error(statusCodeFromHttp(httpReply->statusCode(), httpRequest.url()), msg);
++    }
+ 
+     if (httpRequest.isFollowRedirects() && httpReply->isRedirecting())
+         emit redirected(httpReply->redirectUrl(), httpReply->statusCode(), httpReply->request().redirectCount() - 1);
+@@ -535,11 +549,10 @@ void QHttpThreadDelegate::synchronousFinishedSlot()
+     qDebug() << "QHttpThreadDelegate::synchronousFinishedSlot() thread=" << QThread::currentThreadId() << "result=" << httpReply->statusCode();
+ #endif
+     if (httpReply->statusCode() >= 400) {
+-            // it's an error reply
+-            QString msg = QLatin1StringView(QT_TRANSLATE_NOOP("QNetworkReply",
+-                                                              "Error transferring %1 - server replied: %2"));
+-            incomingErrorDetail = msg.arg(httpRequest.url().toString(), httpReply->reasonPhrase());
+-            incomingErrorCode = statusCodeFromHttp(httpReply->statusCode(), httpRequest.url());
++        // it's an error reply
++        incomingErrorDetail = makeServerErrorString(httpReply->statusCode(), httpRequest.url(),
++                                                    httpReply->reasonPhrase());
++        incomingErrorCode = statusCodeFromHttp(httpReply->statusCode(), httpRequest.url());
+     }
+ 
+     isCompressed = httpReply->isCompressed();
+diff --git a/tests/auto/network/access/qnetworkreply/tst_qnetworkreply.cpp b/tests/auto/network/access/qnetworkreply/tst_qnetworkreply.cpp
+index 0ef268cdeb1..18118c3ec53 100644
+--- a/tests/auto/network/access/qnetworkreply/tst_qnetworkreply.cpp
++++ b/tests/auto/network/access/qnetworkreply/tst_qnetworkreply.cpp
+@@ -533,6 +533,8 @@ private Q_SLOTS:
+ 
+     void ioHttpSingleRedirect();
+     void ioHttpChangeMaxRedirects();
++    void ioHttpErrorString_data();
++    void ioHttpErrorString();
+     void ioHttpRedirectErrors_data();
+     void ioHttpRedirectErrors();
+     void ioHttpRedirectPolicy_data();
+@@ -9176,6 +9178,53 @@ void tst_QNetworkReply::ioHttpChangeMaxRedirects()
+     QVERIFY(validateRedirectedResponseHeaders(reply2));
+ }
+ 
++void tst_QNetworkReply::ioHttpErrorString_data()
++{
++    QTest::addColumn<int>("statusCode");
++    QTest::addColumn<QString>("reasonPhrase");
++
++    QTest::newRow("404 - page not found") << 404 << "page not found";
++    QTest::newRow("404 - <no reason provided>") << 404 << QString();
++    QTest::newRow("500 - internal error") << 500 << "internal error";
++    QTest::newRow("500 - <no reason provided>") << 500 << QString();
++}
++
++void tst_QNetworkReply::ioHttpErrorString()
++{
++    QFETCH(const int, statusCode);
++    QFETCH(const QString, reasonPhrase);
++
++    QString serverReply = uR"(HTTP/1.1 %1%2
++    content-type: text/plain
++
++    Hello world)"_s;
++    if (reasonPhrase.isEmpty())
++        serverReply = serverReply.arg(QString::number(statusCode), "");
++    else
++        serverReply = serverReply.arg(QString::number(statusCode), u" " % reasonPhrase);
++    MiniHttpServer server(serverReply.toUtf8());
++
++    QUrl serverAddress;
++    serverAddress.setScheme(u"http"_s);
++    serverAddress.setHost(u"127.0.0.1"_s);
++    serverAddress.setPort(server.serverPort());
++
++    QNetworkRequest request(serverAddress);
++    QNetworkReplyPtr reply(manager.get(request));
++
++    QTRY_VERIFY(reply->isFinished());
++    QCOMPARE_NE(reply->error(), QNetworkReply::NoError);
++    if (!reasonPhrase.isEmpty()) {
++        QCOMPARE(reply->errorString(),
++                 "Error transferring %1 - server replied: %2"_L1.arg(serverAddress.toString(),
++                                                                     reasonPhrase));
++    } else {
++        QCOMPARE(reply->errorString(),
++                 "Error transferring %1 - server replied with status code %2"_L1.arg(
++                         serverAddress.toString(), QString::number(statusCode)));
++    }
++}
++
+ void tst_QNetworkReply::ioHttpRedirectErrors_data()
+ {
+     QTest::addColumn<QString>("url");
+-- 
+2.51.2
+

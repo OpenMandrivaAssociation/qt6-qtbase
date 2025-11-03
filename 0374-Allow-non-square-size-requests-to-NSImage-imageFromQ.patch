@@ -1,0 +1,147 @@
+From 1a2e82ec12273f147f322bac0c986af14a979f0a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tor=20Arne=20Vestb=C3=B8?= <tor.arne.vestbo@qt.io>
+Date: Wed, 1 Oct 2025 15:00:54 +0200
+Subject: [PATCH 374/553] Allow non-square size requests to [NSImage
+ imageFromQIcon]
+
+We feed the size into the icon engine if the engine doesn't have
+an intrinsic size (for example SVG), and the engine might want to
+know if the icon has a non-square size.
+
+Pick-to: 6.8 6.5
+Change-Id: I7c328a874cd2e8dbbd8c782bf82f8e334083becc
+Reviewed-by: Volker Hilsheimer <volker.hilsheimer@qt.io>
+(cherry picked from commit 12885fd3bdc01bd57a1da2ae1d01ecffd6d493f3)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/gui/painting/qcoregraphics.mm                | 16 ++++++++--------
+ src/gui/painting/qcoregraphics_p.h               | 11 +++++++----
+ src/plugins/platforms/cocoa/qcocoaintegration.mm |  5 +++--
+ src/plugins/platforms/cocoa/qcocoamenuitem.mm    |  2 +-
+ src/plugins/platforms/cocoa/qcocoawindow.mm      |  5 +++--
+ 5 files changed, 22 insertions(+), 17 deletions(-)
+
+diff --git a/src/gui/painting/qcoregraphics.mm b/src/gui/painting/qcoregraphics.mm
+index f605cc741d5..6e57085b50f 100644
+--- a/src/gui/painting/qcoregraphics.mm
++++ b/src/gui/painting/qcoregraphics.mm
+@@ -119,24 +119,24 @@ QT_END_NAMESPACE
+ 
+ + (instancetype)imageFromQIcon:(const QIcon &)icon
+ {
+-    return [NSImage imageFromQIcon:icon withSize:0];
++    return [NSImage imageFromQIcon:icon withSize:QSize()];
+ }
+ 
+-+ (instancetype)imageFromQIcon:(const QIcon &)icon withSize:(int)size
+++ (instancetype)imageFromQIcon:(const QIcon &)icon withSize:(const QSize &)size
+ {
+     return [NSImage imageFromQIcon:icon withSize:size withMode:QIcon::Normal withState:QIcon::Off];
+ }
+ 
+-+ (instancetype)imageFromQIcon:(const QIcon &)icon withSize:(int)size withMode:(QIcon::Mode)mode
+-                                                                     withState:(QIcon::State)state
+++ (instancetype)imageFromQIcon:(const QIcon &)icon withSize:(const QSize &)size
++                    withMode:(QIcon::Mode)mode withState:(QIcon::State)state
+ 
+ {
+     if (icon.isNull())
+         return nil;
+ 
+     auto availableSizes = icon.availableSizes();
+-    if (availableSizes.isEmpty() && size > 0)
+-        availableSizes << QSize(size, size);
++    if (availableSizes.isEmpty() && !size.isNull())
++        availableSizes << size;
+ 
+     auto nsImage = [[[NSImage alloc] initWithSize:NSZeroSize] autorelease];
+ 
+@@ -162,8 +162,8 @@ QT_END_NAMESPACE
+ 
+     [nsImage setTemplate:icon.isMask()];
+ 
+-    if (size)
+-        nsImage.size = CGSizeMake(size, size);
++    if (!size.isNull())
++        nsImage.size = QSizeF(size).toCGSize();
+ 
+     return nsImage;
+ }
+diff --git a/src/gui/painting/qcoregraphics_p.h b/src/gui/painting/qcoregraphics_p.h
+index 57618f7a33b..4736826b4f5 100644
+--- a/src/gui/painting/qcoregraphics_p.h
++++ b/src/gui/painting/qcoregraphics_p.h
+@@ -17,6 +17,8 @@
+ 
+ #include <QtCore/private/qcore_mac_p.h>
+ 
++#include <QtCore/qsize.h>
++
+ #include <QtGui/private/qtguiglobal_p.h>
+ #include <QtGui/qicon.h>
+ #include <QtGui/qpalette.h>
+@@ -56,11 +58,12 @@ QT_END_NAMESPACE
+ @interface NSImage (QtExtras)
+ + (instancetype)imageFromQImage:(const QT_PREPEND_NAMESPACE(QImage) &)image;
+ + (instancetype)imageFromQIcon:(const QT_PREPEND_NAMESPACE(QIcon) &)icon;
+-+ (instancetype)imageFromQIcon:(const QT_PREPEND_NAMESPACE(QIcon) &)icon withSize:(int)size;
+ + (instancetype)imageFromQIcon:(const QT_PREPEND_NAMESPACE(QIcon) &)icon
+-                                            withSize:(int)size
+-                                            withMode:(QT_PREPEND_NAMESPACE(QIcon)::Mode)mode
+-                                           withState:(QT_PREPEND_NAMESPACE(QIcon)::State)state;
++                      withSize:(const QT_PREPEND_NAMESPACE(QSize) &)size;
+++ (instancetype)imageFromQIcon:(const QT_PREPEND_NAMESPACE(QIcon) &)icon
++                      withSize:(const QT_PREPEND_NAMESPACE(QSize) &)size
++                      withMode:(QT_PREPEND_NAMESPACE(QIcon)::Mode)mode
++                     withState:(QT_PREPEND_NAMESPACE(QIcon)::State)state;
+ @end
+ QT_BEGIN_NAMESPACE
+ #endif // __OBJC__
+diff --git a/src/plugins/platforms/cocoa/qcocoaintegration.mm b/src/plugins/platforms/cocoa/qcocoaintegration.mm
+index 63553b986ed..350fe09e059 100644
+--- a/src/plugins/platforms/cocoa/qcocoaintegration.mm
++++ b/src/plugins/platforms/cocoa/qcocoaintegration.mm
+@@ -424,8 +424,9 @@ QPlatformKeyMapper *QCocoaIntegration::keyMapper() const
+ void QCocoaIntegration::setApplicationIcon(const QIcon &icon) const
+ {
+     // Fall back to a size that looks good on the highest resolution screen available
+-    auto fallbackSize = NSApp.dockTile.size.width * qGuiApp->devicePixelRatio();
+-    NSApp.applicationIconImage = [NSImage imageFromQIcon:icon withSize:fallbackSize];
++    // for icon engines that don't have an intrinsic size (like SVG).
++    auto fallbackSize = QSizeF::fromCGSize(NSApp.dockTile.size) * qGuiApp->devicePixelRatio();
++    NSApp.applicationIconImage = [NSImage imageFromQIcon:icon withSize:fallbackSize.toSize()];
+ }
+ 
+ void QCocoaIntegration::setApplicationBadge(qint64 number)
+diff --git a/src/plugins/platforms/cocoa/qcocoamenuitem.mm b/src/plugins/platforms/cocoa/qcocoamenuitem.mm
+index b6033e9cdfc..5a53dd55acb 100644
+--- a/src/plugins/platforms/cocoa/qcocoamenuitem.mm
++++ b/src/plugins/platforms/cocoa/qcocoamenuitem.mm
+@@ -374,7 +374,7 @@ NSMenuItem *QCocoaMenuItem::sync()
+ 
+     const QIcon::Mode mode = m_enabled ? QIcon::Normal : QIcon::Disabled;
+     const QIcon::State state = m_checked ? QIcon::On : QIcon::Off;
+-    m_native.image = [NSImage imageFromQIcon:m_icon withSize:m_iconSize
++    m_native.image = [NSImage imageFromQIcon:m_icon withSize:QSize(m_iconSize, m_iconSize)
+                                                     withMode:mode
+                                                    withState:state];
+ 
+diff --git a/src/plugins/platforms/cocoa/qcocoawindow.mm b/src/plugins/platforms/cocoa/qcocoawindow.mm
+index bca3c9b6f37..2858939228c 100644
+--- a/src/plugins/platforms/cocoa/qcocoawindow.mm
++++ b/src/plugins/platforms/cocoa/qcocoawindow.mm
+@@ -1072,8 +1072,9 @@ void QCocoaWindow::setWindowIcon(const QIcon &icon)
+         iconButton.image = [NSWorkspace.sharedWorkspace iconForFile:m_view.window.representedFilename];
+     } else {
+         // Fall back to a size that looks good on the highest resolution screen available
+-        auto fallbackSize = iconButton.frame.size.height * qGuiApp->devicePixelRatio();
+-        iconButton.image = [NSImage imageFromQIcon:icon withSize:fallbackSize];
++        // for icon engines that don't have an intrinsic size (like SVG).
++        auto fallbackSize = QSizeF::fromCGSize(iconButton.frame.size) * qGuiApp->devicePixelRatio();
++        iconButton.image = [NSImage imageFromQIcon:icon withSize:fallbackSize.toSize()];
+     }
+ }
+ 
+-- 
+2.51.2
+

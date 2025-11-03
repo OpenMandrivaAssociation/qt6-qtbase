@@ -1,0 +1,43 @@
+From 05e2fe069e9ff58c90df0221c3c304bf4676ca1a Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Tue, 28 Oct 2025 16:01:46 +0100
+Subject: [PATCH 533/553] tst_QHeaderView: remove unused static istr()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Amends 3692f14a3000ead3e92cf6fa63cb8b9b3250e6ef, which removed the
+last callers.
+
+Change-Id: Iaf78024a70623a7dc47516cd87f4552bdbbf3d1c
+Reviewed-by: Christian Ehrlicher <ch.ehrlicher@gmx.de>
+Reviewed-by: Thorbjørn Lund Martsum <tmartsum@gmail.com>
+(cherry picked from commit 57e408deb61bac657d863b2fd720f68f39562ab7)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../widgets/itemviews/qheaderview/tst_qheaderview.cpp    | 9 ---------
+ 1 file changed, 9 deletions(-)
+
+diff --git a/tests/auto/widgets/itemviews/qheaderview/tst_qheaderview.cpp b/tests/auto/widgets/itemviews/qheaderview/tst_qheaderview.cpp
+index b651668cabd..526081b2f19 100644
+--- a/tests/auto/widgets/itemviews/qheaderview/tst_qheaderview.cpp
++++ b/tests/auto/widgets/itemviews/qheaderview/tst_qheaderview.cpp
+@@ -2842,15 +2842,6 @@ const bool block_some_signals = true; // The test should also work with this set
+ const int rowcount = 500;
+ const int colcount = 10;
+ 
+-static inline QString istr(int n, bool comma = true)
+-{
+-    QString s;
+-    s.setNum(n);
+-    if (comma)
+-        s += ", ";
+-    return s;
+-}
+-
+ void tst_QHeaderView::setupTestData()
+ {
+     QTest::addColumn<bool>("updates_enabled");
+-- 
+2.51.2
+

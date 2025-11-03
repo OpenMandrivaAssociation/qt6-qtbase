@@ -1,0 +1,34 @@
+From b2e484254fb57f828a49538c6d169dca985d96d1 Mon Sep 17 00:00:00 2001
+From: Christian Ehrlicher <ch.ehrlicher@gmx.de>
+Date: Fri, 19 Sep 2025 19:17:47 +0200
+Subject: [PATCH 195/553] Windows11Style: don't draw non-editable QComboBox as
+ drawable
+
+Only draw the blue underline when the QComboBox is actually editable.
+This amends b335784c25600cf7df20e67f45d0ab315e0a02b3.
+
+Task-number: QTBUG-137403
+Change-Id: I3dbad7917a00c9be63c145163b71678d092870b5
+Reviewed-by: Wladimir Leuschner <wladimir.leuschner@qt.io>
+(cherry picked from commit 7c02c04e93b5d3232eb787e6b3493aefb03960b8)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/plugins/styles/modernwindows/qwindows11style.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/plugins/styles/modernwindows/qwindows11style.cpp b/src/plugins/styles/modernwindows/qwindows11style.cpp
+index d296988514e..53f0d43994a 100644
+--- a/src/plugins/styles/modernwindows/qwindows11style.cpp
++++ b/src/plugins/styles/modernwindows/qwindows11style.cpp
+@@ -481,7 +481,7 @@ void QWindows11Style::drawComplexControl(ComplexControl control, const QStyleOpt
+             drawRoundedRect(painter, frameRect, Qt::NoPen, option->palette.brush(QPalette::Base));
+ 
+             if (combobox->frame)
+-                drawLineEditFrame(painter, frameRect, option);
++                drawLineEditFrame(painter, frameRect, combobox, combobox->editable);
+ 
+             const bool isMouseOver = state & State_MouseOver;
+             const bool hasFocus = state & State_HasFocus;
+-- 
+2.51.2
+

@@ -1,0 +1,43 @@
+From d95aef6e3a496b41c50fd723de5135d753a1ae1c Mon Sep 17 00:00:00 2001
+From: Thiago Macieira <thiago.macieira@intel.com>
+Date: Tue, 21 Oct 2025 23:49:00 -0700
+Subject: [PATCH 476/553] QList::assign: optimize for empty
+ std::initializer_list
+
+Happens often when one writes:
+  l = {};
+
+For the vast majority of cases, the size is a constant because the
+std::initializer_list is an automatic variable, so this should not
+result in extra conditionals in the code (in release mode, of course).
+
+Pick-to: 6.8 6.5
+Change-Id: If90fc920810f42ab68e5fffdc7a254b2e3f709a7
+Reviewed-by: Fabian Kosmale <fabian.kosmale@qt.io>
+(cherry picked from commit e5cec95bffc0a621715b27e4b14966c0dc86afe6)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/tools/qlist.h | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/src/corelib/tools/qlist.h b/src/corelib/tools/qlist.h
+index 7a93ec688ef..da0d89c021a 100644
+--- a/src/corelib/tools/qlist.h
++++ b/src/corelib/tools/qlist.h
+@@ -581,7 +581,12 @@ public:
+     { d.assign(first, last); return *this; }
+ 
+     QList &assign(std::initializer_list<T> l)
+-    { return assign(l.begin(), l.end()); }
++    {
++        if (l.size())
++            return assign(l.begin(), l.end());
++        clear();
++        return *this;
++    }
+ 
+     template <typename ...Args>
+     iterator emplace(const_iterator before, Args&&... args)
+-- 
+2.51.2
+

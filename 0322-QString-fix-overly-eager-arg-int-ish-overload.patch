@@ -1,0 +1,120 @@
+From 7196bb00ed7aba7efedeea53fc520b20338c7786 Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Tue, 15 Jul 2025 22:55:59 +0200
+Subject: [PATCH 322/553] QString: fix overly-eager arg(int-ish) overload
+
+In order to support (unscoped) enums, the overload accepted everything
+that implicitly converted to q(u)longlong. But like the reporter of
+QTBUG-138471 found out, that incorrectly matches types that implicitly
+convert to float. Those types used to call the FP-ish overload set in
+6.8, but that one is now restricted to actual FP types (by way of
+being a template constrained, essentially, on std::is_floating_point),
+and a type that converts to float is not itself a floating-point
+type. Unfortunately, the int-ish overload accepted the call,
+truncating the float to an int for printing.
+
+Fix by being more explicit in the arg(int-ish) constraint, saying
+exactly what we want: integrals, enums, but not scoped ones, and
+nothing that already matches the string-ish or FP-ish overloads.
+
+[ChangeLog][Potentially Source-Incompatible Changes][QtCore][QString]
+Fixed the integral arg() overload to reject types that merely
+implicitly convert to an integral type. This was always the intent,
+but 6.9 and 6.10.0 incorrectly accepted types that implicitly convert
+to float to match this overload, causing truncated results. We now
+reject such types. A backwards-compatible fix is to cast such types to
+a C++ type whose displayed form matches your intent.
+
+Amends 563ed822f867c6c3040956017d4ca7f3795f172c.
+
+Fixes: QTBUG-138471
+Change-Id: I6f3b6b93c243df574b878794b6304109d28d58ff
+Reviewed-by: Ivan Solovev <ivan.solovev@qt.io>
+(cherry picked from commit 0a1c69bba5b5dd26b937ac0a67ab0bdd1c32b221)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/text/qstring.cpp                    |  7 +++++++
+ src/corelib/text/qstring.h                      | 10 +++++++---
+ tests/auto/corelib/text/qstring/tst_qstring.cpp | 13 +++++++++++++
+ 3 files changed, 27 insertions(+), 3 deletions(-)
+
+diff --git a/src/corelib/text/qstring.cpp b/src/corelib/text/qstring.cpp
+index 09caa314ff1..1d4b0280abe 100644
+--- a/src/corelib/text/qstring.cpp
++++ b/src/corelib/text/qstring.cpp
+@@ -8877,6 +8877,13 @@ QString QString::arg_impl(QAnyStringView a, int fieldWidth, QChar fillChar) cons
+   \snippet qstring/main.cpp 12
+   \snippet qstring/main.cpp 14
+ 
++  \note In Qt versions prior to 6.10.1, this function accepted arguments of
++  types that implicitly convert to integral types. This is no longer supported,
++  except for (unscoped) enums, because it also accepted types convertible to
++  floating-point types, losing precision when those were printed as integers. A
++  backwards-compatible fix is to cast such types to a C++ type whose displayed
++  form matches your intent (\c int, \c float, ...).
++
+   \note In Qt versions prior to 6.9, this function was overloaded on various
+   integral types and sometimes incorrectly accepted \c char and \c char16_t
+   arguments.
+diff --git a/src/corelib/text/qstring.h b/src/corelib/text/qstring.h
+index 143bfb9f0a3..2e4a92cb8d2 100644
+--- a/src/corelib/text/qstring.h
++++ b/src/corelib/text/qstring.h
+@@ -28,6 +28,7 @@
+ #include <iterator>
+ #include <QtCore/q20memory.h>
+ #include <string_view>
++#include <QtCore/q23type_traits.h>
+ 
+ #include <stdarg.h>
+ 
+@@ -181,9 +182,12 @@ class Q_CORE_EXPORT QString
+ 
+     template <typename T>
+     using if_integral_non_char = std::enable_if_t<std::conjunction_v<
+-            std::disjunction< // unlike is_integral, also covers unscoped enums
+-                std::is_convertible<T, qulonglong>,
+-                std::is_convertible<T, qlonglong>
++            std::disjunction<
++                std::is_integral<T>,
++                std::conjunction<
++                    std::is_enum<T>,                       // (unscoped) enums yes,
++                    std::negation<q23::is_scoped_enum<T>>  // but not scoped ones
++                >
+             >,
+             std::negation<is_floating_point_like<T>>, // has its own overload
+             std::negation<is_string_like<T>>          // ditto
+diff --git a/tests/auto/corelib/text/qstring/tst_qstring.cpp b/tests/auto/corelib/text/qstring/tst_qstring.cpp
+index 72b36524355..19df768691c 100644
+--- a/tests/auto/corelib/text/qstring/tst_qstring.cpp
++++ b/tests/auto/corelib/text/qstring/tst_qstring.cpp
+@@ -6980,6 +6980,13 @@ using arg_compile_test = decltype(std::declval<S>().arg(std::declval<Ts>()...));
+ template <typename S, typename...Ts>
+ constexpr bool arg_compiles_v = qxp::is_detected_v<arg_compile_test, S, Ts...>;
+ 
++template <typename T>
++struct Wrapper { // QTBUG-138471
++    Q_IMPLICIT operator T() const {
++        return T(1);
++    }
++};
++
+ void tst_QString::arg_negative_tests()
+ {
+     static_assert(!arg_compiles_v<QString&, QObject*>);
+@@ -6993,6 +7000,12 @@ void tst_QString::arg_negative_tests()
+     // strong enums don't match:
+     enum class Strong {};
+     static_assert(!arg_compiles_v<QString&, Strong>);
++
++    // types that merely implicitly convert to a supported type don't match:
++    static_assert(!arg_compiles_v<QString, Wrapper<float>>);
++    static_assert(!arg_compiles_v<QString, Wrapper<double>>);
++    static_assert(!arg_compiles_v<QString, Wrapper<int>>);
++    static_assert(!arg_compiles_v<QString, Wrapper<char16_t>>);
+ }
+ 
+ void tst_QString::number()
+-- 
+2.51.2
+

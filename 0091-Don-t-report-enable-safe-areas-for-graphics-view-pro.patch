@@ -1,0 +1,54 @@
+From 7f784867175110374d46520724bfc2979ebbba36 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tor=20Arne=20Vestb=C3=B8?= <tor.arne.vestbo@qt.io>
+Date: Fri, 12 Sep 2025 15:42:11 +0200
+Subject: [PATCH 091/553] Don't report/enable safe areas for graphics-view
+ proxied widgets
+
+We don't handle the safe area mapping for proxied widgets.
+
+Task-number: QTBUG-140133
+Pick-to: 6.9
+Change-Id: I87b666f5364b7ad89be77e84054eb2d653933b61
+Reviewed-by: Axel Spoerl <axel.spoerl@qt.io>
+Reviewed-by: Assam Boudjelthia <assam.boudjelthia@qt.io>
+(cherry picked from commit 7a272c290097b0672ac4e140cfcfc085484c0ca5)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/widgets/kernel/qwidget.cpp | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/src/widgets/kernel/qwidget.cpp b/src/widgets/kernel/qwidget.cpp
+index 09113cdd2a0..d3d13649c94 100644
+--- a/src/widgets/kernel/qwidget.cpp
++++ b/src/widgets/kernel/qwidget.cpp
+@@ -1199,7 +1199,11 @@ void QWidget::create(WId window, bool initializeWindow, bool destroyOldWindow)
+     if (QApplicationPrivate::testAttribute(Qt::AA_NativeWindows))
+         setAttribute(Qt::WA_NativeWindow);
+ 
+-    if (isWindow()) {
++    if (isWindow()
++#if QT_CONFIG(graphicsview)
++        && !graphicsProxyWidget()
++#endif
++    ) {
+         // Make top levels automatically respect safe areas by default
+         auto *topExtra = d->maybeTopData();
+         if (!topExtra || !topExtra->explicitContentsMarginsRespectsSafeArea) {
+@@ -7716,6 +7720,14 @@ QRect QWidget::contentsRect() const
+ QMargins QWidgetPrivate::safeAreaMargins() const
+ {
+     Q_Q(const QWidget);
++
++#if QT_CONFIG(graphicsview)
++    // Don't report margins for proxied widgets, as the logic
++    // below doesn't handle that case (yet).
++    if (nearestGraphicsProxyWidget(q))
++        return QMargins();
++#endif
++
+     QWidget *nativeWidget = q->window();
+     if (!nativeWidget->windowHandle())
+         return QMargins();
+-- 
+2.51.2
+

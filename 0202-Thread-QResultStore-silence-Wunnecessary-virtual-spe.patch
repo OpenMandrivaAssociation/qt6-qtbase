@@ -1,0 +1,41 @@
+From a883485aa34742c08e8cda670cce03e2c96d470f Mon Sep 17 00:00:00 2001
+From: Tim Blechmann <tim.blechmann@qt.io>
+Date: Wed, 24 Sep 2025 12:13:55 +0800
+Subject: [PATCH 202/553] Thread: QResultStore - silence
+ -Wunnecessary-virtual-specifier
+
+clang-21 emits -Wunnecessary-virtual-specifier on final classes.
+Disabling the warning to silence warnings when compiling application
+code.
+
+Pick-to: 6.8 6.5
+Change-Id: I382f38d20d67d0758f670bd880924982d525e5ab
+Reviewed-by: Marc Mutz <marc.mutz@qt.io>
+(cherry picked from commit 8e2fd13d20a365e555c429f89e46b9bd874a8e3c)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/thread/qresultstore.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/src/corelib/thread/qresultstore.h b/src/corelib/thread/qresultstore.h
+index bb9d92b2e77..fe2624da512 100644
+--- a/src/corelib/thread/qresultstore.h
++++ b/src/corelib/thread/qresultstore.h
+@@ -111,7 +111,14 @@ public:
+     int count() const;
+     // ### Qt 7: 'virtual' isn't required, can be removed, along with renaming
+     // the class to ResultStore and changing the members below to be private.
++    QT_WARNING_PUSH
++#if defined(Q_CC_CLANG)
++#  if __has_warning("-Wunnecessary-virtual-specifier")
++    QT_WARNING_DISABLE_CLANG("-Wunnecessary-virtual-specifier")
++#  endif
++#endif
+     virtual ~ResultStoreBase();
++    QT_WARNING_POP
+ 
+ protected:
+     int insertResultItem(int index, ResultItem &resultItem);
+-- 
+2.51.2
+

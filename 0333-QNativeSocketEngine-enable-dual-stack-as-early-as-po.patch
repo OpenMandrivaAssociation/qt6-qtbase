@@ -1,0 +1,79 @@
+From 46c556d8ecca78cf24922071f188b59bb661ebeb Mon Sep 17 00:00:00 2001
+From: Ivan Solovev <ivan.solovev@qt.io>
+Date: Wed, 24 Sep 2025 16:30:24 +0200
+Subject: [PATCH 333/553] QNativeSocketEngine: enable dual-stack as early as
+ possible
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Try to disable the IPV6_V6ONLY socket option right after creating the
+socket.
+
+This is important, because it can affect how setting other options works.
+For example, on Windows we could not properly set the
+ReceivePacketInformation option before calling bind()/connectToHost().
+
+If we're actually binding/connecting to an IPv6 address, then the
+pre-existing code in nativeBind()/nativeConnect() would take care of
+adjusting the option again.
+
+Task-number: QTBUG-80704
+Task-number: QTBUG-139697
+Pick-to: 6.8
+Change-Id: I6d504d354f63f441c90df21f933fd800fafa655f
+Reviewed-by: Mårten Nordheim <marten.nordheim@qt.io>
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit e0c0b7cab2bbbec4ae6f5c9e55c949fd05ee4c64)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/network/socket/qnativesocketengine_unix.cpp | 14 ++++++++++++++
+ src/network/socket/qnativesocketengine_win.cpp  |  7 +++++++
+ 2 files changed, 21 insertions(+)
+
+diff --git a/src/network/socket/qnativesocketengine_unix.cpp b/src/network/socket/qnativesocketengine_unix.cpp
+index a3f70343dcf..2495330979e 100644
+--- a/src/network/socket/qnativesocketengine_unix.cpp
++++ b/src/network/socket/qnativesocketengine_unix.cpp
+@@ -236,6 +236,20 @@ bool QNativeSocketEnginePrivate::createNewSocket(QAbstractSocket::SocketType soc
+         return false;
+     }
+ 
++    // Attempt to enable dual-stack
++    if (domain == AF_INET6) {
++        const int ipv6only = 0;
++        [[maybe_unused]] const int ret = ::setsockopt(socket, IPPROTO_IPV6, IPV6_V6ONLY,
++                                                      &ipv6only, sizeof(ipv6only));
++#if defined (QNATIVESOCKETENGINE_DEBUG)
++        if (ret != 0) {
++            qDebug("QNativeSocketEnginePrivate::createNewSocket(%d, %d): "
++                   "failed to set IPV6_V6ONLY to %d.",
++                   socketType, socketProtocol, ipv6only);
++        }
++#endif
++    }
++
+ #if defined (QNATIVESOCKETENGINE_DEBUG)
+     qDebug("QNativeSocketEnginePrivate::createNewSocket(%d, %d) == true",
+            socketType, socketProtocol);
+diff --git a/src/network/socket/qnativesocketengine_win.cpp b/src/network/socket/qnativesocketengine_win.cpp
+index 32eefc40a88..7afef9d1036 100644
+--- a/src/network/socket/qnativesocketengine_win.cpp
++++ b/src/network/socket/qnativesocketengine_win.cpp
+@@ -330,6 +330,13 @@ bool QNativeSocketEnginePrivate::createNewSocket(QAbstractSocket::SocketType soc
+                  &sendmsg, sizeof(sendmsg), &bytesReturned, NULL, NULL) == SOCKET_ERROR)
+         sendmsg = 0;
+ 
++    // Attempt to enable dual-stack
++    if (protocol == AF_INET6) {
++        int ipv6only = 0;
++        ::setsockopt(socket, IPPROTO_IPV6, IPV6_V6ONLY,
++                     reinterpret_cast<char *>(&ipv6only), sizeof(ipv6only));
++    }
++
+     socketDescriptor = socket;
+     this->socketProtocol = socketProtocol;
+     this->socketType = socketType;
+-- 
+2.51.2
+

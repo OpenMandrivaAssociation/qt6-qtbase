@@ -1,0 +1,133 @@
+From 09d2ceca242c093675484c2b1d92faa265bacac0 Mon Sep 17 00:00:00 2001
+From: Thiago Macieira <thiago.macieira@intel.com>
+Date: Tue, 16 Sep 2025 15:32:13 -0700
+Subject: [PATCH 165/553] QLockFile: inline getLockFileHandle() so it's not in
+ the QtCore DLL
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+It's only used by the unit test, so we shouldn't need it in regular
+builds. In doing that, we can also fix the file descriptor leak on
+Windows.
+
+Change-Id: I38f87e4acc15167f8284fffdf8d76f09242aa787
+Reviewed-by: Mårten Nordheim <marten.nordheim@qt.io>
+(cherry picked from commit 1f86f801d207c11d101a152c1c69dcb6164639b7)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/io/qlockfile.cpp                  | 13 +------
+ src/corelib/io/qlockfile_p.h                  |  5 ++-
+ .../corelib/io/qlockfile/tst_qlockfile.cpp    | 34 +++++++++++++++----
+ 3 files changed, 32 insertions(+), 20 deletions(-)
+
+diff --git a/src/corelib/io/qlockfile.cpp b/src/corelib/io/qlockfile.cpp
+index fef20455732..908db7b9d38 100644
+--- a/src/corelib/io/qlockfile.cpp
++++ b/src/corelib/io/qlockfile.cpp
+@@ -458,18 +458,7 @@ bool QLockFilePrivate::isApparentlyStale() const
+     return staleLockTime > 0ms && abs(age) > staleLockTime;
+ }
+ 
+-int QLockFilePrivate::getLockFileHandle(QLockFile *f)
+-{
+-    int fd;
+-#ifdef Q_OS_WIN
+-    // Use of this function on Windows WILL leak a file descriptor.
+-    fd = _open_osfhandle(intptr_t(f->d_func()->fileHandle), 0);
+-#else
+-    fd = f->d_func()->fileHandle;
+-#endif
+-    QT_LSEEK(fd, 0, SEEK_SET);
+-    return fd;
+-}
++
+ 
+ /*!
+     Attempts to forcefully remove an existing lock file.
+diff --git a/src/corelib/io/qlockfile_p.h b/src/corelib/io/qlockfile_p.h
+index 8758adfb71e..2a7ebe1926d 100644
+--- a/src/corelib/io/qlockfile_p.h
++++ b/src/corelib/io/qlockfile_p.h
+@@ -52,7 +52,10 @@ public:
+     bool isLocked = false;
+ 
+     // used in tst_QLockFile:
+-    Q_CORE_EXPORT static int getLockFileHandle(QLockFile *f);
++    static auto getLockFileHandle(QLockFile *f)
++    {
++        return f->d_func()->fileHandle;
++    }
+ };
+ 
+ QT_END_NAMESPACE
+diff --git a/tests/auto/corelib/io/qlockfile/tst_qlockfile.cpp b/tests/auto/corelib/io/qlockfile/tst_qlockfile.cpp
+index 48c90e263bd..bec14851dd4 100644
+--- a/tests/auto/corelib/io/qlockfile/tst_qlockfile.cpp
++++ b/tests/auto/corelib/io/qlockfile/tst_qlockfile.cpp
+@@ -11,8 +11,10 @@
+ #include <QFutureSynchronizer>
+ 
+ #include <qlockfile.h>
+-#include <qtemporarydir.h>
+ #include <qsysinfo.h>
++#include <qplatformdefs.h>
++#include <qtemporarydir.h>
++
+ #if defined(Q_OS_UNIX) && !defined(Q_OS_VXWORKS)
+ #include <unistd.h>
+ 
+@@ -544,6 +546,28 @@ void tst_QLockFile::corruptedLockFileInTheFuture()
+ #endif
+ }
+ 
++static bool openLockFile(QFile *f, QLockFile *lockfile)
++{
++    int fd;
++    QFile::FileHandleFlags flags = {};
++#ifdef Q_OS_WIN
++    // Since _open_osfhandle() takes ownership of the handle, we need to first
++    // duplicate the HANDLE from QLockFilePrivate.
++    HANDLE h = QLockFilePrivate::getLockFileHandle(lockfile);
++    bool bInheritHandle = false;
++    DWORD dwDesiredAccess = 0;
++    if (!DuplicateHandle(GetCurrentProcess(), h, GetCurrentProcess(), &h, dwDesiredAccess,
++                         bInheritHandle, DUPLICATE_SAME_ACCESS))
++        return false;
++    fd = _open_osfhandle(intptr_t(h), 0);
++    flags = QFile::AutoCloseHandle;
++#else
++    fd = QLockFilePrivate::getLockFileHandle(lockfile);
++#endif
++    QT_LSEEK(fd, 0, SEEK_SET);
++    return f->open(fd, QIODevice::ReadWrite | QIODevice::Text, flags);
++}
++
+ void tst_QLockFile::hostnameChange()
+ {
+     const QByteArray hostid = QSysInfo::machineUniqueId();
+@@ -557,9 +581,7 @@ void tst_QLockFile::hostnameChange()
+     {
+         // now modify it
+         QFile f;
+-        QVERIFY(f.open(QLockFilePrivate::getLockFileHandle(&lock1),
+-                       QIODevice::ReadWrite | QIODevice::Text,
+-                       QFile::DontCloseHandle));
++        QVERIFY(openLockFile(&f, &lock1));
+         QVERIFY(overwriteLineInLockFile(f, 3, "this is not a hostname"));
+     }
+ 
+@@ -583,9 +605,7 @@ void tst_QLockFile::differentMachines()
+     {
+         // now modify it
+         QFile f;
+-        QVERIFY(f.open(QLockFilePrivate::getLockFileHandle(&lock1),
+-                       QIODevice::ReadWrite | QIODevice::Text,
+-                       QFile::DontCloseHandle));
++        QVERIFY(openLockFile(&f, &lock1));
+         QVERIFY(overwriteLineInLockFile(f, 1, QT_STRINGIFY(INT_MAX)));
+         QVERIFY(overwriteLineInLockFile(f, 4, "this is not a UUID"));
+     }
+-- 
+2.51.2
+

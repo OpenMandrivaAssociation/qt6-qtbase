@@ -1,0 +1,101 @@
+From 76c265529c357b3dd6e26e79f95d50b1e6e9f51e Mon Sep 17 00:00:00 2001
+From: Ahmad Samir <a.samirh78@gmail.com>
+Date: Tue, 21 Oct 2025 15:57:31 +0300
+Subject: [PATCH 493/553] tst_QDirListing: de-duplicate hidden files/dirs test
+ code
+
+Pick-to: 6.8
+Change-Id: I61cdc0bf84c9bb1154e51f8cfecd9cdb8fa9f813
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit d9e47bfddefa084584dff4f575c577a289cf9723)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../io/qdirlisting/tst_qdirlisting.cpp        | 47 ++++++++++---------
+ 1 file changed, 24 insertions(+), 23 deletions(-)
+
+diff --git a/tests/auto/corelib/io/qdirlisting/tst_qdirlisting.cpp b/tests/auto/corelib/io/qdirlisting/tst_qdirlisting.cpp
+index adcdb588b01..fcc2f8977f6 100644
+--- a/tests/auto/corelib/io/qdirlisting/tst_qdirlisting.cpp
++++ b/tests/auto/corelib/io/qdirlisting/tst_qdirlisting.cpp
+@@ -89,8 +89,8 @@ private slots:
+     void uncPaths();
+ #endif
+ #ifndef Q_OS_WIN
+-    void hiddenFiles();
+-    void hiddenDirs();
++    void hidden_data();
++    void hidden();
+ #endif
+ 
+     void withStdAlgorithms();
+@@ -767,45 +767,46 @@ void tst_QDirListing::uncPaths()
+ // anything starting by a '.' is a hidden file.
+ // For that reason these two tests aren't run on Windows.
+ 
+-void tst_QDirListing::hiddenFiles()
++void tst_QDirListing::hidden_data()
+ {
+-    QStringList expected = {
++    QTest::addColumn<QDirListing::IteratorFlags>("flags");
++    QTest::addColumn<QStringList>("expected");
++
++    using F = QDirListing::IteratorFlag;
++
++    QTest::newRow("Recursive-ExcludeDirs")
++        << (F::ExcludeDirs | F::IncludeHidden | F::Recursive)
++        << QStringList{
+         "hiddenDirs_hiddenFiles/.hiddenDirectory/.hiddenFile"_L1,
+         "hiddenDirs_hiddenFiles/.hiddenDirectory/normalFile"_L1,
+         "hiddenDirs_hiddenFiles/.hiddenFile"_L1,
+         "hiddenDirs_hiddenFiles/normalDirectory/.hiddenFile"_L1,
+         "hiddenDirs_hiddenFiles/normalDirectory/normalFile"_L1,
+         "hiddenDirs_hiddenFiles/normalFile"_L1,
+-    };
+-
+-    constexpr auto flags = ItFlag::ExcludeDirs | ItFlag::IncludeHidden | ItFlag::Recursive;
+-    QStringList list;
+-    list.reserve(expected.size());
+-    for (const auto &dirEntry : QDirListing(u"hiddenDirs_hiddenFiles"_s, flags)) {
+-        QVERIFY(dirEntry.isFile());
+-        list.emplace_back(dirEntry.filePath());
+-    }
+-    list.sort();
+-
+-    QCOMPARE_EQ(list, expected);
+-}
++        };
+ 
+-void tst_QDirListing::hiddenDirs()
+-{
+-    QStringList expected = {
++    QTest::newRow("Recursive-ExcludeFiles")
++        << (F::ExcludeFiles | F::IncludeHidden | F::Recursive)
++        << QStringList{
+         "hiddenDirs_hiddenFiles/.hiddenDirectory"_L1,
+         "hiddenDirs_hiddenFiles/.hiddenDirectory/.hidden-subdir"_L1,
+         "hiddenDirs_hiddenFiles/.hiddenDirectory/subdir"_L1,
+         "hiddenDirs_hiddenFiles/normalDirectory"_L1,
+         "hiddenDirs_hiddenFiles/normalDirectory/.hidden-subdir"_L1,
+         "hiddenDirs_hiddenFiles/normalDirectory/subdir"_L1,
+-    };
++        };
++}
++
++void tst_QDirListing::hidden()
++{
++    QFETCH(QDirListing::IteratorFlags, flags);
++    QFETCH(QStringList, expected);
+ 
+-    constexpr auto flags = ItFlag::ExcludeFiles | ItFlag::IncludeHidden | ItFlag::Recursive;
+     QStringList list;
+     list.reserve(expected.size());
++    bool isDir = flags.testFlags(ItFlag::ExcludeFiles);
+     for (const auto &dirEntry : QDirListing(u"hiddenDirs_hiddenFiles"_s, flags)) {
+-        QVERIFY(dirEntry.isDir());
++        QVERIFY(isDir ? dirEntry.isDir() : dirEntry.isFile());
+         list.emplace_back(dirEntry.filePath());
+     }
+     list.sort();
+-- 
+2.51.2
+

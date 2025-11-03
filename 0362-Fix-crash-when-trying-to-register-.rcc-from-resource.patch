@@ -1,0 +1,108 @@
+From e529377afa2d8b619339f6c6066f702f2c17c10f Mon Sep 17 00:00:00 2001
+From: Joni Poikelin <joni.poikelin@qt.io>
+Date: Wed, 30 Jul 2025 12:44:34 +0300
+Subject: [PATCH 362/553] Fix crash when trying to register .rcc from resource
+ system
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+_get_osfhandle crashes if invalid value is passed in as a file
+descriptor. Avoid trying to map if there is no valid file
+descriptor for a file.
+
+Fixes: QTBUG-138807
+Pick-to: 6.8
+Change-Id: I462b93d3665c1894fb966080d106839b9840a05b
+Reviewed-by: Mårten Nordheim <marten.nordheim@qt.io>
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit 843f39358f764f6bda2a2b4e5ed881d4b728f7cb)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/io/qresource.cpp                         |  6 +++---
+ tests/auto/corelib/io/qresourceengine/CMakeLists.txt |  8 ++++++++
+ .../io/qresourceengine/tst_qresourceengine.cpp       | 12 ++++++++++++
+ 3 files changed, 23 insertions(+), 3 deletions(-)
+
+diff --git a/src/corelib/io/qresource.cpp b/src/corelib/io/qresource.cpp
+index 235e5737289..18017ea4381 100644
+--- a/src/corelib/io/qresource.cpp
++++ b/src/corelib/io/qresource.cpp
+@@ -1176,17 +1176,17 @@ uchar *QDynamicFileResourceRoot::map_sys(QFile &file, qint64 offset, qsizetype s
+     void *ptr = nullptr;
+     if (size < 0)
+         size = qMin(file.size() - offset, (std::numeric_limits<qsizetype>::max)());
+-
++    int fd = file.handle();
++    if (fd < 0)
++        return nullptr;
+     // We don't use QFile::map() here because we want to dispose of the QFile object
+ #if defined(QT_USE_MMAP)
+-    int fd = file.handle();
+     int protection = PROT_READ;                 // read-only memory
+     int flags = MAP_FILE | MAP_PRIVATE;         // swap-backed map from file
+     ptr = QT_MMAP(nullptr, size, protection, flags, fd, offset);
+     if (ptr == MAP_FAILED)
+         ptr = nullptr;
+ #elif defined(Q_OS_WIN)
+-    int fd = file.handle();
+     HANDLE fileHandle = reinterpret_cast<HANDLE>(_get_osfhandle(fd));
+     if (fileHandle != INVALID_HANDLE_VALUE) {
+         HANDLE mapHandle = CreateFileMapping(fileHandle, 0, PAGE_WRITECOPY, 0, 0, 0);
+diff --git a/tests/auto/corelib/io/qresourceengine/CMakeLists.txt b/tests/auto/corelib/io/qresourceengine/CMakeLists.txt
+index cf4d4ccde74..c07e4cf9c41 100644
+--- a/tests/auto/corelib/io/qresourceengine/CMakeLists.txt
++++ b/tests/auto/corelib/io/qresourceengine/CMakeLists.txt
+@@ -55,4 +55,12 @@ qt_add_binary_resources(tst_qresourceengine_runtime_resource "testqrc/test.qrc"
+     OPTIONS -root "/runtime_resource/" -binary)
+ add_dependencies(tst_qresourceengine tst_qresourceengine_runtime_resource)
+ 
++set_property(SOURCE "${CMAKE_CURRENT_BINARY_DIR}/runtime_resource.rcc" PROPERTY
++    QT_RESOURCE_ALIAS "runtime_resource.rcc"
++)
++qt_add_resources(tst_qresourceengine "nestedrcc"
++    PREFIX "/nestedrcc"
++    FILES "${CMAKE_CURRENT_BINARY_DIR}/runtime_resource.rcc"
++)
++
+ add_subdirectory(staticplugin)
+diff --git a/tests/auto/corelib/io/qresourceengine/tst_qresourceengine.cpp b/tests/auto/corelib/io/qresourceengine/tst_qresourceengine.cpp
+index 0c5664c381a..472e03adcac 100644
+--- a/tests/auto/corelib/io/qresourceengine/tst_qresourceengine.cpp
++++ b/tests/auto/corelib/io/qresourceengine/tst_qresourceengine.cpp
+@@ -42,6 +42,7 @@ private slots:
+     void lastModified();
+     void resourcesInStaticPlugins();
+     void qtResourceEmpty();
++    void registerNestedRccFile();
+ 
+ private:
+     const QString m_runtimeResourceRcc;
+@@ -188,6 +189,7 @@ void tst_QResourceEngine::checkStructure_data()
+                  << QLatin1String("android_testdata")
+ #endif
+                  << QLatin1String("empty")
++                 << QLatin1String("nestedrcc")
+                  << QLatin1String("otherdir")
+                  << QLatin1String("runtime_resource")
+                  << QLatin1String("searchpath1")
+@@ -670,6 +672,16 @@ void tst_QResourceEngine::qtResourceEmpty()
+     QVERIFY(f.readAll().isEmpty());
+ }
+ 
++void tst_QResourceEngine::registerNestedRccFile()
++{
++    QVERIFY(QResource::registerResource(":/nestedrcc/runtime_resource.rcc",
++                                        "/registeredNestedRccFile"));
++    QVERIFY2(QResource::registerResource(":/nestedrcc/runtime_resource.rcc",
++                                         "/registeredNestedRccFile"),
++             "Second QResource::registerResource call failed.");
++    QVERIFY(QFile::exists(":/registeredNestedRccFile/runtime_resource/search_file.txt"));
++}
++
+ QTEST_MAIN(tst_QResourceEngine)
+ 
+ #include "tst_qresourceengine.moc"
+-- 
+2.51.2
+

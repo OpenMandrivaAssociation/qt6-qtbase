@@ -1,0 +1,64 @@
+From dca62a306e462d0914643685e2a72baf2d53fb90 Mon Sep 17 00:00:00 2001
+From: Andre Hartmann <aha_1980@gmx.de>
+Date: Tue, 15 Jul 2025 14:46:29 +0200
+Subject: [PATCH 164/553] QTimer: Doc: Distribute existing note to useful
+ places
+
+Amends 146749f9b7bbfc0d495a8bd1edd4c6e602d5dcf5
+
+Pick-to: 6.9 6.8
+Change-Id: Id4e861faaf1d268692ec496fdcb2e69c8acd694f
+Reviewed-by: Paul Wicking <paul.wicking@qt.io>
+(cherry picked from commit c887a780fd1c9106b123726101330ad34c1eace3)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/kernel/qtimer.cpp | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/src/corelib/kernel/qtimer.cpp b/src/corelib/kernel/qtimer.cpp
+index 1aa8bca83ff..afc6bab8559 100644
+--- a/src/corelib/kernel/qtimer.cpp
++++ b/src/corelib/kernel/qtimer.cpp
+@@ -205,6 +205,11 @@ Qt::TimerId QTimer::id() const
+ //! [singleshot-activation]
+     If \l singleShot is true, the timer will be activated only once.
+ //! [singleshot-activation]
++
++//! [eventloop-busy]
++    \note   Keeping the event loop busy with a zero-timer is bound to
++            cause trouble and highly erratic behavior of the UI.
++//! [eventloop-busy]
+ */
+ void QTimer::start()
+ {
+@@ -236,8 +241,7 @@ void QTimer::start()
+ 
+     \include timers-common.qdocinc negative-intervals-not-allowed
+ 
+-    \note   Keeping the event loop busy with a zero-timer is bound to
+-            cause trouble and highly erratic behavior of the UI.
++    \include qtimer.cpp eventloop-busy
+ */
+ void QTimer::start(int msec)
+ {
+@@ -277,6 +281,8 @@ checkInterval(const char *caller, std::chrono::milliseconds interval)
+     \include qtimer.cpp singleshot-activation
+ 
+     \include timers-common.qdocinc negative-intervals-not-allowed
++
++    \include qtimer.cpp eventloop-busy
+ */
+ void QTimer::start(std::chrono::milliseconds interval)
+ {
+@@ -631,6 +637,8 @@ QBindable<bool> QTimer::bindableSingleShot()
+     interval of 0 will time out as soon as all the events in the window
+     system's event queue have been processed.
+ 
++    \include qtimer.cpp eventloop-busy
++
+     Setting the interval of a running timer will change the interval,
+     stop() and then start() the timer, and acquire a new id().
+     If the timer is not running, only the interval is changed.
+-- 
+2.51.2
+

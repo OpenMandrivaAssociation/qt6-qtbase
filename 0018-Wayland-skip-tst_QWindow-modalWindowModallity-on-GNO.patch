@@ -1,0 +1,42 @@
+From 05c74df451d50aad5f428d369a5f66d25e3f68ff Mon Sep 17 00:00:00 2001
+From: Liang Qi <liang.qi@qt.io>
+Date: Mon, 23 Jun 2025 11:32:48 +0200
+Subject: [PATCH 018/553] Wayland: skip tst_QWindow::modalWindowModallity() on
+ GNOME
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+We are facing this issue: "<Application> is ready" middleman notifications
+https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/358
+
+in "normal_window.requestActivate();" line.
+
+Without clicking the notification, the window which we requested
+programmatically will not be shown, the test fails.
+
+Task-number: QTBUG-137020
+Change-Id: I54f684c69ca678b26830b62e5443402436da104c
+Reviewed-by: Tor Arne Vestbø <tor.arne.vestbo@qt.io>
+(cherry picked from commit b839e95f917023ffc1684c140ba7414d144b0f62)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ tests/auto/gui/kernel/qwindow/tst_qwindow.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/tests/auto/gui/kernel/qwindow/tst_qwindow.cpp b/tests/auto/gui/kernel/qwindow/tst_qwindow.cpp
+index 4ff2dabec1c..c498efa66fe 100644
+--- a/tests/auto/gui/kernel/qwindow/tst_qwindow.cpp
++++ b/tests/auto/gui/kernel/qwindow/tst_qwindow.cpp
+@@ -2503,6 +2503,8 @@ void tst_QWindow::modalWithChildWindow()
+ 
+ void tst_QWindow::modalWindowModallity()
+ {
++    if (isPlatformWayland() && qgetenv("XDG_CURRENT_DESKTOP").toLower().contains("ubuntu:gnome"))
++        QSKIP("Wayland: This will trigger a 'X is ready' system notification in GNOME.");
+     if (!QGuiApplicationPrivate::platformIntegration()->hasCapability(QPlatformIntegration::WindowActivation))
+         QSKIP("QWindow::requestActivate() is not supported.");
+ 
+-- 
+2.51.2
+

@@ -1,0 +1,48 @@
+From 61ca6d7bf4303fbcd6a5682288c504d4f19af221 Mon Sep 17 00:00:00 2001
+From: Volker Hilsheimer <volker.hilsheimer@qt.io>
+Date: Mon, 29 Sep 2025 08:49:23 +0200
+Subject: [PATCH 232/553] QRM: fix -Waddress/-Wnonnull-compare warnings from
+ gcc
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When using a C array as the input range, gcc emits two warnings from
+isValid implementation:
+
+warning: the compiler can assume that the address of ‘t’ will
+never be NULL [-Waddress]
+  356 |             return bool(t);
+      |                    ^~~~~~~
+warning: ‘nonnull’ argument ‘t’ compared to NULL [-Wnonnull-compare]
+  356 |             return bool(t);
+      |                          ^
+
+Handle array types explicitly; they are always valid.
+
+Change-Id: Ic18c63c02cd130ba58055b1541398a7c37d7e892
+Reviewed-by: Artem Dyomin <artem.dyomin@qt.io>
+(cherry picked from commit beb6d0e97303187066a041d1e3b2ceee9b998e79)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/itemmodels/qrangemodel_impl.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/corelib/itemmodels/qrangemodel_impl.h b/src/corelib/itemmodels/qrangemodel_impl.h
+index 39e62fbc4dc..f9543cb78b4 100644
+--- a/src/corelib/itemmodels/qrangemodel_impl.h
++++ b/src/corelib/itemmodels/qrangemodel_impl.h
+@@ -350,7 +350,9 @@ namespace QRangeModelDetails
+     template <typename T>
+     static constexpr bool isValid(const T &t) noexcept
+     {
+-        if constexpr (is_validatable<T>())
++        if constexpr (std::is_array_v<T>)
++            return true;
++        else if constexpr (is_validatable<T>())
+             return bool(t);
+         else
+             return true;
+-- 
+2.51.2
+

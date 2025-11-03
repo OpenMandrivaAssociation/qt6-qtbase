@@ -1,0 +1,32 @@
+From 0983ba76571118088c2ef7a8185bbea7f787f9f8 Mon Sep 17 00:00:00 2001
+From: Joerg Bornemann <joerg.bornemann@qt.io>
+Date: Fri, 17 Oct 2025 18:22:00 +0200
+Subject: [PATCH 434/553] Doc: Fix broken link to the Sinclair ZX Spectrum
+
+The page that describes the Sinclair ZX Spectrum has moved.
+Update the link.
+
+Change-Id: I12d3f0f8aa38e2b426ee322a55518e2f742b8423
+Reviewed-by: Paul Wicking <paul.wicking@qt.io>
+(cherry picked from commit fc25a3335f587d8280211f970d217a2812392cb0)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/widgets/doc/src/external-resources.qdoc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/widgets/doc/src/external-resources.qdoc b/src/widgets/doc/src/external-resources.qdoc
+index 17459b6a5bc..96117546a29 100644
+--- a/src/widgets/doc/src/external-resources.qdoc
++++ b/src/widgets/doc/src/external-resources.qdoc
+@@ -8,7 +8,7 @@
+ */
+ 
+ /*!
+-    \externalpage http://www.nvg.ntnu.no/sinclair/computers/zxspectrum/zxspectrum.htm
++    \externalpage https://rk.nvg.ntnu.no/sinclair/computers/zxspectrum/zxspectrum.htm
+     \title Sinclair Spectrum
+ */
+ /*!
+-- 
+2.51.2
+

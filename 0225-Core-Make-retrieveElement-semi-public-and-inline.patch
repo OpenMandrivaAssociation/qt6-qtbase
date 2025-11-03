@@ -1,0 +1,111 @@
+From bcf60a442c4033c0fa61e2f6edf66d814bddb264 Mon Sep 17 00:00:00 2001
+From: Ulf Hermann <ulf.hermann@qt.io>
+Date: Tue, 23 Sep 2025 14:09:59 +0200
+Subject: [PATCH 225/553] Core: Make retrieveElement() semi-public and inline
+
+Some of the iterable methods are only out of line and exported because
+that function is private. Since we need to re-write the iterables
+anyway, let's not make this mistake again.
+
+Pick-to: 6.8
+Task-number: QTBUG-140181
+Change-Id: If5cb255f9c95403d1e8611721b3275403602794b
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit 7cbfdd1ee2e36ed73fdec91e3f9135d0dbc733f9)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/CMakeLists.txt                    |  2 +-
+ src/corelib/kernel/qassociativeiterable.cpp   |  3 +--
+ .../{qiterable_p.h => qiterable_impl.h}       | 21 +++++--------------
+ src/corelib/kernel/qsequentialiterable.cpp    |  3 +--
+ 4 files changed, 8 insertions(+), 21 deletions(-)
+ rename src/corelib/kernel/{qiterable_p.h => qiterable_impl.h} (61%)
+
+diff --git a/src/corelib/CMakeLists.txt b/src/corelib/CMakeLists.txt
+index 3847fb84c5e..85101acf47e 100644
+--- a/src/corelib/CMakeLists.txt
++++ b/src/corelib/CMakeLists.txt
+@@ -168,7 +168,7 @@ qt_internal_add_module(Core
+         kernel/qelapsedtimer.cpp kernel/qelapsedtimer.h
+         kernel/qeventloop.cpp kernel/qeventloop.h kernel/qeventloop_p.h
+         kernel/qfunctions_p.h
+-        kernel/qiterable.cpp kernel/qiterable.h kernel/qiterable_p.h
++        kernel/qiterable.cpp kernel/qiterable.h kernel/qiterable_impl.h
+         kernel/qmath.cpp kernel/qmath.h
+         kernel/qmetacontainer.cpp kernel/qmetacontainer.h
+         kernel/qmetaobject.cpp kernel/qmetaobject.h kernel/qmetaobject_p.h
+diff --git a/src/corelib/kernel/qassociativeiterable.cpp b/src/corelib/kernel/qassociativeiterable.cpp
+index db17c392a2a..625fa0a869e 100644
+--- a/src/corelib/kernel/qassociativeiterable.cpp
++++ b/src/corelib/kernel/qassociativeiterable.cpp
+@@ -2,10 +2,9 @@
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+ 
+ #include <QtCore/qassociativeiterable.h>
++#include <QtCore/qiterable_impl.h>
+ #include <QtCore/qvariant.h>
+ 
+-#include <QtCore/private/qiterable_p.h>
+-
+ QT_BEGIN_NAMESPACE
+ 
+ /*!
+diff --git a/src/corelib/kernel/qiterable_p.h b/src/corelib/kernel/qiterable_impl.h
+similarity index 61%
+rename from src/corelib/kernel/qiterable_p.h
+rename to src/corelib/kernel/qiterable_impl.h
+index 6a9c804745e..7bc06ccde15 100644
+--- a/src/corelib/kernel/qiterable_p.h
++++ b/src/corelib/kernel/qiterable_impl.h
+@@ -1,21 +1,10 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+ 
+-#ifndef QITERABLE_P_H
+-#define QITERABLE_P_H
+-
+-//
+-//  W A R N I N G
+-//  -------------
+-//
+-// This file is not part of the Qt API.  It exists purely as an
+-// implementation detail.  This header file may change from version to
+-// version without notice, or even be removed.
+-//
+-// We mean it.
+-//
+-
+-#include <QtCore/private/qglobal_p.h>
++#ifndef QITERABLE_IMPL_H
++#define QITERABLE_IMPL_H
++
++#include <QtCore/qglobal.h>
+ #include <QtCore/qvariant.h>
+ 
+ QT_BEGIN_NAMESPACE
+@@ -39,4 +28,4 @@ static QVariant retrieveElement(QMetaType type, Callback callback)
+ 
+ QT_END_NAMESPACE
+ 
+-#endif // QITERABLE_P_H
++#endif // QITERABLE_IMPL_H
+diff --git a/src/corelib/kernel/qsequentialiterable.cpp b/src/corelib/kernel/qsequentialiterable.cpp
+index c331f1de631..94a2e501cd7 100644
+--- a/src/corelib/kernel/qsequentialiterable.cpp
++++ b/src/corelib/kernel/qsequentialiterable.cpp
+@@ -1,11 +1,10 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+ 
++#include <QtCore/qiterable_impl.h>
+ #include <QtCore/qsequentialiterable.h>
+ #include <QtCore/qvariant.h>
+ 
+-#include <QtCore/private/qiterable_p.h>
+-
+ QT_BEGIN_NAMESPACE
+ 
+ /*!
+-- 
+2.51.2
+

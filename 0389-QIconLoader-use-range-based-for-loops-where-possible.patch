@@ -1,0 +1,66 @@
+From 275b7e82e75250299a3ef7652371bb628e029b61 Mon Sep 17 00:00:00 2001
+From: Christian Ehrlicher <ch.ehrlicher@gmx.de>
+Date: Sun, 15 Jun 2025 21:29:31 +0200
+Subject: [PATCH 389/553] QIconLoader: use range-based for loops where possible
+
+Use range-based for loops where possible and change from 'int' to
+'qsizetype' for the run variable where a range-based loop is not easily
+possible.
+
+Change-Id: I8ae66a9806d59c14a604f8c60956b91013874f0e
+Reviewed-by: Oliver Wolff <oliver.wolff@qt.io>
+(cherry picked from commit e08012e7ff6d048729b83494662bbefaf293d5f8)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/gui/image/qiconloader.cpp | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
+
+diff --git a/src/gui/image/qiconloader.cpp b/src/gui/image/qiconloader.cpp
+index 8e21c92f9b3..8f29fb503b0 100644
+--- a/src/gui/image/qiconloader.cpp
++++ b/src/gui/image/qiconloader.cpp
+@@ -352,8 +352,8 @@ QIconTheme::QIconTheme(const QString &themeName)
+     QFile themeIndex;
+ 
+     const QStringList iconDirs = QIcon::themeSearchPaths();
+-    for ( int i = 0 ; i < iconDirs.size() ; ++i) {
+-        QDir iconDir(iconDirs[i]);
++    for (const auto &dirName : iconDirs) {
++        QDir iconDir(dirName);
+         QString themeDir = iconDir.path() + u'/' + themeName;
+         QFileInfo themeDirInfo(themeDir);
+ 
+@@ -479,7 +479,7 @@ QThemeIconInfo QIconLoader::findIconHelper(const QString &themeName,
+         const QString pngIconName = iconNameFallback + ".png"_L1;
+ 
+         // Add all relevant files
+-        for (int i = 0; i < contentDirs.size(); ++i) {
++        for (qsizetype i = 0; i < contentDirs.size(); ++i) {
+             QList<QIconDirInfo> subDirs = theme.keyList();
+ 
+             // Try to reduce the amount of subDirs by looking in the GTK+ cache in order to save
+@@ -504,8 +504,7 @@ QThemeIconInfo QIconLoader::findIconHelper(const QString &themeName,
+             }
+ 
+             QString contentDir = contentDirs.at(i) + u'/';
+-            for (int j = 0; j < subDirs.size() ; ++j) {
+-                const QIconDirInfo &dirInfo = subDirs.at(j);
++            for (const auto &dirInfo : std::as_const(subDirs)) {
+                 if (searchingGenericFallback &&
+                         (dirInfo.context == QIconDirInfo::Applications ||
+                          dirInfo.context == QIconDirInfo::MimeTypes))
+@@ -544,9 +543,9 @@ QThemeIconInfo QIconLoader::findIconHelper(const QString &themeName,
+             << "skipping visited" << visited;
+ 
+         // Search recursively through inherited themes
+-        for (int i = 0 ; i < parents.size() ; ++i) {
++        for (const auto &parent : parents) {
+ 
+-            const QString parentTheme = parents.at(i).trimmed();
++            const QString parentTheme = parent.trimmed();
+ 
+             if (!visited.contains(parentTheme)) // guard against recursion
+                 info = findIconHelper(parentTheme, iconName, visited, QIconLoader::NoFallBack);
+-- 
+2.51.2
+

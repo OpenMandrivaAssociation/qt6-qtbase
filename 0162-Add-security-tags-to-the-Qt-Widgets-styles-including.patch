@@ -1,0 +1,678 @@
+From dc471fa92b0a7729e20150c22cb2515d431c74e1 Mon Sep 17 00:00:00 2001
+From: Volker Hilsheimer <volker.hilsheimer@qt.io>
+Date: Wed, 17 Sep 2025 16:34:58 +0200
+Subject: [PATCH 162/553] Add security tags to the Qt Widgets styles, including
+ plugins
+
+The only critical code in widgets styling is the QStyleSheetStyle
+implementation. While it doesn't parse the CSS code directly (that is
+done by the internal QCssParser), it interprets the rules and also
+checks value strings for unit markers, such as "em" or "ex".
+
+Style sheet code might come from an untrusted source, and even though it
+is then application code setting the style sheet (or even the end user
+via command line arguments), the application has no meaningful way to
+verify that the style sheet code is not malformed.
+
+The rest of the styling code is not security critical. Styles access
+files (such as icons) embedded into the binary through the Qt resource
+system, which can be trusted; or they use pixmaps provided by the
+application, such as the QPixmapStyle. Some styles use native APIs to
+get relevant data; we also trust those APIs.
+
+Plugins are loaded through the regular Qt plugin loading machinery,
+and any security critical code involved in the finding and loading of
+shared libraries lives there.
+
+QUIP: 23
+Fixes: QTBUG-135742
+Pick-to: 6.9 6.8
+Change-Id: I073440eb4e3b561822b9b54e8dcad923803c92f6
+Reviewed-by: Timur Pocheptsov <timur.pocheptsov@qt.io>
+(cherry picked from commit 113d28a4b7b969f2ceea59888502827012124514)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/plugins/styles/android/main.cpp                         | 1 +
+ src/plugins/styles/android/qandroidstyle.cpp                | 1 +
+ src/plugins/styles/android/qandroidstyle_p.h                | 1 +
+ src/plugins/styles/mac/main.mm                              | 1 +
+ src/plugins/styles/mac/qmacstyle_mac.mm                     | 1 +
+ src/plugins/styles/mac/qmacstyle_mac_p.h                    | 1 +
+ src/plugins/styles/mac/qmacstyle_mac_p_p.h                  | 2 +-
+ src/plugins/styles/modernwindows/main.cpp                   | 1 +
+ src/plugins/styles/modernwindows/qwindows11style.cpp        | 1 +
+ src/plugins/styles/modernwindows/qwindows11style_p.h        | 1 +
+ src/plugins/styles/modernwindows/qwindowsthemedata.cpp      | 1 +
+ src/plugins/styles/modernwindows/qwindowsthemedata_p.h      | 1 +
+ src/plugins/styles/modernwindows/qwindowsvistaanimation.cpp | 1 +
+ src/plugins/styles/modernwindows/qwindowsvistaanimation_p.h | 1 +
+ src/plugins/styles/modernwindows/qwindowsvistastyle.cpp     | 1 +
+ src/plugins/styles/modernwindows/qwindowsvistastyle_p.h     | 1 +
+ src/plugins/styles/modernwindows/qwindowsvistastyle_p_p.h   | 1 +
+ src/widgets/styles/qcommonstyle.cpp                         | 1 +
+ src/widgets/styles/qcommonstyle.h                           | 1 +
+ src/widgets/styles/qcommonstyle_p.h                         | 1 +
+ src/widgets/styles/qcommonstylepixmaps_p.h                  | 1 +
+ src/widgets/styles/qdrawutil.cpp                            | 1 +
+ src/widgets/styles/qdrawutil.h                              | 1 +
+ src/widgets/styles/qfusionstyle.cpp                         | 1 +
+ src/widgets/styles/qfusionstyle_p.h                         | 1 +
+ src/widgets/styles/qfusionstyle_p_p.h                       | 1 +
+ src/widgets/styles/qpixmapstyle.cpp                         | 1 +
+ src/widgets/styles/qpixmapstyle_p.h                         | 1 +
+ src/widgets/styles/qpixmapstyle_p_p.h                       | 1 +
+ src/widgets/styles/qproxystyle.cpp                          | 1 +
+ src/widgets/styles/qproxystyle.h                            | 1 +
+ src/widgets/styles/qproxystyle_p.h                          | 1 +
+ src/widgets/styles/qstyle.cpp                               | 1 +
+ src/widgets/styles/qstyle.h                                 | 1 +
+ src/widgets/styles/qstyle_p.h                               | 1 +
+ src/widgets/styles/qstyleanimation.cpp                      | 1 +
+ src/widgets/styles/qstyleanimation_p.h                      | 1 +
+ src/widgets/styles/qstylefactory.cpp                        | 1 +
+ src/widgets/styles/qstylefactory.h                          | 1 +
+ src/widgets/styles/qstylehelper.cpp                         | 1 +
+ src/widgets/styles/qstylehelper_p.h                         | 1 +
+ src/widgets/styles/qstyleoption.cpp                         | 1 +
+ src/widgets/styles/qstyleoption.h                           | 1 +
+ src/widgets/styles/qstylepainter.cpp                        | 1 +
+ src/widgets/styles/qstylepainter.h                          | 1 +
+ src/widgets/styles/qstyleplugin.cpp                         | 1 +
+ src/widgets/styles/qstyleplugin.h                           | 1 +
+ src/widgets/styles/qstylesheetstyle.cpp                     | 1 +
+ src/widgets/styles/qstylesheetstyle_default.cpp             | 1 +
+ src/widgets/styles/qstylesheetstyle_p.h                     | 1 +
+ src/widgets/styles/qwindowsstyle.cpp                        | 1 +
+ src/widgets/styles/qwindowsstyle_p.h                        | 1 +
+ src/widgets/styles/qwindowsstyle_p_p.h                      | 1 +
+ 53 files changed, 53 insertions(+), 1 deletion(-)
+
+diff --git a/src/plugins/styles/android/main.cpp b/src/plugins/styles/android/main.cpp
+index 3be434e362a..74fa450c928 100644
+--- a/src/plugins/styles/android/main.cpp
++++ b/src/plugins/styles/android/main.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2017 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QtWidgets/qstyleplugin.h>
+ #include "qandroidstyle_p.h"
+diff --git a/src/plugins/styles/android/qandroidstyle.cpp b/src/plugins/styles/android/qandroidstyle.cpp
+index 64940ed4d82..f20498cb677 100644
+--- a/src/plugins/styles/android/qandroidstyle.cpp
++++ b/src/plugins/styles/android/qandroidstyle.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2013 BogDan Vatra <bogdan@kde.org>
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qandroidstyle_p.h"
+ 
+diff --git a/src/plugins/styles/android/qandroidstyle_p.h b/src/plugins/styles/android/qandroidstyle_p.h
+index d47591f1752..3b9cf6aa1a7 100644
+--- a/src/plugins/styles/android/qandroidstyle_p.h
++++ b/src/plugins/styles/android/qandroidstyle_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2013 BogDan Vatra <bogdan@kde.org>
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QANDROIDSTYLE_P_H
+ #define QANDROIDSTYLE_P_H
+diff --git a/src/plugins/styles/mac/main.mm b/src/plugins/styles/mac/main.mm
+index ef6ca46045d..72226631170 100644
+--- a/src/plugins/styles/mac/main.mm
++++ b/src/plugins/styles/mac/main.mm
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2017 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QtWidgets/qstyleplugin.h>
+ #include "qmacstyle_mac_p.h"
+diff --git a/src/plugins/styles/mac/qmacstyle_mac.mm b/src/plugins/styles/mac/qmacstyle_mac.mm
+index 24f9d3d4bcc..46f195fcd6c 100644
+--- a/src/plugins/styles/mac/qmacstyle_mac.mm
++++ b/src/plugins/styles/mac/qmacstyle_mac.mm
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ /*
+   Note: The qdoc comments for QMacStyle are contained in
+diff --git a/src/plugins/styles/mac/qmacstyle_mac_p.h b/src/plugins/styles/mac/qmacstyle_mac_p.h
+index 15ced48e21d..6a8c9576e8f 100644
+--- a/src/plugins/styles/mac/qmacstyle_mac_p.h
++++ b/src/plugins/styles/mac/qmacstyle_mac_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QMACSTYLE_MAC_P_H
+ #define QMACSTYLE_MAC_P_H
+diff --git a/src/plugins/styles/mac/qmacstyle_mac_p_p.h b/src/plugins/styles/mac/qmacstyle_mac_p_p.h
+index d702b9e30df..b3c807047fd 100644
+--- a/src/plugins/styles/mac/qmacstyle_mac_p_p.h
++++ b/src/plugins/styles/mac/qmacstyle_mac_p_p.h
+@@ -1,6 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+-
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QMACSTYLE_MAC_P_P_H
+ #define QMACSTYLE_MAC_P_P_H
+diff --git a/src/plugins/styles/modernwindows/main.cpp b/src/plugins/styles/modernwindows/main.cpp
+index 18c751c1cb2..5383c5bc71d 100644
+--- a/src/plugins/styles/modernwindows/main.cpp
++++ b/src/plugins/styles/modernwindows/main.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2017 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QtWidgets/private/qtwidgetsglobal_p.h>
+ #include <QtWidgets/qstyleplugin.h>
+diff --git a/src/plugins/styles/modernwindows/qwindows11style.cpp b/src/plugins/styles/modernwindows/qwindows11style.cpp
+index 3d76eb087a1..d296988514e 100644
+--- a/src/plugins/styles/modernwindows/qwindows11style.cpp
++++ b/src/plugins/styles/modernwindows/qwindows11style.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2022 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qwindows11style_p.h"
+ #include <qstylehints.h>
+diff --git a/src/plugins/styles/modernwindows/qwindows11style_p.h b/src/plugins/styles/modernwindows/qwindows11style_p.h
+index c2466052dab..aec4046ca60 100644
+--- a/src/plugins/styles/modernwindows/qwindows11style_p.h
++++ b/src/plugins/styles/modernwindows/qwindows11style_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2022 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QWINDOWS11STYLE_P_H
+ #define QWINDOWS11STYLE_P_H
+diff --git a/src/plugins/styles/modernwindows/qwindowsthemedata.cpp b/src/plugins/styles/modernwindows/qwindowsthemedata.cpp
+index c13fe596799..a3cca4c54d6 100644
+--- a/src/plugins/styles/modernwindows/qwindowsthemedata.cpp
++++ b/src/plugins/styles/modernwindows/qwindowsthemedata.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qwindowsthemedata_p.h"
+ #include "qwindowsvistastyle_p_p.h"
+diff --git a/src/plugins/styles/modernwindows/qwindowsthemedata_p.h b/src/plugins/styles/modernwindows/qwindowsthemedata_p.h
+index 15dd7177b29..789a15e8bc8 100644
+--- a/src/plugins/styles/modernwindows/qwindowsthemedata_p.h
++++ b/src/plugins/styles/modernwindows/qwindowsthemedata_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QWINDOWSTHEMEDATA_P_H
+ #define QWINDOWSTHEMEDATA_P_H
+diff --git a/src/plugins/styles/modernwindows/qwindowsvistaanimation.cpp b/src/plugins/styles/modernwindows/qwindowsvistaanimation.cpp
+index 6997bcf89b4..1f070ae323a 100644
+--- a/src/plugins/styles/modernwindows/qwindowsvistaanimation.cpp
++++ b/src/plugins/styles/modernwindows/qwindowsvistaanimation.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qwindowsvistaanimation_p.h"
+ #include "qwindowsvistastyle_p_p.h"
+diff --git a/src/plugins/styles/modernwindows/qwindowsvistaanimation_p.h b/src/plugins/styles/modernwindows/qwindowsvistaanimation_p.h
+index 3d3980413c9..7ab3cf55b8c 100644
+--- a/src/plugins/styles/modernwindows/qwindowsvistaanimation_p.h
++++ b/src/plugins/styles/modernwindows/qwindowsvistaanimation_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QWINDOWSVISTAANIMATION_P_H
+ #define QWINDOWSVISTAANIMATION_P_H
+diff --git a/src/plugins/styles/modernwindows/qwindowsvistastyle.cpp b/src/plugins/styles/modernwindows/qwindowsvistastyle.cpp
+index 1c3d3987e2c..3ea6f80862c 100644
+--- a/src/plugins/styles/modernwindows/qwindowsvistastyle.cpp
++++ b/src/plugins/styles/modernwindows/qwindowsvistastyle.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qwindowsvistastyle_p.h"
+ #include "qwindowsvistastyle_p_p.h"
+diff --git a/src/plugins/styles/modernwindows/qwindowsvistastyle_p.h b/src/plugins/styles/modernwindows/qwindowsvistastyle_p.h
+index ff5300becaf..da58e0b0fec 100644
+--- a/src/plugins/styles/modernwindows/qwindowsvistastyle_p.h
++++ b/src/plugins/styles/modernwindows/qwindowsvistastyle_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QWINDOWSVISTASTYLE_P_H
+ #define QWINDOWSVISTASTYLE_P_H
+diff --git a/src/plugins/styles/modernwindows/qwindowsvistastyle_p_p.h b/src/plugins/styles/modernwindows/qwindowsvistastyle_p_p.h
+index 3c67ef8682c..f9a3d3c6eb3 100644
+--- a/src/plugins/styles/modernwindows/qwindowsvistastyle_p_p.h
++++ b/src/plugins/styles/modernwindows/qwindowsvistastyle_p_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QWINDOWSVISTASTYLE_P_P_H
+ #define QWINDOWSVISTASTYLE_P_P_H
+diff --git a/src/widgets/styles/qcommonstyle.cpp b/src/widgets/styles/qcommonstyle.cpp
+index 7357d32f431..d2ac4a48666 100644
+--- a/src/widgets/styles/qcommonstyle.cpp
++++ b/src/widgets/styles/qcommonstyle.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qcommonstyle.h"
+ #include "qcommonstyle_p.h"
+diff --git a/src/widgets/styles/qcommonstyle.h b/src/widgets/styles/qcommonstyle.h
+index 40ed13d4533..a3a22e11d22 100644
+--- a/src/widgets/styles/qcommonstyle.h
++++ b/src/widgets/styles/qcommonstyle.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QCOMMONSTYLE_H
+ #define QCOMMONSTYLE_H
+diff --git a/src/widgets/styles/qcommonstyle_p.h b/src/widgets/styles/qcommonstyle_p.h
+index 46f1d4e67a3..58f6c642569 100644
+--- a/src/widgets/styles/qcommonstyle_p.h
++++ b/src/widgets/styles/qcommonstyle_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QCOMMONSTYLE_P_H
+ #define QCOMMONSTYLE_P_H
+diff --git a/src/widgets/styles/qcommonstylepixmaps_p.h b/src/widgets/styles/qcommonstylepixmaps_p.h
+index 313c5b93758..acb3aedc5ab 100644
+--- a/src/widgets/styles/qcommonstylepixmaps_p.h
++++ b/src/widgets/styles/qcommonstylepixmaps_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QtWidgets/private/qtwidgetsglobal_p.h>
+ 
+diff --git a/src/widgets/styles/qdrawutil.cpp b/src/widgets/styles/qdrawutil.cpp
+index 29d8101f719..a38fb518584 100644
+--- a/src/widgets/styles/qdrawutil.cpp
++++ b/src/widgets/styles/qdrawutil.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qdrawutil.h"
+ #include "qbitmap.h"
+diff --git a/src/widgets/styles/qdrawutil.h b/src/widgets/styles/qdrawutil.h
+index 26d8d5075f3..f49f6fb3282 100644
+--- a/src/widgets/styles/qdrawutil.h
++++ b/src/widgets/styles/qdrawutil.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QDRAWUTIL_H
+ #define QDRAWUTIL_H
+diff --git a/src/widgets/styles/qfusionstyle.cpp b/src/widgets/styles/qfusionstyle.cpp
+index c341a025115..33777933495 100644
+--- a/src/widgets/styles/qfusionstyle.cpp
++++ b/src/widgets/styles/qfusionstyle.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qfusionstyle_p.h"
+ #include "qfusionstyle_p_p.h"
+diff --git a/src/widgets/styles/qfusionstyle_p.h b/src/widgets/styles/qfusionstyle_p.h
+index 448b541ebdd..a67380ffde6 100644
+--- a/src/widgets/styles/qfusionstyle_p.h
++++ b/src/widgets/styles/qfusionstyle_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QFUSIONSTYLE_P_H
+ #define QFUSIONSTYLE_P_H
+diff --git a/src/widgets/styles/qfusionstyle_p_p.h b/src/widgets/styles/qfusionstyle_p_p.h
+index 62641609d59..f37ac1b72ca 100644
+--- a/src/widgets/styles/qfusionstyle_p_p.h
++++ b/src/widgets/styles/qfusionstyle_p_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QFUSIONSTYLE_P_P_H
+ #define QFUSIONSTYLE_P_P_H
+diff --git a/src/widgets/styles/qpixmapstyle.cpp b/src/widgets/styles/qpixmapstyle.cpp
+index 8eadba9443c..671a5394b4b 100644
+--- a/src/widgets/styles/qpixmapstyle.cpp
++++ b/src/widgets/styles/qpixmapstyle.cpp
+@@ -2,6 +2,7 @@
+ // Copyright (C) 2015 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qpixmapstyle_p.h"
+ #include "qpixmapstyle_p_p.h"
+diff --git a/src/widgets/styles/qpixmapstyle_p.h b/src/widgets/styles/qpixmapstyle_p.h
+index 62233add74a..8e6896b9d66 100644
+--- a/src/widgets/styles/qpixmapstyle_p.h
++++ b/src/widgets/styles/qpixmapstyle_p.h
+@@ -2,6 +2,7 @@
+ // Copyright (C) 2015 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPIXMAPSTYLE_H
+ #define QPIXMAPSTYLE_H
+diff --git a/src/widgets/styles/qpixmapstyle_p_p.h b/src/widgets/styles/qpixmapstyle_p_p.h
+index 9e0495f7880..39bd129ff70 100644
+--- a/src/widgets/styles/qpixmapstyle_p_p.h
++++ b/src/widgets/styles/qpixmapstyle_p_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPIXMAPSTYLE_P_H
+ #define QPIXMAPSTYLE_P_H
+diff --git a/src/widgets/styles/qproxystyle.cpp b/src/widgets/styles/qproxystyle.cpp
+index a85c40a3298..2bc451fec2c 100644
+--- a/src/widgets/styles/qproxystyle.cpp
++++ b/src/widgets/styles/qproxystyle.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <qstyle.h>
+ #include <private/qproxystyle_p.h>
+diff --git a/src/widgets/styles/qproxystyle.h b/src/widgets/styles/qproxystyle.h
+index 7b3ec9a9399..345f46f1957 100644
+--- a/src/widgets/styles/qproxystyle.h
++++ b/src/widgets/styles/qproxystyle.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPROXYSTYLE_H
+ #define QPROXYSTYLE_H
+diff --git a/src/widgets/styles/qproxystyle_p.h b/src/widgets/styles/qproxystyle_p.h
+index 6b686023a52..92ccfbc2c4a 100644
+--- a/src/widgets/styles/qproxystyle_p.h
++++ b/src/widgets/styles/qproxystyle_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPROXYSTYLE_P_H
+ #define QPROXYSTYLE_P_H
+diff --git a/src/widgets/styles/qstyle.cpp b/src/widgets/styles/qstyle.cpp
+index 6bb0728cfd4..22d089866f2 100644
+--- a/src/widgets/styles/qstyle.cpp
++++ b/src/widgets/styles/qstyle.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qstyle.h"
+ #include "qapplication.h"
+diff --git a/src/widgets/styles/qstyle.h b/src/widgets/styles/qstyle.h
+index db09eedc70d..37687946c65 100644
+--- a/src/widgets/styles/qstyle.h
++++ b/src/widgets/styles/qstyle.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSTYLE_H
+ #define QSTYLE_H
+diff --git a/src/widgets/styles/qstyle_p.h b/src/widgets/styles/qstyle_p.h
+index 95ebe754952..bf18b3eb959 100644
+--- a/src/widgets/styles/qstyle_p.h
++++ b/src/widgets/styles/qstyle_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSTYLE_P_H
+ #define QSTYLE_P_H
+diff --git a/src/widgets/styles/qstyleanimation.cpp b/src/widgets/styles/qstyleanimation.cpp
+index 8e71bb4fae1..02119b92188 100644
+--- a/src/widgets/styles/qstyleanimation.cpp
++++ b/src/widgets/styles/qstyleanimation.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qstyleanimation_p.h"
+ 
+diff --git a/src/widgets/styles/qstyleanimation_p.h b/src/widgets/styles/qstyleanimation_p.h
+index fc05607f961..3fbbbb2ec40 100644
+--- a/src/widgets/styles/qstyleanimation_p.h
++++ b/src/widgets/styles/qstyleanimation_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSTYLEANIMATION_P_H
+ #define QSTYLEANIMATION_P_H
+diff --git a/src/widgets/styles/qstylefactory.cpp b/src/widgets/styles/qstylefactory.cpp
+index fc87b2b0c8f..bc1cceff7de 100644
+--- a/src/widgets/styles/qstylefactory.cpp
++++ b/src/widgets/styles/qstylefactory.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qstylefactory.h"
+ #include "qstyleplugin.h"
+diff --git a/src/widgets/styles/qstylefactory.h b/src/widgets/styles/qstylefactory.h
+index ccaee95d44e..779de77cff4 100644
+--- a/src/widgets/styles/qstylefactory.h
++++ b/src/widgets/styles/qstylefactory.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSTYLEFACTORY_H
+ #define QSTYLEFACTORY_H
+diff --git a/src/widgets/styles/qstylehelper.cpp b/src/widgets/styles/qstylehelper.cpp
+index 14804382b20..6a1556f2f3c 100644
+--- a/src/widgets/styles/qstylehelper.cpp
++++ b/src/widgets/styles/qstylehelper.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <qstyleoption.h>
+ #include <qpainter.h>
+diff --git a/src/widgets/styles/qstylehelper_p.h b/src/widgets/styles/qstylehelper_p.h
+index eb9c1d4f008..4291a245c39 100644
+--- a/src/widgets/styles/qstylehelper_p.h
++++ b/src/widgets/styles/qstylehelper_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QtWidgets/private/qtwidgetsglobal_p.h>
+ #include <QtCore/qpoint.h>
+diff --git a/src/widgets/styles/qstyleoption.cpp b/src/widgets/styles/qstyleoption.cpp
+index af14d1ff98b..21fa5f3ea65 100644
+--- a/src/widgets/styles/qstyleoption.cpp
++++ b/src/widgets/styles/qstyleoption.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QtWidgets/private/qtwidgetsglobal_p.h>
+ #include "private/qstylehelper_p.h"
+diff --git a/src/widgets/styles/qstyleoption.h b/src/widgets/styles/qstyleoption.h
+index 715a1794634..f3f222c41c8 100644
+--- a/src/widgets/styles/qstyleoption.h
++++ b/src/widgets/styles/qstyleoption.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSTYLEOPTION_H
+ #define QSTYLEOPTION_H
+diff --git a/src/widgets/styles/qstylepainter.cpp b/src/widgets/styles/qstylepainter.cpp
+index 375928ae4ba..5c7b3904c6b 100644
+--- a/src/widgets/styles/qstylepainter.cpp
++++ b/src/widgets/styles/qstylepainter.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qstylepainter.h"
+ 
+diff --git a/src/widgets/styles/qstylepainter.h b/src/widgets/styles/qstylepainter.h
+index 240ffbd137e..486c1490971 100644
+--- a/src/widgets/styles/qstylepainter.h
++++ b/src/widgets/styles/qstylepainter.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSTYLEPAINTER_H
+ #define QSTYLEPAINTER_H
+diff --git a/src/widgets/styles/qstyleplugin.cpp b/src/widgets/styles/qstyleplugin.cpp
+index 94ea92e0a38..c560db53423 100644
+--- a/src/widgets/styles/qstyleplugin.cpp
++++ b/src/widgets/styles/qstyleplugin.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qstyleplugin.h"
+ #include "qstyle.h"
+diff --git a/src/widgets/styles/qstyleplugin.h b/src/widgets/styles/qstyleplugin.h
+index 3a24f9e3877..70fe69d6691 100644
+--- a/src/widgets/styles/qstyleplugin.h
++++ b/src/widgets/styles/qstyleplugin.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSTYLEPLUGIN_H
+ #define QSTYLEPLUGIN_H
+diff --git a/src/widgets/styles/qstylesheetstyle.cpp b/src/widgets/styles/qstylesheetstyle.cpp
+index 87259f8ec9d..54facf60bdd 100644
+--- a/src/widgets/styles/qstylesheetstyle.cpp
++++ b/src/widgets/styles/qstylesheetstyle.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:critical reason:data-parser
+ 
+ #include <qglobal.h>
+ #include "qstylesheetstyle_p.h"
+diff --git a/src/widgets/styles/qstylesheetstyle_default.cpp b/src/widgets/styles/qstylesheetstyle_default.cpp
+index 6356835ff40..73e7c9524d6 100644
+--- a/src/widgets/styles/qstylesheetstyle_default.cpp
++++ b/src/widgets/styles/qstylesheetstyle_default.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ /* This is the default Qt style sheet.
+ 
+diff --git a/src/widgets/styles/qstylesheetstyle_p.h b/src/widgets/styles/qstylesheetstyle_p.h
+index 95d9db19c94..ad8bec4e7e1 100644
+--- a/src/widgets/styles/qstylesheetstyle_p.h
++++ b/src/widgets/styles/qstylesheetstyle_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSTYLESHEETSTYLE_P_H
+ #define QSTYLESHEETSTYLE_P_H
+diff --git a/src/widgets/styles/qwindowsstyle.cpp b/src/widgets/styles/qwindowsstyle.cpp
+index a5ffa93e167..21b5a2699dd 100644
+--- a/src/widgets/styles/qwindowsstyle.cpp
++++ b/src/widgets/styles/qwindowsstyle.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qwindowsstyle_p.h"
+ #include "qwindowsstyle_p_p.h"
+diff --git a/src/widgets/styles/qwindowsstyle_p.h b/src/widgets/styles/qwindowsstyle_p.h
+index 2c2ca0c76b0..eba0eff7e70 100644
+--- a/src/widgets/styles/qwindowsstyle_p.h
++++ b/src/widgets/styles/qwindowsstyle_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QWINDOWSSTYLE_P_H
+ #define QWINDOWSSTYLE_P_H
+diff --git a/src/widgets/styles/qwindowsstyle_p_p.h b/src/widgets/styles/qwindowsstyle_p_p.h
+index dce60cbf8d6..fab31c6c3eb 100644
+--- a/src/widgets/styles/qwindowsstyle_p_p.h
++++ b/src/widgets/styles/qwindowsstyle_p_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QWINDOWSSTYLE_P_P_H
+ #define QWINDOWSSTYLE_P_P_H
+-- 
+2.51.2
+

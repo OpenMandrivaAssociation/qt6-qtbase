@@ -1,0 +1,89 @@
+From 19b32c6f376ba221dc884c9b991cbe39717fac42 Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Thu, 11 Sep 2025 13:08:05 +0200
+Subject: [PATCH 082/553] QTextBoundaryFinder: squash the bitfield member
+
+This is in the way of adding an inline member-swap() (can't take
+references to bit-fields), and therefore move-assignment.
+
+We can always redistribute the bits in freeBuffer later, if needed:
+there are (and, since 6.0, were) no inline users of this member.
+
+This should even improve codegen, as the compiler doesn't have to deal
+with bit-fields anymore. There's no need to pessimize the code for
+that kind of flexibility until another user actually surfaces.
+
+Amends the start of the public history.
+
+Task-number: QTBUG-138659
+Pick-to: 6.9 6.8 6.5
+Change-Id: I47eb96da87bf4e3f1052e9f455943d9dea3121d1
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit cc16e9e4030f310cf344b340a01c99c257f3841b)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/text/qtextboundaryfinder.cpp | 5 -----
+ src/corelib/text/qtextboundaryfinder.h   | 3 +--
+ 2 files changed, 1 insertion(+), 7 deletions(-)
+
+diff --git a/src/corelib/text/qtextboundaryfinder.cpp b/src/corelib/text/qtextboundaryfinder.cpp
+index 6c247ffa6e0..969490b4812 100644
+--- a/src/corelib/text/qtextboundaryfinder.cpp
++++ b/src/corelib/text/qtextboundaryfinder.cpp
+@@ -104,7 +104,6 @@ static void init(QTextBoundaryFinder::BoundaryType type, QStringView str, QCharA
+ */
+ QTextBoundaryFinder::QTextBoundaryFinder()
+     : freeBuffer(true)
+-    , unused{0}
+ {
+ }
+ 
+@@ -117,7 +116,6 @@ QTextBoundaryFinder::QTextBoundaryFinder(const QTextBoundaryFinder &other)
+     , sv(other.sv)
+     , pos(other.pos)
+     , freeBuffer(true)
+-    , unused{0}
+ {
+     if (other.attributes) {
+         Q_ASSERT(sv.size() > 0);
+@@ -165,7 +163,6 @@ QTextBoundaryFinder &QTextBoundaryFinder::operator=(const QTextBoundaryFinder &o
+ */
+ QTextBoundaryFinder::~QTextBoundaryFinder()
+ {
+-    Q_UNUSED(unused);
+     if (freeBuffer)
+         free(attributes);
+ }
+@@ -178,7 +175,6 @@ QTextBoundaryFinder::QTextBoundaryFinder(BoundaryType type, const QString &strin
+     , s(string)
+     , sv(s)
+     , freeBuffer(true)
+-    , unused{0}
+ {
+     if (sv.size() > 0) {
+         attributes = (QCharAttributes *) malloc((sv.size() + 1) * sizeof(QCharAttributes));
+@@ -212,7 +208,6 @@ QTextBoundaryFinder::QTextBoundaryFinder(BoundaryType type, QStringView string,
+     : t(type)
+     , sv(string)
+     , freeBuffer(true)
+-    , unused{0}
+ {
+     if (!sv.isEmpty()) {
+         if (buffer && bufferSize / int(sizeof(QCharAttributes)) >= sv.size() + 1) {
+diff --git a/src/corelib/text/qtextboundaryfinder.h b/src/corelib/text/qtextboundaryfinder.h
+index b68071bc843..2dabe466246 100644
+--- a/src/corelib/text/qtextboundaryfinder.h
++++ b/src/corelib/text/qtextboundaryfinder.h
+@@ -65,8 +65,7 @@ private:
+     QString s;
+     QStringView sv;
+     qsizetype pos = 0;
+-    uint freeBuffer : 1;
+-    uint unused : 31;
++    uint freeBuffer; // this may be used to store another 31 bit of data in the future
+     QCharAttributes *attributes = nullptr;
+ };
+ 
+-- 
+2.51.2
+

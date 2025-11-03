@@ -1,0 +1,66 @@
+From 39ebb27abb9ce1e7a2ae0f1ccd5a8daffb398709 Mon Sep 17 00:00:00 2001
+From: Tim Blechmann <tim.blechmann@qt.io>
+Date: Sun, 14 Sep 2025 12:57:51 +0800
+Subject: [PATCH 197/553] CMake: add inclusion guards for generated feature
+ includes
+
+Including qconfig.h multiple times seems to be perfectly possible, but
+the lack of inclusion guards meant that we could end up with #define /
+#undef / #define sequences.
+
+Task-number: QTBUG-140149
+Fixes: QTBUG-140150
+Change-Id: I6b727deedf0c9ed10e2426d6bdc969b1acabd517
+Reviewed-by: Alexandru Croitor <alexandru.croitor@qt.io>
+(cherry picked from commit db8a88b9403e0b43e7842bca38eb387d42707ef6)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ cmake/QtFeature.cmake | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/cmake/QtFeature.cmake b/cmake/QtFeature.cmake
+index 618bf839bfe..e8ae3dd5163 100644
+--- a/cmake/QtFeature.cmake
++++ b/cmake/QtFeature.cmake
+@@ -1137,13 +1137,20 @@ function(qt_internal_generate_feature_line line feature)
+     endif()
+ endfunction()
+ 
+-function(qt_internal_feature_write_file file features extra)
++function(qt_internal_feature_write_file target file features extra)
++    file(RELATIVE_PATH relative_path "${CMAKE_BINARY_DIR}" "${file}")
++
++    string(MAKE_C_IDENTIFIER "${target}_${relative_path}" inclusion_guard_suffix)
++
+     set(contents "")
++    string(APPEND contents "#ifndef QT_FEATURES_${inclusion_guard_suffix}_H\n")
++    string(APPEND contents "#define QT_FEATURES_${inclusion_guard_suffix}_H\n\n")
+     foreach(it ${features})
+         qt_internal_generate_feature_line(line "${it}")
+         string(APPEND contents "${line}")
+     endforeach()
+-    string(APPEND contents "${extra}")
++    string(APPEND contents "${extra}\n")
++    string(APPEND contents "#endif // QT_FEATURES_${inclusion_guard_suffix}_H\n")
+ 
+     file(GENERATE OUTPUT "${file}" CONTENT "${contents}")
+ endfunction()
+@@ -1237,11 +1244,13 @@ function(qt_feature_module_end)
+     endforeach()
+ 
+     if(NOT arg_ONLY_EVALUATE_FEATURES)
+-        qt_internal_feature_write_file("${CMAKE_CURRENT_BINARY_DIR}/${__QtFeature_private_file}"
++        qt_internal_feature_write_file(${target}
++            "${CMAKE_CURRENT_BINARY_DIR}/${__QtFeature_private_file}"
+             "${__QtFeature_private_features}" "${__QtFeature_private_extra}"
+         )
+ 
+-        qt_internal_feature_write_file("${CMAKE_CURRENT_BINARY_DIR}/${__QtFeature_public_file}"
++        qt_internal_feature_write_file(${target}
++            "${CMAKE_CURRENT_BINARY_DIR}/${__QtFeature_public_file}"
+             "${__QtFeature_public_features}" "${__QtFeature_public_extra}"
+         )
+     endif()
+-- 
+2.51.2
+

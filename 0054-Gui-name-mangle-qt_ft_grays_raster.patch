@@ -1,0 +1,111 @@
+From 3a9c73d41411408bdc3d20f3576fcd6923d1c4d2 Mon Sep 17 00:00:00 2001
+From: Tim Blechmann <tim.blechmann@qt.io>
+Date: Tue, 2 Sep 2025 18:22:02 +0800
+Subject: [PATCH 054/553] Gui: name mangle qt_ft_grays_raster
+
+qt_ft_grays_raster can clash with symbols of the same name in the same
+DSO. To be on the safe side, we should append the qt namespace to the
+identifier
+
+Task-number: QTBUG-138543
+Change-Id: I2523a1c509985e226f5e510140d184d14eb8470b
+Reviewed-by: Eirik Aavitsland <eirik.aavitsland@qt.io>
+(cherry picked from commit 4d11d9fe9cf4da574d69d0a7d7252495c4777b6e)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/gui/painting/qgrayraster.c           |  2 +-
+ src/gui/painting/qgrayraster_p.h         |  4 +++-
+ src/gui/painting/qpaintengine_raster.cpp | 14 +++++++-------
+ 3 files changed, 11 insertions(+), 9 deletions(-)
+
+diff --git a/src/gui/painting/qgrayraster.c b/src/gui/painting/qgrayraster.c
+index 34e1203d2db..b8b138b22ef 100644
+--- a/src/gui/painting/qgrayraster.c
++++ b/src/gui/painting/qgrayraster.c
+@@ -1959,7 +1959,7 @@ QT_FT_END_STMNT
+     }
+   }
+ 
+-  const QT_FT_Raster_Funcs  qt_ft_grays_raster =
++  const QT_FT_Raster_Funcs  QT_MANGLE_NAMESPACE(qt_ft_grays_raster) =
+   {
+     QT_FT_GLYPH_FORMAT_OUTLINE,
+ 
+diff --git a/src/gui/painting/qgrayraster_p.h b/src/gui/painting/qgrayraster_p.h
+index f9aae18e9d3..b2aae12c119 100644
+--- a/src/gui/painting/qgrayraster_p.h
++++ b/src/gui/painting/qgrayraster_p.h
+@@ -32,6 +32,8 @@
+ // We mean it.
+ */
+ 
++#include <qtconfigmacros.h>
++
+ #ifdef __cplusplus
+   extern "C" {
+ #endif
+@@ -55,7 +57,7 @@
+    for TWorker and TCell sizes.*/
+ #define MINIMUM_POOL_SIZE 8192
+ 
+-  QT_FT_EXPORT_VAR( const QT_FT_Raster_Funcs )  qt_ft_grays_raster;
++  QT_FT_EXPORT_VAR( const QT_FT_Raster_Funcs )  QT_MANGLE_NAMESPACE(qt_ft_grays_raster);
+ 
+ 
+ #ifdef __cplusplus
+diff --git a/src/gui/painting/qpaintengine_raster.cpp b/src/gui/painting/qpaintengine_raster.cpp
+index dbc9981c07a..74321705ff5 100644
+--- a/src/gui/painting/qpaintengine_raster.cpp
++++ b/src/gui/painting/qpaintengine_raster.cpp
+@@ -311,7 +311,7 @@ void QRasterPaintEngine::init()
+     // The antialiasing raster.
+     d->grayRaster.reset(new QT_FT_Raster);
+     Q_CHECK_PTR(d->grayRaster.data());
+-    if (qt_ft_grays_raster.raster_new(d->grayRaster.data()))
++    if (QT_MANGLE_NAMESPACE(qt_ft_grays_raster).raster_new(d->grayRaster.data()))
+         QT_THROW(std::bad_alloc()); // an error creating the raster is caused by a bad malloc
+ 
+ 
+@@ -376,7 +376,7 @@ QRasterPaintEngine::~QRasterPaintEngine()
+ {
+     Q_D(QRasterPaintEngine);
+ 
+-    qt_ft_grays_raster.raster_done(*d->grayRaster.data());
++    QT_MANGLE_NAMESPACE(qt_ft_grays_raster).raster_done(*d->grayRaster.data());
+ }
+ 
+ /*!
+@@ -3591,7 +3591,7 @@ void QRasterPaintEnginePrivate::rasterize(QT_FT_Outline *outline,
+     uchar *rasterPoolBase = alignAddress(rasterPoolOnStack, 0xf);
+     uchar *rasterPoolOnHeap = nullptr;
+ 
+-    qt_ft_grays_raster.raster_reset(*grayRaster.data(), rasterPoolBase, rasterPoolSize);
++    QT_MANGLE_NAMESPACE(qt_ft_grays_raster).raster_reset(*grayRaster.data(), rasterPoolBase, rasterPoolSize);
+ 
+     void *data = userData;
+ 
+@@ -3621,7 +3621,7 @@ void QRasterPaintEnginePrivate::rasterize(QT_FT_Outline *outline,
+         rasterParams.flags |= (QT_FT_RASTER_FLAG_AA | QT_FT_RASTER_FLAG_DIRECT);
+         rasterParams.gray_spans = callback;
+         rasterParams.skip_spans = rendered_spans;
+-        error = qt_ft_grays_raster.raster_render(*grayRaster.data(), &rasterParams);
++        error = QT_MANGLE_NAMESPACE(qt_ft_grays_raster).raster_render(*grayRaster.data(), &rasterParams);
+ 
+         // Out of memory, reallocate some more and try again...
+         if (error == -6) { // ErrRaster_OutOfMemory from qgrayraster.c
+@@ -3640,9 +3640,9 @@ void QRasterPaintEnginePrivate::rasterize(QT_FT_Outline *outline,
+ 
+             rasterPoolBase = alignAddress(rasterPoolOnHeap, 0xf);
+ 
+-            qt_ft_grays_raster.raster_done(*grayRaster.data());
+-            qt_ft_grays_raster.raster_new(grayRaster.data());
+-            qt_ft_grays_raster.raster_reset(*grayRaster.data(), rasterPoolBase, rasterPoolSize);
++            QT_MANGLE_NAMESPACE(qt_ft_grays_raster).raster_done(*grayRaster.data());
++            QT_MANGLE_NAMESPACE(qt_ft_grays_raster).raster_new(grayRaster.data());
++            QT_MANGLE_NAMESPACE(qt_ft_grays_raster).raster_reset(*grayRaster.data(), rasterPoolBase, rasterPoolSize);
+         } else {
+             done = true;
+         }
+-- 
+2.51.2
+

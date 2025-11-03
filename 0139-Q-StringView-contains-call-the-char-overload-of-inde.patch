@@ -1,0 +1,48 @@
+From 2911266ba07d128fe66a66d691b755a26b0b5f74 Mon Sep 17 00:00:00 2001
+From: Thiago Macieira <thiago.macieira@intel.com>
+Date: Tue, 9 Jul 2024 09:33:06 -0700
+Subject: [PATCH 139/553] Q*StringView::contains: call the char overload of
+ indexOf()
+
+Avoids an unnecessary QStringView and possibly pessimizing the
+code generation.
+
+Pick-to: 6.9 6.8
+Change-Id: Iac1ff680887641888e00fffd17e098972382bf10
+Reviewed-by: Ahmad Samir <a.samirh78@gmail.com>
+(cherry picked from commit e00ca26f9a8555963f7678e58e31c81a81e4766c)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/text/qlatin1stringview.h | 2 +-
+ src/corelib/text/qstringview.h       | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/corelib/text/qlatin1stringview.h b/src/corelib/text/qlatin1stringview.h
+index 31c36c63120..9f4bf543db5 100644
+--- a/src/corelib/text/qlatin1stringview.h
++++ b/src/corelib/text/qlatin1stringview.h
+@@ -131,7 +131,7 @@ public:
+     [[nodiscard]] bool contains(QLatin1StringView s, Qt::CaseSensitivity cs = Qt::CaseSensitive) const noexcept
+     { return indexOf(s, 0, cs) != -1; }
+     [[nodiscard]] bool contains(QChar c, Qt::CaseSensitivity cs = Qt::CaseSensitive) const noexcept
+-    { return indexOf(QStringView(&c, 1), 0, cs) != -1; }
++    { return indexOf(c, 0, cs) != -1; }
+ 
+     [[nodiscard]] qsizetype lastIndexOf(QStringView s, Qt::CaseSensitivity cs = Qt::CaseSensitive) const noexcept
+     { return lastIndexOf(s, size(), cs); }
+diff --git a/src/corelib/text/qstringview.h b/src/corelib/text/qstringview.h
+index c63ff6fbea1..9331e5b50d7 100644
+--- a/src/corelib/text/qstringview.h
++++ b/src/corelib/text/qstringview.h
+@@ -284,7 +284,7 @@ public:
+     [[nodiscard]] inline qsizetype indexOf(QLatin1StringView s, qsizetype from = 0, Qt::CaseSensitivity cs = Qt::CaseSensitive) const noexcept;
+ 
+     [[nodiscard]] bool contains(QChar c, Qt::CaseSensitivity cs = Qt::CaseSensitive) const noexcept
+-    { return indexOf(QStringView(&c, 1), 0, cs) != qsizetype(-1); }
++    { return indexOf(c, 0, cs) != qsizetype(-1); }
+     [[nodiscard]] bool contains(QStringView s, Qt::CaseSensitivity cs = Qt::CaseSensitive) const noexcept
+     { return indexOf(s, 0, cs) != qsizetype(-1); }
+     [[nodiscard]] inline bool contains(QLatin1StringView s, Qt::CaseSensitivity cs = Qt::CaseSensitive) const noexcept;
+-- 
+2.51.2
+

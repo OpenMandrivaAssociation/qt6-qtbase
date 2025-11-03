@@ -1,0 +1,43 @@
+From 366ffa2c2da105c0da8e5c23417e6714c69fdf77 Mon Sep 17 00:00:00 2001
+From: Ahmad Samir <a.samirh78@gmail.com>
+Date: Sun, 27 Jul 2025 23:47:55 +0300
+Subject: [PATCH 060/553] tst_QDir: use COMPARE_EQ when comparing QStringLists
+
+It prints the computed and expected lists if they don't match.
+
+Also rename a duplicate test data tag name.
+
+Pick-to: 6.9 6.8 6.5
+Change-Id: Id2d438cdbebd5262fdacdfb3cc29660619aead18
+Reviewed-by: Marc Mutz <marc.mutz@qt.io>
+(cherry picked from commit fb640ad2f40adf1a5f46c37ce6b76f15c0f78e1f)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ tests/auto/corelib/io/qdir/tst_qdir.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/auto/corelib/io/qdir/tst_qdir.cpp b/tests/auto/corelib/io/qdir/tst_qdir.cpp
+index 065d71fb6b2..64be9797845 100644
+--- a/tests/auto/corelib/io/qdir/tst_qdir.cpp
++++ b/tests/auto/corelib/io/qdir/tst_qdir.cpp
+@@ -852,7 +852,7 @@ void tst_QDir::entryListWithTestFiles_data()
+                               << filterLinks(QString(".,..,directory,file,linktodirectory.lnk,linktofile.lnk,writable").split(','));
+     // Tests an assert in QDirSortItemComparator, when QDir::LocaleAware is set
+     // a QCollator is used
+-    QTest::newRow("QDir::AllEntries")
++    QTest::newRow("QDir::AllEntries-LocaleAware")
+         << (m_dataPath + "/entrylist/") << QStringList("*")
+         << int(QDir::AllEntries) << int(QDir::Name | QDir::LocaleAware)
+         << filterLinks(QString(".,..,directory,file,linktodirectory.lnk,linktofile.lnk,writable").split(','));
+@@ -1027,7 +1027,7 @@ void tst_QDir::entryListWithTestFiles()
+         QVERIFY2(QFile::remove(testFiles.at(i)), qPrintable(testFiles.at(i)));
+ 
+     if (doContentCheck)
+-        QCOMPARE(actual, expected);
++        QCOMPARE_EQ(actual, expected);
+ }
+ 
+ void tst_QDir::entryListTimedSort()
+-- 
+2.51.2
+

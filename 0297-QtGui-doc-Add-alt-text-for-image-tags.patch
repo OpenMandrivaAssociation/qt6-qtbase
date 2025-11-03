@@ -1,0 +1,344 @@
+From 49073682c5447e05227a32b318f45b337965c573 Mon Sep 17 00:00:00 2001
+From: Eren Bursali <eren.bursali@qt.io>
+Date: Tue, 23 Sep 2025 15:01:01 +0200
+Subject: [PATCH 297/553] (QtGui) doc: Add alt text for \image tags
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Adding alt texts that were needed for QDoc
+
+Fixes: QTBUG-135119
+Change-Id: Id330b1933f56ff845fa02d91680cec27855e56e3
+Reviewed-by: Kai Köhne <kai.koehne@qt.io>
+(cherry picked from commit fc00dca1c388ee04401d2e391f74b38d42c177df)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ examples/gui/doc/src/rhiwindow.qdoc            |  2 +-
+ examples/vulkan/doc/src/hellovulkancubes.qdoc  |  3 ++-
+ .../vulkan/doc/src/hellovulkantriangle.qdoc    |  2 +-
+ examples/vulkan/doc/src/hellovulkanwidget.qdoc |  3 ++-
+ src/corelib/global/qnamespace.qdoc             |  3 ++-
+ src/gui/doc/src/coordsys.qdoc                  |  4 +++-
+ src/gui/doc/src/paintsystem.qdoc               | 18 ++++++++++++------
+ src/gui/doc/src/richtext.qdoc                  |  3 ++-
+ src/gui/kernel/qevent.cpp                      |  6 ++++--
+ src/gui/painting/qbrush.cpp                    |  3 ++-
+ src/gui/painting/qcolor.cpp                    |  3 ++-
+ src/gui/painting/qpainter.cpp                  |  8 ++++++--
+ src/gui/painting/qpen.cpp                      |  3 ++-
+ src/gui/painting/qtransform.cpp                |  3 ++-
+ src/gui/text/qtextformat.cpp                   |  6 ++++--
+ src/gui/text/qtextobject.cpp                   |  7 +++++--
+ 16 files changed, 52 insertions(+), 25 deletions(-)
+
+diff --git a/examples/gui/doc/src/rhiwindow.qdoc b/examples/gui/doc/src/rhiwindow.qdoc
+index 3ee33c80021..2c534e29771 100644
+--- a/examples/gui/doc/src/rhiwindow.qdoc
++++ b/examples/gui/doc/src/rhiwindow.qdoc
+@@ -9,7 +9,7 @@
+     \brief This example shows how to create a minimal QWindow-based
+     application using QRhi.
+ 
+-    \image rhiwindow_example.jpg
++    \image rhiwindow_example.jpg {Screenshot of example}
+ 
+     Qt 6.6 starts offering its accelerated 3D API and shader abstraction layer
+     for application use as well. Applications can now use the same 3D graphics
+diff --git a/examples/vulkan/doc/src/hellovulkancubes.qdoc b/examples/vulkan/doc/src/hellovulkancubes.qdoc
+index 91149911df6..b7d7896d216 100644
+--- a/examples/vulkan/doc/src/hellovulkancubes.qdoc
++++ b/examples/vulkan/doc/src/hellovulkancubes.qdoc
+@@ -11,7 +11,8 @@
+ 
+     The \e{Hello Vulkan Cubes Example} shows more advanced usage of QVulkanWindow.
+ 
+-    \image hellovulkancubes.png
++    \image hellovulkancubes.png {Screenshot of example demonstrating instanced
++           drawing of mesh from a file}
+ 
+     In this example there is a mesh loaded from a file and two different
+     materials and corresponding graphics pipelines. The rounded cubes are drawn
+diff --git a/examples/vulkan/doc/src/hellovulkantriangle.qdoc b/examples/vulkan/doc/src/hellovulkantriangle.qdoc
+index bafa026ccdc..4994fe26d66 100644
+--- a/examples/vulkan/doc/src/hellovulkantriangle.qdoc
++++ b/examples/vulkan/doc/src/hellovulkantriangle.qdoc
+@@ -12,7 +12,7 @@
+     The \e{Hello Vulkan Triangle Example} creates a full graphics pipeline,
+     including a vertex and fragment shader, to render a triangle.
+ 
+-    \image hellovulkantriangle.png
++    \image hellovulkantriangle.png {Screenshot of example}
+ 
+     \section1 Startup
+ 
+diff --git a/examples/vulkan/doc/src/hellovulkanwidget.qdoc b/examples/vulkan/doc/src/hellovulkanwidget.qdoc
+index 2a71084fc49..2051ae86947 100644
+--- a/examples/vulkan/doc/src/hellovulkanwidget.qdoc
++++ b/examples/vulkan/doc/src/hellovulkanwidget.qdoc
+@@ -13,7 +13,8 @@
+     that embeds the QVulkanWindow into a QWidget-based user interface using
+     QWidget::createWindowContainer().
+ 
+-    \image hellovulkanwidget.png
++    \image hellovulkanwidget.png {Screenshot of example with window showing image contents
++           and label showing color format and buttons to grab and quit}
+ 
+     The code to set up the Vulkan pipeline and render the triangle is the same
+     as in \l hellovulkantriangle. In addition, this example demonstrates
+diff --git a/src/corelib/global/qnamespace.qdoc b/src/corelib/global/qnamespace.qdoc
+index c845cfa7eec..09ed97abc59 100644
+--- a/src/corelib/global/qnamespace.qdoc
++++ b/src/corelib/global/qnamespace.qdoc
+@@ -914,7 +914,8 @@
+     This enum type defines what happens to the aspect ratio when
+     scaling an rectangle.
+ 
+-    \image qimage-scaling.png
++    \image qimage-scaling.png {Illustration showing three different
++           ways to scale images with Aspect Ratio Mode}
+ 
+     \value IgnoreAspectRatio  The size is scaled freely. The aspect
+                               ratio is not preserved.
+diff --git a/src/gui/doc/src/coordsys.qdoc b/src/gui/doc/src/coordsys.qdoc
+index 979b8fc8b49..baeba4170e9 100644
+--- a/src/gui/doc/src/coordsys.qdoc
++++ b/src/gui/doc/src/coordsys.qdoc
+@@ -321,7 +321,9 @@
+     still transformed to the viewport using the same linear algebraic
+     approach.
+ 
+-    \image coordinatesystem-transformations.png
++    \image coordinatesystem-transformations.png {Illustration showing
++           how coordinates are mapped using viewport, "window" and
++           transformation matrix}
+ 
+     The viewport, "window" and transformation matrix determine how
+     logical QPainter coordinates map to the paint device's physical
+diff --git a/src/gui/doc/src/paintsystem.qdoc b/src/gui/doc/src/paintsystem.qdoc
+index f3a5248db1e..91da2757072 100644
+--- a/src/gui/doc/src/paintsystem.qdoc
++++ b/src/gui/doc/src/paintsystem.qdoc
+@@ -40,7 +40,8 @@
+     QPaintDevice, and is hidden from application programmers unless
+     they create their own device type.
+ 
+-    \image paintsystem-core.png
++    \image paintsystem-core.png {Illustration showing the relations of
++           the paint system}
+ 
+     The main benefit of this approach is that all painting follows the
+     same painting pipeline making it easy to add support for new
+@@ -174,7 +175,7 @@
+ 
+     \table 100%
+     \row
+-    \li \image paintsystem-painterpath.png
++    \li \image paintsystem-painterpath.png {Qt logo}
+     \li \b QPainterPath
+ 
+     A painter path is an object composed of lines and curves. For
+@@ -230,7 +231,8 @@
+     antialias edges of primitives if possible, i.e. smoothing the
+     edges by using different color intensities.
+ 
+-    \li \image paintsystem-antialiasing.png
++    \li \image paintsystem-antialiasing.png {Screenshot showing a drawing
++               that was rendered with antialiasing}
+ 
+     \endtable
+ 
+@@ -255,13 +257,15 @@
+ 
+     \table 100%
+     \row
+-    \li \image paintsystem-fancygradient.png
++    \li \image paintsystem-fancygradient.png {Screenshot of the gradient
++               example}
+     \li \b QGradient
+ 
+     The QGradient class is used in combination with QBrush to specify
+     gradient fills.
+ 
+-    \image paintsystem-gradients.png
++    \image paintsystem-gradients.png {Illustration that shows three
++           different supported ways gradients can be used}
+ 
+     Qt currently supports three types of gradient fills: Linear
+     gradients interpolate colors between start and end points, radial
+@@ -300,7 +304,9 @@
+     provides various functions for both running and controlling the
+     given animation.
+ 
+-    \li \image paintsystem-movie.png
++    \li \image paintsystem-movie.png {Screenshot showing how creating
++               an animation with QMovie looks by separating the
++               animation into individual images}
+     \endtable
+ 
+     The QImageReader and QImageWriter classes rely on the
+diff --git a/src/gui/doc/src/richtext.qdoc b/src/gui/doc/src/richtext.qdoc
+index 005f42b15fa..429233ec8f1 100644
+--- a/src/gui/doc/src/richtext.qdoc
++++ b/src/gui/doc/src/richtext.qdoc
+@@ -650,7 +650,8 @@
+     the QTextLayout class, to help developers perform word-wrapping and
+     layout tasks without the need to create a document first.
+ 
+-    \image plaintext-layout.png
++    \image plaintext-layout.png {Screenshot of a text that flows around a
++           circle.}
+ 
+     Formatting and drawing a paragraph of plain text is straightforward.
+     The example below will lay out a paragraph of text, using a single
+diff --git a/src/gui/kernel/qevent.cpp b/src/gui/kernel/qevent.cpp
+index af3ad64689d..bd950024bcc 100644
+--- a/src/gui/kernel/qevent.cpp
++++ b/src/gui/kernel/qevent.cpp
+@@ -964,7 +964,8 @@ Qt::MouseEventFlags QMouseEvent::flags() const
+     consider a top-level window A containing a child B which in turn contains a
+     child C (all with mouse tracking enabled):
+ 
+-    \image hoverevents.png
++    \image hoverevents.png {Screenshot showing widgets A, B, C stacked on top
++           of each other}
+ 
+     Now, if you move the cursor from the top to the bottom in the middle of A,
+     you will get the following QEvent::MouseMove events:
+@@ -2613,7 +2614,8 @@ Q_IMPL_POINTER_EVENT(QTabletEvent)
+     Positive values are towards the tablet's physical right. The angle
+     is in the range -60 to +60 degrees.
+ 
+-    \image qtabletevent-tilt.png
++    \image qtabletevent-tilt.png {Illustration of a device that is tilted
++           in a 3 Dimensional coordinate system}
+ 
+     \note The value is stored as a single-precision float.
+ 
+diff --git a/src/gui/painting/qbrush.cpp b/src/gui/painting/qbrush.cpp
+index 2e56b15bb94..3df8ed9c40c 100644
+--- a/src/gui/painting/qbrush.cpp
++++ b/src/gui/painting/qbrush.cpp
+@@ -2421,7 +2421,8 @@ void QRadialGradient::setFocalPoint(const QPointF &focalPoint)
+     Conical gradients interpolate interpolate colors counter-clockwise
+     around a center point.
+ 
+-    \image qconicalgradient.png
++    \image qconicalgradient.png {Screenshot that shows an example of
++           what a conical gradient looks like}
+ 
+     The colors in a gradient is defined using stop points of the
+     QGradientStop type, i.e. a position and a color. Use the
+diff --git a/src/gui/painting/qcolor.cpp b/src/gui/painting/qcolor.cpp
+index 480941c9f04..dcf216089d6 100644
+--- a/src/gui/painting/qcolor.cpp
++++ b/src/gui/painting/qcolor.cpp
+@@ -441,7 +441,8 @@ static QStringList get_colornames()
+ 
+     The code above produces the following output:
+ 
+-    \image alphafill.png
++    \image alphafill.png {An image that contains four square sections,
++           with the colors purple, blue, red and white}
+ 
+     The alpha channel of a color can be retrieved and set using the
+     alpha() and setAlpha() functions if its value is an integer, and
+diff --git a/src/gui/painting/qpainter.cpp b/src/gui/painting/qpainter.cpp
+index 87b0bdd43c7..96ae6b730d9 100644
+--- a/src/gui/painting/qpainter.cpp
++++ b/src/gui/painting/qpainter.cpp
+@@ -2146,8 +2146,12 @@ void QPainter::setBrushOrigin(const QPointF &p)
+     hint will effectively disable the RasterOp modes.
+ 
+ 
+-     \image qpainter-compositionmode1.png
+-     \image qpainter-compositionmode2.png
++     \image qpainter-compositionmode1.png {Illustration showing Source,
++            Destination, SourceOver, DestinationOver, SourceIn,
++            DestinationIn composition modes}
++     \image qpainter-compositionmode2.png {Illustration showing SourceOut,
++            DestinationOut, SourceAtop, DestinationAtop, Clear and Xor
++            composition modes}
+ 
+     The most common type is SourceOver (often referred to as just
+     alpha blending) where the source pixel is blended on top of the
+diff --git a/src/gui/painting/qpen.cpp b/src/gui/painting/qpen.cpp
+index b2242087d91..8780c0d8bc2 100644
+--- a/src/gui/painting/qpen.cpp
++++ b/src/gui/painting/qpen.cpp
+@@ -158,7 +158,8 @@ QT_BEGIN_NAMESPACE
+ 
+     The default is Qt::BevelJoin.
+ 
+-    \image qpen-miterlimit.png
++    \image qpen-miterlimit.png {Illustration showing how miterLimit controls
++           the length of the sharp corner for miterJoin}
+ 
+     When the Qt::MiterJoin style is applied, it is possible to use the
+     setMiterLimit() function to specify how far the miter join can
+diff --git a/src/gui/painting/qtransform.cpp b/src/gui/painting/qtransform.cpp
+index eaa836bff90..de2b146c2a7 100644
+--- a/src/gui/painting/qtransform.cpp
++++ b/src/gui/painting/qtransform.cpp
+@@ -135,7 +135,8 @@ void QTransform::do_map(qreal x, qreal y, qreal &nx, qreal &ny) const
+ 
+     \section1 Basic Matrix Operations
+ 
+-    \image qtransform-representation.png
++    \image qtransform-representation.png {Illustration showing an object that
++           contains a 3x3 matrix where every row is a different element}
+ 
+     A QTransform object contains a 3 x 3 matrix.  The \c m31 (\c dx) and
+     \c m32 (\c dy) elements specify horizontal and vertical translation.
+diff --git a/src/gui/text/qtextformat.cpp b/src/gui/text/qtextformat.cpp
+index d5f1c1f5ed6..a4232ecaff7 100644
+--- a/src/gui/text/qtextformat.cpp
++++ b/src/gui/text/qtextformat.cpp
+@@ -2810,7 +2810,8 @@ QTextListFormat::QTextListFormat(const QTextFormat &fmt)
+     frame's padding(). This scheme is similar to the box model used by Cascading
+     Style Sheets for HTML pages.
+ 
+-    \image qtextframe-style.png
++    \image qtextframe-style.png {Diagram showing how padding, border, and margin
++           are laid around the text content rectangle.}
+ 
+     The position() of a frame is set using setPosition() and determines how it
+     is located relative to the surrounding text.
+@@ -3140,7 +3141,8 @@ qreal QTextFrameFormat::rightMargin() const
+     between each cell edge and its contents is set with setCellPadding() and read
+     with cellPadding().
+ 
+-    \image qtexttableformat-cell.png
++    \image qtexttableformat-cell.png {Diagram showing how cell spacing and padding
++           are laid around the cell content rectangle.}
+ 
+     The table's background color can be read with the background() function,
+     and can be specified with setBackground(). The background color of each
+diff --git a/src/gui/text/qtextobject.cpp b/src/gui/text/qtextobject.cpp
+index 6aafdc1a255..48a8ce990be 100644
+--- a/src/gui/text/qtextobject.cpp
++++ b/src/gui/text/qtextobject.cpp
+@@ -781,7 +781,9 @@ QTextBlockUserData::~QTextBlockUserData()
+     compares two blocks for inequality, and \l operator<() determines whether
+     a block precedes another in the same document.
+ 
+-    \image qtextblock-sequence.png
++    \image qtextblock-sequence.png {Diagram showing multiple text blocks in
++           a hierarchy of text frames, and the iteration order between the
++           text blocks.}
+ 
+     \sa QTextBlockFormat, QTextCharFormat, QTextFragment
+  */
+@@ -1560,7 +1562,8 @@ QTextBlock::iterator &QTextBlock::iterator::operator--()
+     of the sentence, the second will contain the text from the middle, and the
+     third takes the text from the end of the sentence.
+ 
+-    \image qtextfragment-split.png
++    \image qtextfragment-split.png {Screenshot showing how a text is separated
++           in three fragments if the middle text is made bold.}
+ 
+     A fragment's text and character format can be obtained with the text()
+     and charFormat() functions. The length() function gives the length of
+-- 
+2.51.2
+

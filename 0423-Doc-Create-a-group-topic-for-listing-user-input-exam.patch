@@ -1,0 +1,135 @@
+From 96a3f1e0bd87c8a7d24ccdf8656643f0bf077ef3 Mon Sep 17 00:00:00 2001
+From: Alexei Cazacov <alexei.cazacov@qt.io>
+Date: Tue, 7 Oct 2025 17:01:41 +0300
+Subject: [PATCH 423/553] Doc: Create a group topic for listing user input
+ examples
+
+This commit adds a new `\group` for user input and drag-and-drop
+examples. Previously, some of the examples from this group were
+orphaned topics and users could not navigate them by following links in
+docs.
+
+Task-number: QTBUG-140882
+Change-Id: I3dc9530a5c239b708ce2f1068e12c7aa25bcd2b8
+Reviewed-by: Jerome Pasion <jerome.pasion@qt.io>
+(cherry picked from commit 35b4050d4bfc5005435a155666fed541dd544888)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ examples/widgets/doc/src/draggableicons.qdoc         |  1 +
+ examples/widgets/doc/src/draggabletext.qdoc          |  1 +
+ examples/widgets/doc/src/dropsite.qdoc               |  1 +
+ examples/widgets/doc/src/tablet.qdoc                 |  2 +-
+ .../imagegestures/doc/src/imagegestures.qdoc         |  1 +
+ .../widgets/touch/knobs/doc/src/touch-knobs.qdoc     |  1 +
+ src/widgets/doc/src/qtwidgets-examples.qdoc          | 12 ++++++++++++
+ src/widgets/doc/src/qtwidgets-toc.qdoc               |  1 +
+ 8 files changed, 19 insertions(+), 1 deletion(-)
+
+diff --git a/examples/widgets/doc/src/draggableicons.qdoc b/examples/widgets/doc/src/draggableicons.qdoc
+index 0f1feacb7fb..3cf9b9b7266 100644
+--- a/examples/widgets/doc/src/draggableicons.qdoc
++++ b/examples/widgets/doc/src/draggableicons.qdoc
+@@ -4,6 +4,7 @@
+ /*!
+     \example draganddrop/draggableicons
+     \title Draggable Icons Example
++    \ingroup examples-user-input
+     \examplecategory {User Interface Components}
+ 
+     \brief The Draggable Icons example shows how to drag and drop image data between widgets
+diff --git a/examples/widgets/doc/src/draggabletext.qdoc b/examples/widgets/doc/src/draggabletext.qdoc
+index 3609ed5a1a1..f34e166ed89 100644
+--- a/examples/widgets/doc/src/draggabletext.qdoc
++++ b/examples/widgets/doc/src/draggabletext.qdoc
+@@ -4,6 +4,7 @@
+ /*!
+     \example draganddrop/draggabletext
+     \title Draggable Text Example
++    \ingroup examples-user-input
+     \examplecategory {User Interface Components}
+     \brief Illustrates how to drag and drop text between widgets.
+ 
+diff --git a/examples/widgets/doc/src/dropsite.qdoc b/examples/widgets/doc/src/dropsite.qdoc
+index 4c38ffc50d3..baa7b22fa8a 100644
+--- a/examples/widgets/doc/src/dropsite.qdoc
++++ b/examples/widgets/doc/src/dropsite.qdoc
+@@ -4,6 +4,7 @@
+ /*!
+     \example draganddrop/dropsite
+     \title Drop Site Example
++    \ingroup examples-user-input
+     \examplecategory {User Interface Components}
+ 
+     \brief The example shows how to distinguish the various MIME formats available
+diff --git a/examples/widgets/doc/src/tablet.qdoc b/examples/widgets/doc/src/tablet.qdoc
+index a18eb3249e7..f1238238df9 100644
+--- a/examples/widgets/doc/src/tablet.qdoc
++++ b/examples/widgets/doc/src/tablet.qdoc
+@@ -5,7 +5,7 @@
+     \example widgets/tablet
+     \title Tablet Example
+     \examplecategory {User Interface Components}
+-    \ingroup examples-widgets
++    \ingroup examples-user-input
+     \brief This example shows how to use a Wacom tablet in Qt applications.
+ 
+     \image tabletexample.png {Application displaying a drawing area}
+diff --git a/examples/widgets/gestures/imagegestures/doc/src/imagegestures.qdoc b/examples/widgets/gestures/imagegestures/doc/src/imagegestures.qdoc
+index 03b31edabc5..63ca14787b6 100644
+--- a/examples/widgets/gestures/imagegestures/doc/src/imagegestures.qdoc
++++ b/examples/widgets/gestures/imagegestures/doc/src/imagegestures.qdoc
+@@ -5,6 +5,7 @@
+     \example gestures/imagegestures
+     \title Image Gestures Example
+     \examplecategory {User Interface Components}
++    \ingroup examples-user-input
+     \brief Demonstrates the use of simple gestures in a widget.
+ 
+     This example shows how to enable gestures for a widget and use gesture input
+diff --git a/examples/widgets/touch/knobs/doc/src/touch-knobs.qdoc b/examples/widgets/touch/knobs/doc/src/touch-knobs.qdoc
+index d229f54f5c7..38bd2016cab 100644
+--- a/examples/widgets/touch/knobs/doc/src/touch-knobs.qdoc
++++ b/examples/widgets/touch/knobs/doc/src/touch-knobs.qdoc
+@@ -6,6 +6,7 @@
+     \title Touch Knobs Example
+     \examplecategory {User Interface Components}
+     \ingroup touchinputexamples
++    \ingroup examples-user-input
+     \brief Shows how to create custom controls that accept touch input.
+ 
+     The Touch Knobs example shows how to create custom controls that
+diff --git a/src/widgets/doc/src/qtwidgets-examples.qdoc b/src/widgets/doc/src/qtwidgets-examples.qdoc
+index 45677c471ba..364c985b310 100644
+--- a/src/widgets/doc/src/qtwidgets-examples.qdoc
++++ b/src/widgets/doc/src/qtwidgets-examples.qdoc
+@@ -164,3 +164,15 @@
+     regular expressions for the Widget-based applications.
+ 
+ */
++/*!
++    \group examples-user-input
++    \ingroup all-examples
++    \title User Input Examples
++    \brief Using user input in Qt Widgets applications.
++
++    \image imagegestures-example.png {Application handling touch gestures}
++
++    Qt provides the functionality for handling user input and drag-and-drop in
++    widget-based applications.
++
++*/
+diff --git a/src/widgets/doc/src/qtwidgets-toc.qdoc b/src/widgets/doc/src/qtwidgets-toc.qdoc
+index bc447b8bd58..beddf853a22 100644
+--- a/src/widgets/doc/src/qtwidgets-toc.qdoc
++++ b/src/widgets/doc/src/qtwidgets-toc.qdoc
+@@ -53,6 +53,7 @@
+             \li \l{Rich Text Examples}
+             \li \l{Graphics View Examples}
+             \li \l{Widget Tools Examples}
++            \li \l{User Input Examples}
+         \endlist
+     \endlist
+ 
+-- 
+2.51.2
+

@@ -1,0 +1,64 @@
+From a51cfd7d85c3c150aa01e7df624ee5e64fa994f5 Mon Sep 17 00:00:00 2001
+From: Lars Schmertmann <Lars.Schmertmann@governikus.de>
+Date: Tue, 30 Sep 2025 08:19:12 +0200
+Subject: [PATCH 280/553] Android: Update to Gradle 8.14.3
+
+Update to latest version for Gradle:
+* Gradle 8.14.2 -> 8.14.3
+
+[ChangeLog][Third-Party Code] Updated Gradle to 8.14.3.
+
+Task-number: QTBUG-137782
+Change-Id: If3ee2d99f3f54c2e730b5617a94e9bfcbd4ac4b2
+Reviewed-by: Assam Boudjelthia <assam.boudjelthia@qt.io>
+(cherry picked from commit b910addacd9fc5bd909ace5ae9cf1004d9488ec3)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ doc/global/macros.qdocconf                                   | 2 +-
+ src/3rdparty/gradle/gradle/wrapper/gradle-wrapper.properties | 2 +-
+ src/3rdparty/gradle/qt_attribution.json                      | 4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/doc/global/macros.qdocconf b/doc/global/macros.qdocconf
+index 87e8be30443..ae08c76ad93 100644
+--- a/doc/global/macros.qdocconf
++++ b/doc/global/macros.qdocconf
+@@ -96,7 +96,7 @@ macro.AndroidMinVer       = "9"
+ macro.AndroidMaxVer       = "15"
+ macro.AndroidPlatformVer  = "35"
+ macro.AndroidBuildToolsVer = "35.0.1"
+-macro.GradleVer           = "8.14.2"
++macro.GradleVer           = "8.14.3"
+ macro.AGPVer              = "8.10.1"
+ macro.AAOSVer             = "10 to 13"
+ 
+diff --git a/src/3rdparty/gradle/gradle/wrapper/gradle-wrapper.properties b/src/3rdparty/gradle/gradle/wrapper/gradle-wrapper.properties
+index ff23a68d70f..d4081da476b 100644
+--- a/src/3rdparty/gradle/gradle/wrapper/gradle-wrapper.properties
++++ b/src/3rdparty/gradle/gradle/wrapper/gradle-wrapper.properties
+@@ -1,6 +1,6 @@
+ distributionBase=GRADLE_USER_HOME
+ distributionPath=wrapper/dists
+-distributionUrl=https\://services.gradle.org/distributions/gradle-8.14.2-bin.zip
++distributionUrl=https\://services.gradle.org/distributions/gradle-8.14.3-bin.zip
+ networkTimeout=10000
+ validateDistributionUrl=true
+ zipStoreBase=GRADLE_USER_HOME
+diff --git a/src/3rdparty/gradle/qt_attribution.json b/src/3rdparty/gradle/qt_attribution.json
+index d2966e5c8b9..3178dfaa706 100644
+--- a/src/3rdparty/gradle/qt_attribution.json
++++ b/src/3rdparty/gradle/qt_attribution.json
+@@ -4,8 +4,8 @@
+     "QDocModule": "qtcore",
+     "QtParts": ["tools"],
+     "Homepage": "https://gradle.org",
+-    "Version": "8.14.2",
+-    "DownloadLocation": "https://github.com/gradle/gradle/releases/tag/v8.14.2",
++    "Version": "8.14.3",
++    "DownloadLocation": "https://github.com/gradle/gradle/releases/tag/v8.14.3",
+     "PURL": "pkg:github/gradle/gradle@v$<VERSION>",
+     "CPE": "cpe:2.3:a:gradle:gradle:$<VERSION>:*:*:*:*:*:*:*",
+     "QtUsage": "Needed to create Android packages",
+-- 
+2.51.2
+

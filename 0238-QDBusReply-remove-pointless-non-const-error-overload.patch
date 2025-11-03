@@ -1,0 +1,63 @@
+From 10001a4c6a509c95302fc47340b1390c277c9061 Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Sun, 28 Sep 2025 23:55:03 +0200
+Subject: [PATCH 238/553] QDBusReply: remove pointless non-const error()
+ overload
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The const overload is callable for non-const objects, too.
+
+Amends c474f404526d82f74e3272e1debbc7f50679e9eb.
+
+Task-number: QTBUG-29917
+Pick-to: 6.9 6.8
+Change-Id: I1ec7280b4234db8d9d4da50737469d31b47290b5
+Reviewed-by: Mårten Nordheim <marten.nordheim@qt.io>
+(cherry picked from commit e3569985c9cd38a4df8230012a48c3965a7f5bf2)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/dbus/qdbusreply.cpp | 5 -----
+ src/dbus/qdbusreply.h   | 2 --
+ 2 files changed, 7 deletions(-)
+
+diff --git a/src/dbus/qdbusreply.cpp b/src/dbus/qdbusreply.cpp
+index a90e7354ed2..b9eff2a5251 100644
+--- a/src/dbus/qdbusreply.cpp
++++ b/src/dbus/qdbusreply.cpp
+@@ -136,11 +136,6 @@ using namespace Qt::StringLiterals;
+     \sa isValid()
+ */
+ 
+-/*!
+-    \fn template <typename T> const QDBusError& QDBusReply<T>::error()
+-    \overload
+-*/
+-
+ /*!
+     \fn template <typename T> Type QDBusReply<T>::value() const
+     Returns the remote function's calls return value. If the remote call returned with an error,
+diff --git a/src/dbus/qdbusreply.h b/src/dbus/qdbusreply.h
+index 5dfb63f3b4b..8605f735b90 100644
+--- a/src/dbus/qdbusreply.h
++++ b/src/dbus/qdbusreply.h
+@@ -73,7 +73,6 @@ public:
+ 
+     inline bool isValid() const { return !m_error.isValid(); }
+ 
+-    inline const QDBusError& error() { return m_error; }
+     inline const QDBusError& error() const { return m_error; }
+ 
+     inline Type value() const
+@@ -146,7 +145,6 @@ public:
+ 
+     inline bool isValid() const { return !m_error.isValid(); }
+ 
+-    inline const QDBusError& error() { return m_error; }
+     inline const QDBusError& error() const { return m_error; }
+ 
+ private:
+-- 
+2.51.2
+

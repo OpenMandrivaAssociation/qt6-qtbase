@@ -1,0 +1,71 @@
+From b42bcc84dc3c0f344b8c4591fce86d5ef4266eba Mon Sep 17 00:00:00 2001
+From: Thiago Macieira <thiago.macieira@intel.com>
+Date: Thu, 2 Oct 2025 20:39:45 -0700
+Subject: [PATCH 271/553] QAbstractSocket/QHostAddress: ensure definition of
+ static constexprs
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Amends commit 969337bcfd6af6d91b988e4b412703274a0b5877, which introduced
+these constants. We've since learned that those either need an
+out-of-line definition or need to be in a non-exported base[1]. This
+commit uses both strategies: an out-of-line definition for the symbols
+that are used in Qt 6 and thus have an ABI requirement to stay the same,
+and moving to a base class for the Qt 7 ones, which don't yet.
+
+[1] https://lists.qt-project.org/pipermail/development/2024-January/044888.html
+
+Pick-to: 6.8
+Change-Id: Id6fb9fd431ee59534769fffd916b9db68c4e18a9
+Reviewed-by: Mårten Nordheim <marten.nordheim@qt.io>
+(cherry picked from commit 043590b891a98350edb23715a86f4af6d3f1ecdb)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/network/socket/qabstractsocket.h | 22 +++++++++++++++-------
+ 1 file changed, 15 insertions(+), 7 deletions(-)
+
+diff --git a/src/network/socket/qabstractsocket.h b/src/network/socket/qabstractsocket.h
+index f3db8b0e722..8d2e8a299cc 100644
+--- a/src/network/socket/qabstractsocket.h
++++ b/src/network/socket/qabstractsocket.h
+@@ -23,7 +23,22 @@ class QNetworkProxy;
+ class QAbstractSocketPrivate;
+ class QAuthenticator;
+ 
++namespace QtPrivate {
++struct QAbstractSocketConstants
++{
++#if QT_VERSION >= QT_VERSION_CHECK(7, 0, 0)
++    // compatibility with Qt 4 to 6
++    using NetworkLayerProtocol = QHostAddress::NetworkLayerProtocol;
++    static constexpr auto IPv4Protocol = QHostAddress::IPv4Protocol;
++    static constexpr auto IPv6Protocol = QHostAddress::IPv6Protocol;
++    static constexpr auto AnyIPProtocol = QHostAddress::AnyIPProtocol;
++    static constexpr auto UnknownNetworkLayerProtocol = QHostAddress::UnknownNetworkLayerProtocol;
++#endif
++};
++}
++
+ class Q_NETWORK_EXPORT QAbstractSocket : public QIODevice
++        QT7_ONLY(, public QtPrivate::QAbstractSocketConstants)
+ {
+     Q_OBJECT
+     Q_MOC_INCLUDE(<QtNetwork/qauthenticator.h>)
+@@ -45,13 +60,6 @@ public:
+         UnknownNetworkLayerProtocol = -1
+     };
+     Q_ENUM(NetworkLayerProtocol)
+-#else
+-    // compatibility with Qt 4 to 6
+-    using NetworkLayerProtocol = QHostAddress::NetworkLayerProtocol;
+-    static constexpr auto IPv4Protocol = QHostAddress::IPv4Protocol;
+-    static constexpr auto IPv6Protocol = QHostAddress::IPv6Protocol;
+-    static constexpr auto AnyIPProtocol = QHostAddress::AnyIPProtocol;
+-    static constexpr auto UnknownNetworkLayerProtocol = QHostAddress::UnknownNetworkLayerProtocol;
+ #endif
+ 
+     enum SocketError {
+-- 
+2.51.2
+

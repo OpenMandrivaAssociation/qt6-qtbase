@@ -1,0 +1,185 @@
+From e7680f05598387e4df7e8d2f881eab46795c9206 Mon Sep 17 00:00:00 2001
+From: Alexandru Croitor <alexandru.croitor@qt.io>
+Date: Fri, 19 Sep 2025 15:02:25 +0200
+Subject: [PATCH 171/553] CMake: Handle TARGET_SUPPORTS_SHARED_LIBS for
+ Emscripten better
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The upstream emsdk / emscripten cmake toolchain file sets the
+CMake global property TARGET_SUPPORTS_SHARED_LIBS to FALSE, claiming
+that creation of true shared libraries is not supported. See the
+following comment:
+https://github.com/emscripten-core/emscripten/pull/8362#issuecomment-3050586255
+
+Despite that, Qt for a while now set the global property to TRUE
+both when building Qt and user projects, and things mostly worked.
+
+This was done in QtWasmHelpers.cmake for shared lib Qt builds. And in
+Qt6CoreConfigExtras.cmake.in for user projects in both shared or
+static qt builds (which actually affects repos other than qtbase as
+well).
+
+Starting with CMake 3.30, which introduced policy CMP0164, if it's set
+to NEW, and TARGET_SUPPORTS_SHARED_LIBS is FALSE, CMake will refuse to
+create shared library targets (even IMPORTED ones) with an error like:
+
+CMake Error at lib/cmake/Qt6Core/Qt6CoreTargets.cmake:50 (add_library):
+  ADD_LIBRARY called with SHARED option but the target platform does
+  not support dynamic linking.
+Call Stack (most recent call first):
+  lib/cmake/Qt6Core/Qt6CoreConfig.cmake:57 (include)
+  lib/cmake/Qt6/Qt6Config.cmake:240 (find_package)
+  CMakeLists.txt:7 (find_package)
+
+This usually popped up when configuring a user project or a qt repo
+other than qtbase, when Qt is built with CMake 3.30. That's because
+the auto-generated *Targets.cmake always enables all policies up to
+the version of the used CMake version, with a command like
+cmake_policy(VERSION 2.8.3...3.31)
+
+The Qt6CoreConfigExtras.cmake file is included after the Targets file,
+so its setting of TARGET_SUPPORTS_SHARED_LIBS to TRUE is too late.
+
+To avoid this error, introduce a new
+_qt_internal_handle_target_supports_shared_libs helper function
+that sets TARGET_SUPPORTS_SHARED_LIBS to TRUE in
+Qt6ConfigExtras.cmake. This will be executed before any imported
+target creation in Qt*Targets.cmake files.
+
+Because Qt6ConfigExtras.cmake is not loaded during the initial
+configuration of the qtbase build, also replace the call in
+QtWasmHelpers.cmake. Make it consistent and call the function
+regardless of a shared or static Qt build.
+
+Allow opting out of the TARGET_SUPPORTS_SHARED_LIBS assignment by
+passing -DQT_NO_ENABLE_TARGET_SUPPORTS_SHARED_LIBS=ON.
+
+Incidentally, CMake 4.2 is introducing it's own support for
+Emscripten, and will set TARGET_SUPPORTS_SHARED_LIBS to TRUE if it
+detects that the emsdk toolchain file is not loaded.
+
+Pick-to: 6.9 6.8
+Task-number: QTBUG-140211
+Change-Id: I9313476abd885bcbe60309e62fe1d6ae568769e8
+Reviewed-by: Morten Johan Sørvig <morten.sorvig@qt.io>
+Reviewed-by: Joerg Bornemann <joerg.bornemann@qt.io>
+(cherry picked from commit 897034bc9361ae776de9dfb615af24daffaf3778)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ cmake/QtBaseGlobalTargets.cmake          | 13 ++++++++++++-
+ cmake/QtConfig.cmake.in                  |  4 +++-
+ cmake/QtPublicCMakeHelpers.cmake         | 24 ++++++++++++++++++++++++
+ cmake/QtWasmHelpers.cmake                |  5 ++---
+ src/corelib/Qt6CoreConfigExtras.cmake.in |  1 -
+ 5 files changed, 41 insertions(+), 6 deletions(-)
+
+diff --git a/cmake/QtBaseGlobalTargets.cmake b/cmake/QtBaseGlobalTargets.cmake
+index 041e6a0d7b2..8d7df417f6e 100644
+--- a/cmake/QtBaseGlobalTargets.cmake
++++ b/cmake/QtBaseGlobalTargets.cmake
+@@ -220,7 +220,18 @@ configure_package_config_file(
+     INSTALL_DESTINATION "${__GlobalConfig_install_dir}"
+ )
+ 
+-_qt_internal_export_apple_sdk_and_xcode_version_requirements(QT_CONFIG_EXTRAS_CODE)
++set(QT_CONFIG_EXTRAS_CODE "")
++
++_qt_internal_export_apple_sdk_and_xcode_version_requirements(apple_requirements)
++if(apple_requirements)
++    string(APPEND QT_CONFIG_EXTRAS_CODE "${apple_requirements}")
++endif()
++
++if(EMSCRIPTEN)
++    string(APPEND QT_CONFIG_EXTRAS_CODE "\n
++_qt_internal_handle_target_supports_shared_libs()
++")
++endif()
+ 
+ configure_file(
+     "${PROJECT_SOURCE_DIR}/cmake/QtConfigExtras.cmake.in"
+diff --git a/cmake/QtConfig.cmake.in b/cmake/QtConfig.cmake.in
+index c1d52375f77..93f47570706 100644
+--- a/cmake/QtConfig.cmake.in
++++ b/cmake/QtConfig.cmake.in
+@@ -9,9 +9,11 @@ __qt_internal_save_directory_scope_policy_cmp0156()
+ 
+ cmake_minimum_required(VERSION @min_new_policy_version@...@max_new_policy_version@)
+ 
++include("${CMAKE_CURRENT_LIST_DIR}/QtPublicCMakeHelpers.cmake")
++
++# ConfigExtras uses functions from QtPublicCMakeHelpers.cmake
+ include("${CMAKE_CURRENT_LIST_DIR}/@INSTALL_CMAKE_NAMESPACE@ConfigExtras.cmake")
+ include("${CMAKE_CURRENT_LIST_DIR}/QtPublicCMakeVersionHelpers.cmake")
+-include("${CMAKE_CURRENT_LIST_DIR}/QtPublicCMakeHelpers.cmake")
+ include("${CMAKE_CURRENT_LIST_DIR}/QtInstallPaths.cmake")
+ 
+ __qt_internal_require_suitable_cmake_version_for_using_qt()
+diff --git a/cmake/QtPublicCMakeHelpers.cmake b/cmake/QtPublicCMakeHelpers.cmake
+index 1cb6e5a2412..96db15cc76c 100644
+--- a/cmake/QtPublicCMakeHelpers.cmake
++++ b/cmake/QtPublicCMakeHelpers.cmake
+@@ -189,6 +189,30 @@ function(_qt_internal_get_check_cxx_source_compiles_out_var out_output_var out_f
+     set(${out_func_args} "${extra_func_args}" PARENT_SCOPE)
+ endfunction()
+ 
++# Sets TARGET_SUPPORTS_SHARED_LIBS to TRUE when using Emscripten to build Qt for WebAssembly
++# or user projects.
++# The upstream Emscripten cmake toolchain file sets TARGET_SUPPORTS_SHARED_LIBS to FALSE, claiming
++# true shared library support is not available.
++# See https://github.com/emscripten-core/emscripten/pull/8362#issuecomment-3050586255
++# Upstream CMake 4.2+ will set it to TRUE itself, when not using the Emscripten cmake toolchain
++# file directly.
++function(_qt_internal_handle_target_supports_shared_libs)
++    if(NOT EMSCRIPTEN)
++        return()
++    endif()
++
++    if(QT_NO_ENABLE_TARGET_SUPPORTS_SHARED_LIBS)
++        return()
++    endif()
++
++    get_property(target_supports_shared_libs GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS)
++    if(target_supports_shared_libs)
++        return()
++    endif()
++
++    set_property(GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS TRUE)
++endfunction()
++
+ # This function gets all targets below this directory
+ #
+ # Multi-value Arguments:
+diff --git a/cmake/QtWasmHelpers.cmake b/cmake/QtWasmHelpers.cmake
+index 81a77b7e207..ffa18dace33 100644
+--- a/cmake/QtWasmHelpers.cmake
++++ b/cmake/QtWasmHelpers.cmake
+@@ -90,10 +90,9 @@ function (qt_internal_setup_wasm_target_properties wasmTarget)
+         target_compile_definitions("${wasmTarget}" INTERFACE QT_HAVE_EMSCRIPTEN_ASYNCIFY)
+     endif()
+ 
+-    if(QT_FEATURE_shared)
+-
+-        set_property(GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS TRUE)
++    _qt_internal_handle_target_supports_shared_libs()
+ 
++    if(QT_FEATURE_shared)
+         set(side_modules
+             MODULE_LIBRARY SHARED_LIBRARY)
+         set(enable_side_module_if_needed
+diff --git a/src/corelib/Qt6CoreConfigExtras.cmake.in b/src/corelib/Qt6CoreConfigExtras.cmake.in
+index ce53b89a7b8..5090c3c0d8b 100644
+--- a/src/corelib/Qt6CoreConfigExtras.cmake.in
++++ b/src/corelib/Qt6CoreConfigExtras.cmake.in
+@@ -47,7 +47,6 @@ if(QT_FEATURE_permissions AND APPLE)
+ endif()
+ 
+ if(EMSCRIPTEN)
+-    set_property(GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS TRUE)
+     include("${CMAKE_CURRENT_LIST_DIR}/@QT_CMAKE_EXPORT_NAMESPACE@WasmMacros.cmake")
+ endif()
+ 
+-- 
+2.51.2
+

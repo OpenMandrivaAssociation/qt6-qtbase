@@ -1,0 +1,81 @@
+From 341d1cad29128f8000d201e7d3b944827b3a2fab Mon Sep 17 00:00:00 2001
+From: Christian Ehrlicher <ch.ehrlicher@gmx.de>
+Date: Sat, 27 Sep 2025 15:59:34 +0200
+Subject: [PATCH 281/553] QTreeView: fix calculating ViewItemPosition when
+ first column is hidden
+
+When there are only two columns and the first one is hidden, the
+calculation for ViewItemPosition was wrong.
+
+Pick-to: 6.9 6.8
+Task-number: QTBUG-140494
+Change-Id: I2d96f0ef1b40608cf8a3705891877464e93c6857
+Reviewed-by: Richard Moe Gustavsen <richard.gustavsen@qt.io>
+(cherry picked from commit 21a8a28fb041787448ca461f9c4ace99cadbf04d)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/widgets/itemviews/qtreeview.cpp             | 17 ++++++++++-------
+ .../itemviews/qtreeview/tst_qtreeview.cpp       | 11 +++++++++++
+ 2 files changed, 21 insertions(+), 7 deletions(-)
+
+diff --git a/src/widgets/itemviews/qtreeview.cpp b/src/widgets/itemviews/qtreeview.cpp
+index d8fa9a83d83..57a2d2939e9 100644
+--- a/src/widgets/itemviews/qtreeview.cpp
++++ b/src/widgets/itemviews/qtreeview.cpp
+@@ -1611,21 +1611,24 @@ void QTreeViewPrivate::calcLogicalIndices(
+         }
+     }
+ 
+-    itemPositions->resize(logicalIndices->size());
+-    for (int currentLogicalSection = 0; currentLogicalSection < logicalIndices->size(); ++currentLogicalSection) {
++    const auto indicesCount = logicalIndices->size();
++    itemPositions->resize(indicesCount);
++    for (qsizetype currentLogicalSection = 0; currentLogicalSection < indicesCount; ++currentLogicalSection) {
++        // shortcut, no need to calc anything more
++        if (indicesCount == 1 || spanning) {
++            (*itemPositions)[currentLogicalSection] = QStyleOptionViewItem::OnlyOne;
++            continue;
++        }
+         const int headerSection = logicalIndices->at(currentLogicalSection);
+         // determine the viewItemPosition depending on the position of column 0
+-        int nextLogicalSection = currentLogicalSection + 1 >= logicalIndices->size()
++        int nextLogicalSection = currentLogicalSection + 1 >= indicesCount
+                                  ? logicalIndexAfterRight
+                                  : logicalIndices->at(currentLogicalSection + 1);
+         int prevLogicalSection = currentLogicalSection - 1 < 0
+                                  ? logicalIndexBeforeLeft
+                                  : logicalIndices->at(currentLogicalSection - 1);
+         QStyleOptionViewItem::ViewItemPosition pos;
+-        if (columnCount == 1 || (nextLogicalSection == 0 && prevLogicalSection == -1)
+-            || (headerSection == 0 && nextLogicalSection == -1) || spanning)
+-            pos = QStyleOptionViewItem::OnlyOne;
+-        else if (isTreePosition(headerSection) || (nextLogicalSection != 0 && prevLogicalSection == -1))
++        if ((nextLogicalSection != 0 && prevLogicalSection == -1) || isTreePosition(headerSection))
+             pos = QStyleOptionViewItem::Beginning;
+         else if (nextLogicalSection == 0 || nextLogicalSection == -1)
+             pos = QStyleOptionViewItem::End;
+diff --git a/tests/auto/widgets/itemviews/qtreeview/tst_qtreeview.cpp b/tests/auto/widgets/itemviews/qtreeview/tst_qtreeview.cpp
+index 96c45e79448..ac50a5cdae7 100644
+--- a/tests/auto/widgets/itemviews/qtreeview/tst_qtreeview.cpp
++++ b/tests/auto/widgets/itemviews/qtreeview/tst_qtreeview.cpp
+@@ -3513,6 +3513,17 @@ void tst_QTreeView::styleOptionViewItem()
+         delegate.count = 0;
+         QTRY_COMPARE_GE(delegate.count, 2);
+     }
++
++    // special case, two column, first is hidden
++    model.clear();
++    model.appendRow({ new QStandardItem("Hidden"),
++                      new QStandardItem("OnlyOne Last") });
++    view.setColumnHidden(0, true);
++    view.setColumnHidden(1, false);
++    view.setModel(&model);
++
++    delegate.count = 0;
++    QTRY_COMPARE_GE(delegate.count, 1);
+ }
+ 
+ class task174627_TreeView : public QTreeView
+-- 
+2.51.2
+

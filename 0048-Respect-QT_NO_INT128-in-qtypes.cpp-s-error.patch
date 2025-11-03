@@ -1,0 +1,57 @@
+From ddd5da17ebb367e291abfccfe41e866aaf9506dd Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Mon, 8 Sep 2025 11:53:20 +0200
+Subject: [PATCH 048/553] Respect QT_NO_INT128 in qtypes.cpp's #error
+
+We currently don't support building Qt with GCC and -ansi (or
+-std=c++NN as opposed to -std=gnu++NN), because in that mode, the
+language still recognizes __int128_t, but the C++ standard library
+does not, leading to bloopers such as std::is_integral_v<__int128_t>
+== false or std::is_signed_v<__int128_t> == false, or simply
+std::numerical_limits<__int128_t> not being properly specialized.
+
+But we do have QT_NO_INT128, which, when defined, disabled all the Qt
+extended integer support.
+
+A user requested to allow compiling with -ansi again, to which I
+responded that they should define QT_NO_INT128 then, too, but of
+course, the sanity-check in qtypes.cpp ignored QT_NO_INT128 and would
+fire nonetheless, so this patch fixes that.
+
+[ChangeLog][QtCore] Made it possible to compile Qt with GCC in strict
+C++ mode (-ansi or -std=c++NN) again, provided QT_NO_INT128 is
+defined, too.
+
+Amends 30e04340dac26ebd09f9bc8ceb598e873ab63ba7.
+
+Pick-to: 6.9 6.8
+Task-number: QTBUG-139280
+Change-Id: I3e05d1f5e11b6a0a6a49fad53846f2b9cf0663a7
+Reviewed-by: Ivan Solovev <ivan.solovev@qt.io>
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit e6ddf72279a36c25a83ea057698345e15e18c04c)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/global/qtypes.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/corelib/global/qtypes.cpp b/src/corelib/global/qtypes.cpp
+index bd01498ce2d..6b79c1fa9ea 100644
+--- a/src/corelib/global/qtypes.cpp
++++ b/src/corelib/global/qtypes.cpp
+@@ -503,10 +503,10 @@ static_assert(sizeof(size_t) == sizeof(qsizetype)); // implied by the definition
+ static_assert((std::is_same<qsizetype, qptrdiff>::value));
+ static_assert(std::is_same_v<std::size_t, size_t>);
+ 
+-#ifdef QT_COMPILER_SUPPORTS_INT128
++#if defined(QT_COMPILER_SUPPORTS_INT128) && !defined(QT_NO_INT128)
+ # ifndef QT_SUPPORTS_INT128
+ #  error Qt needs to be compiled in a mode that enables INT128 \
+-    if the compiler supports it in principle.
++    if the compiler supports it in principle and QT_NO_INT128 is not defined.
+ # endif
+ #endif
+ 
+-- 
+2.51.2
+

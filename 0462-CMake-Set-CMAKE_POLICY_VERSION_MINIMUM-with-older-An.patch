@@ -1,0 +1,281 @@
+From 88e12a5f8a893c4d5561f0f774affc27007803a8 Mon Sep 17 00:00:00 2001
+From: Alexandru Croitor <alexandru.croitor@qt.io>
+Date: Fri, 26 Sep 2025 14:38:25 +0200
+Subject: [PATCH 462/553] CMake: Set CMAKE_POLICY_VERSION_MINIMUM with older
+ Android NDKs
+
+When using CMake 3.31+ with Android NDKs older than r28, CMake shows
+the following deprecation warning:
+
+CMake Deprecation Warning at
+ndk/27.2.12479018/build/cmake/android.toolchain.cmake:35
+  (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future
+  version of CMake.
+
+This warning appears multiple times, when configuring Qt, user
+projects, try_compile calls, etc.
+
+That's because the Android NDK cmake toolchain file sets
+cmake_minimum_required(VERSION 3.6) unconditionally, which is less
+than 3.10.
+
+To avoid the warnings, we can set the CMAKE_POLICY_VERSION_MINIMUM
+variable or environment variable to 3.10.
+The variable can only be set in CMake 4.0+ though, so it won't help
+with CMake 3.31.
+
+The assignment has to be done in multiple places:
+- When detecting Android in QtAutoDetectHelpers.cmake
+- When generating the Qt toolchain file in QtToolchainHelpers.cmake
+- When doing try_compile calls in QtFeature.cmake
+- When doing test calls in QtRunCMakeTestWrappers.cmake
+
+To be on the safer side, the following opt-outs are provided:
+- QT_NO_SET_ANDROID_CMAKE_POLICY_VERSION_MINIMUM
+    If set to true, the automatic setting of
+    CMAKE_POLICY_VERSION_MINIMUM is disabled.
+- QT_ANDROID_CMAKE_POLICY_VERSION_MINIMUM
+    A version to use instead of 3.10.
+- QT_NO_SET_RUN_CMAKE_TESTS_CMAKE_POLICY_VERSION_MINIMUM
+    Disables the assignment for RunCMake tests.
+
+These are considered at various points in the code, rather than just
+once when configuring Qt.
+
+When using NDK r28 or newer, the toolchain file sets 3.10 itself, so
+no warning appears.
+
+Pick-to: 6.8
+Change-Id: I47c6013f9cafed8836c32d2b726e75838c9d8779
+Reviewed-by: Joerg Bornemann <joerg.bornemann@qt.io>
+Reviewed-by: Assam Boudjelthia <assam.boudjelthia@qt.io>
+(cherry picked from commit 97357b5df94666c45aa0c4ca5eaeb8c950d7033b)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ cmake/QtAutoDetectHelpers.cmake               | 37 ++++++++
+ cmake/QtCMakeVersionHelpers.cmake             | 87 +++++++++++++++++++
+ cmake/QtFeature.cmake                         |  8 ++
+ cmake/QtToolchainHelpers.cmake                |  7 ++
+ src/testinternal/QtRunCMakeTestWrappers.cmake | 14 +++
+ 5 files changed, 153 insertions(+)
+
+diff --git a/cmake/QtAutoDetectHelpers.cmake b/cmake/QtAutoDetectHelpers.cmake
+index fe6087748d6..6e6473da641 100644
+--- a/cmake/QtAutoDetectHelpers.cmake
++++ b/cmake/QtAutoDetectHelpers.cmake
+@@ -64,6 +64,41 @@ function(qt_auto_detect_wasm)
+     endif()
+ endfunction()
+ 
++# Handle assignment of CMAKE_POLICY_VERSION_MINIMUM for Android NDK cmake toolchain files shipped
++# with NDK < r28, to avoid deprecation warnings.
++#
++# NOTE: If updating the version, also update
++# qt_internal_get_android_qt_default_cmake_policy_version_minimum.
++#
++# Use a macro, to make propagation of the variable in the parent scope of the calling function
++# easier.
++macro(qt_auto_detect_set_android_cmake_policy_version_minimum is_android_detected)
++    if("${is_android_detected}"
++            AND CMAKE_VERSION VERSION_GREATER_EQUAL "4.0"
++            AND NOT QT_NO_SET_ANDROID_CMAKE_POLICY_VERSION_MINIMUM
++        )
++
++        if(QT_ANDROID_CMAKE_POLICY_VERSION_MINIMUM)
++            set(min_policy_version "${QT_ANDROID_CMAKE_POLICY_VERSION_MINIMUM}")
++        elseif(CMAKE_POLICY_VERSION_MINIMUM)
++            set(min_policy_version "${CMAKE_POLICY_VERSION_MINIMUM}")
++        else()
++            set(min_policy_version "3.10")
++        endif()
++
++        message(DEBUG
++            "Setting CMAKE_POLICY_VERSION_MINIMUM to ${min_policy_version} for Android builds.")
++
++        # Set the variable in the qtbase directory scope for easier reading.
++        set(CMAKE_POLICY_VERSION_MINIMUM "${min_policy_version}" PARENT_SCOPE)
++
++        # Also set the environment variable, otherwise any try_compile project that's started
++        # by CMake itself, rather than Qt (e.g. compiler detection), will not inherit the
++        # assignment.
++        set(ENV{CMAKE_POLICY_VERSION_MINIMUM} "${min_policy_version}")
++    endif()
++endmacro()
++
+ function(qt_auto_detect_android)
+     # Don't assume an Android build if we're requesting to build Java documentation on the host.
+     if(QT_BUILD_HOST_JAVA_DOCS)
+@@ -154,6 +189,8 @@ function(qt_auto_detect_android)
+     elseif (QT_AUTODETECT_ANDROID)
+         message(STATUS "Android build detected")
+     endif()
++
++    qt_auto_detect_set_android_cmake_policy_version_minimum("${android_detected}")
+ endfunction()
+ 
+ function(qt_auto_detect_vcpkg)
+diff --git a/cmake/QtCMakeVersionHelpers.cmake b/cmake/QtCMakeVersionHelpers.cmake
+index 3a3ba0fc750..73b40b4a610 100644
+--- a/cmake/QtCMakeVersionHelpers.cmake
++++ b/cmake/QtCMakeVersionHelpers.cmake
+@@ -300,3 +300,90 @@ function(qt_internal_upgrade_cmake_policies)
+     qt_internal_get_max_new_policy_cmake_version(upper_version)
+     cmake_minimum_required(VERSION ${lower_version}...${upper_version})
+ endfunction()
++
++# Get which version to use for CMAKE_POLICY_VERSION_MINIMUM on Android.
++# Allow various overrides via QT_ANDROID_CMAKE_POLICY_VERSION_MINIMUM and reading an existing
++# CMAKE_POLICY_VERSION_MINIMUM.
++function(qt_internal_get_android_cmake_policy_version_minimum_value out_var)
++    if(QT_ANDROID_CMAKE_POLICY_VERSION_MINIMUM)
++        set(value "${QT_ANDROID_CMAKE_POLICY_VERSION_MINIMUM}")
++    elseif(CMAKE_POLICY_VERSION_MINIMUM)
++        set(value "${CMAKE_POLICY_VERSION_MINIMUM}")
++    else()
++        qt_internal_get_android_qt_default_cmake_policy_version_minimum(default_value)
++        set(value "${default_value}")
++    endif()
++
++    set(${out_var} "${value}" PARENT_SCOPE)
++endfunction()
++
++# NOTE: If updating the version, also update
++# qt_auto_detect_set_android_cmake_policy_version_minimum.
++function(qt_internal_get_android_qt_default_cmake_policy_version_minimum out_var)
++    set(${out_var} "3.10" PARENT_SCOPE)
++endfunction()
++
++# Handle assignment of CMAKE_POLICY_VERSION_MINIMUM for Android NDK cmake toolchain files shipped
++# with NDK < r28, to avoid deprecation warnings.
++# See https://github.com/android/ndk/issues/2100
++# and https://android.googlesource.com/platform/ndk/+/799e5a2d44cc2cc6c7d67f52f2d67957944b7680
++# The function is to get the appropriate var asisgnment for try_compile calls,
++# as well as writing it to the Qt generated toolchain file.
++# Various opt-outs and opt-ins are provided via QT_NO_SET_ANDROID_CMAKE_POLICY_VERSION_MINIMUM
++# and QT_ANDROID_CMAKE_POLICY_VERSION_MINIMUM.
++#
++# See also usage in qt_auto_detect_set_android_cmake_policy_version_minimum.
++function(qt_internal_get_android_cmake_policy_version_minimum_assignment out_var)
++    set(option_args "")
++    set(single_args
++        TYPE
++    )
++    set(multi_args "")
++
++    cmake_parse_arguments(PARSE_ARGV 1 arg
++        "${option_args}"
++        "${single_args}"
++        "${multi_args}"
++    )
++    _qt_internal_validate_all_args_are_parsed(arg)
++
++    set(value "")
++    if(CMAKE_VERSION VERSION_GREATER_EQUAL "4.0"
++            AND NOT QT_NO_SET_ANDROID_CMAKE_POLICY_VERSION_MINIMUM
++        )
++        qt_internal_get_android_cmake_policy_version_minimum_value(version)
++
++        if(arg_TYPE STREQUAL "COMMAND_LINE")
++            set(value "-DCMAKE_POLICY_VERSION_MINIMUM=${version}")
++
++        elseif(arg_TYPE STREQUAL "TOOLCHAIN_FILE_ASSIGNMENT")
++            set(value "
++# Avoid deprecation warnings in Android ndk cmake toolchain file < r28
++set(__qt_initially_configured_android_cmake_policy_version_minimum \"${version}\")
++if(CMAKE_VERSION VERSION_GREATER_EQUAL \"4.0\"
++        AND NOT QT_NO_SET_ANDROID_CMAKE_POLICY_VERSION_MINIMUM
++    )
++    if(QT_ANDROID_CMAKE_POLICY_VERSION_MINIMUM)
++        set(__qt_toolchain_cmake_policy_version_minimum
++            \"\${QT_ANDROID_CMAKE_POLICY_VERSION_MINIMUM}\")
++    elseif(CMAKE_POLICY_VERSION_MINIMUM)
++        set(__qt_toolchain_cmake_policy_version_minimum
++            \"\${CMAKE_POLICY_VERSION_MINIMUM}\")
++    else()
++        set(__qt_toolchain_cmake_policy_version_minimum
++            \"\${__qt_initially_configured_android_cmake_policy_version_minimum}\")
++    endif()
++    set(CMAKE_POLICY_VERSION_MINIMUM \"\${__qt_toolchain_cmake_policy_version_minimum}\")
++    message(DEBUG
++        \"Setting CMAKE_POLICY_VERSION_MINIMUM to \"
++        \"\${__qt_toolchain_cmake_policy_version_minimum}\ in toolchain file.\")
++endif()
++")
++        else()
++            message(FATAL_ERROR "Unknown TYPE value '${arg_TYPE}'. "
++                " Supported values are COMMAND_LINE and VAR_ASSIGNMENT.")
++        endif()
++    endif()
++
++    set(${out_var} "${value}" PARENT_SCOPE)
++endfunction()
+diff --git a/cmake/QtFeature.cmake b/cmake/QtFeature.cmake
+index e8ae3dd5163..de0323214c5 100644
+--- a/cmake/QtFeature.cmake
++++ b/cmake/QtFeature.cmake
+@@ -1737,6 +1737,14 @@ function(qt_get_platform_try_compile_vars out_var)
+         list(APPEND flags_cmd_line "-DCMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH:BOOL=OFF")
+     endif()
+ 
++    if(ANDROID)
++        qt_internal_get_android_cmake_policy_version_minimum_assignment(
++            android_cmake_policy_version_minimum TYPE COMMAND_LINE)
++        if(android_cmake_policy_version_minimum)
++            list(APPEND flags_cmd_line "${android_cmake_policy_version_minimum}")
++        endif()
++    endif()
++
+     set("${out_var}" "${flags_cmd_line}" PARENT_SCOPE)
+ endfunction()
+ 
+diff --git a/cmake/QtToolchainHelpers.cmake b/cmake/QtToolchainHelpers.cmake
+index 9407fd0ebe5..348a3c25603 100644
+--- a/cmake/QtToolchainHelpers.cmake
++++ b/cmake/QtToolchainHelpers.cmake
+@@ -309,6 +309,13 @@ endif()")
+             "            \"Please specify the toolchain file with -DQT_CHAINLOAD_TOOLCHAIN_FILE=<file>.\")")
+         list(APPEND init_platform "    endif()")
+         list(APPEND init_platform "endif()")
++
++        qt_internal_get_android_cmake_policy_version_minimum_assignment(
++            android_cmake_policy_version_minimum TYPE TOOLCHAIN_FILE_ASSIGNMENT)
++        if(android_cmake_policy_version_minimum)
++            list(APPEND init_platform "${android_cmake_policy_version_minimum}")
++        endif()
++
+     elseif(EMSCRIPTEN)
+         list(APPEND init_platform
+ "include(\${CMAKE_CURRENT_LIST_DIR}/QtPublicWasmToolchainHelpers.cmake)
+diff --git a/src/testinternal/QtRunCMakeTestWrappers.cmake b/src/testinternal/QtRunCMakeTestWrappers.cmake
+index fdf93692e1f..cead9e52c82 100644
+--- a/src/testinternal/QtRunCMakeTestWrappers.cmake
++++ b/src/testinternal/QtRunCMakeTestWrappers.cmake
+@@ -30,10 +30,24 @@ function(qt_internal_add_RunCMake_test test)
+ 
+     string(JOIN "\n" pre_run_code ${_qt_internal_skip_build_test_pre_run})
+ 
++    set(android_code "")
++    if(ANDROID)
++        qt_internal_get_android_cmake_policy_version_minimum_value(version)
++        string(APPEND android_code "
++# Avoid cmake policy deprecation warnings with older android NDKs appearing in stderr, which
++# causes test failures if the test doesn't set
++# set(RunCMake_TEST_OUTPUT_MERGE 1)
++# to avoid stderr being polluted.
++if(NOT QT_NO_SET_RUN_CMAKE_TESTS_CMAKE_POLICY_VERSION_MINIMUM)
++    set(ENV{CMAKE_POLICY_VERSION_MINIMUM} ${version})
++endif()")
++    endif()
++
+     _qt_internal_configure_file(CONFIGURE
+         OUTPUT "${wrapper_file}"
+         CONTENT "
+ ${pre_run_code}
++${android_code}
+ include(\"${script_path_to_include}\")
+ ")
+ 
+-- 
+2.51.2
+

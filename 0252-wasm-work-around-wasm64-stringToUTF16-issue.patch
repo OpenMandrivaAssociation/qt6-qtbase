@@ -1,0 +1,48 @@
+From 9dcd349dd12a15fb1cbb04124cea2f8414daea00 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Morten=20S=C3=B8rvig?= <morten.sorvig@qt.io>
+Date: Thu, 25 Sep 2025 21:33:48 +0200
+Subject: [PATCH 252/553] wasm: work around wasm64 stringToUTF16 issue
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Work around https://github.com/emscripten-core/emscripten/issues/25315
+by converting strings via std::u16string.
+
+Change-Id: Idcb01687cda4ae250c7b3a37098288c4fc2c9428
+Reviewed-by: Morten Johan Sørvig <morten.sorvig@qt.io>
+Reviewed-by: Even Oscar Andersen <even.oscar.andersen@qt.io>
+(cherry picked from commit 1e1e821edc08ead89e0cad66aed7790b7c58d9bf)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/kernel/qcore_wasm.cpp | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/src/corelib/kernel/qcore_wasm.cpp b/src/corelib/kernel/qcore_wasm.cpp
+index fb12ae50c3e..8df2fe3e95d 100644
+--- a/src/corelib/kernel/qcore_wasm.cpp
++++ b/src/corelib/kernel/qcore_wasm.cpp
+@@ -55,6 +55,10 @@ QString QString::fromEcmaString(emscripten::val jsString)
+ {
+     Q_ASSERT_X(jsString.isString(), Q_FUNC_INFO, "Passed object is not a string");
+ 
++#ifdef __wasm64__
++    return QString::fromStdU16String(jsString.as<std::u16string>());
++#endif
++
+     const double length = jsString["length"].as<double>();
+ 
+     Q_ASSERT_X((double(uint64_t(length)) != double(uint64_t(length) - 1)
+@@ -90,6 +94,9 @@ QString QString::fromEcmaString(emscripten::val jsString)
+ */
+ emscripten::val QString::toEcmaString() const
+ {
++#ifdef __wasm64__
++    return emscripten::val::u16string(toStdU16String().c_str());
++#endif
+     static const emscripten::val UTF16ToString(emscripten::val::module_property("UTF16ToString"));
+     return UTF16ToString(emscripten::val(quintptr(utf16())));
+ }
+-- 
+2.51.2
+

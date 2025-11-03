@@ -1,0 +1,46 @@
+From f405dea71b5f31aab53d46dc6c45deea8e50e627 Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Wed, 27 Aug 2025 22:17:47 +0200
+Subject: [PATCH 044/553] util/unicode: add missing assertions on field counts
+
+Two functions indexed into the split() fields without first checking
+whether there are sufficiently many fields to index into.
+
+Add the missing Q_ASSERT()s. Yes, a qFatal() with line-number would be
+nicer, but all other functions do it like this, so I'm asking for
+forgiveness that I do it here, too.
+
+Amends the start of the public history.
+
+Pick-to: 6.9 6.8 6.5
+Change-Id: Ief054796f2e058a331037540bc2a633ec7f64f2c
+Reviewed-by: Edward Welbourne <edward.welbourne@qt.io>
+(cherry picked from commit e51a3e052e07dfe7adc669c97f3af4e796ddaf90)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ util/unicode/main.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/util/unicode/main.cpp b/util/unicode/main.cpp
+index 7272c3cc2ce..ab6fca95888 100644
+--- a/util/unicode/main.cpp
++++ b/util/unicode/main.cpp
+@@ -1805,6 +1805,7 @@ static void readSpecialCasing()
+     readUnicodeFile("SpecialCasing.txt",
+                     [] (const QByteArray &line, int lineNo) {
+         QList<QByteArray> l = line.split(';');
++        Q_ASSERT(l.size() >= 4);
+ 
+         QByteArray condition = l.size() < 5 ? QByteArray() : l[4].trimmed();
+         if (!condition.isEmpty())
+@@ -1852,6 +1853,7 @@ static void readCaseFolding()
+     readUnicodeFile("CaseFolding.txt",
+                     [] (const QByteArray &line, int lineNo) {
+         QList<QByteArray> l = line.split(';');
++        Q_ASSERT(l.size() >= 3);
+ 
+         const int codepoint = parseHex(l[0], lineNo);
+ 
+-- 
+2.51.2
+

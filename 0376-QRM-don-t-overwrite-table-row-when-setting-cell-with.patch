@@ -1,0 +1,152 @@
+From 2d8fcbc9982a5edded3e6e169bddf3ee6fa0b00f Mon Sep 17 00:00:00 2001
+From: Volker Hilsheimer <volker.hilsheimer@qt.io>
+Date: Fri, 10 Oct 2025 11:30:34 +0200
+Subject: [PATCH 376/553] QRM: don't overwrite table row when setting cell with
+ RangeModelDataRole
+
+A list of multi-column gadgets or objects becomes a table, and writing
+Qt::RangeModelDataRole to any cell should overwrite that property, and
+not the entire gadget/object for the whole row.
+
+Add test case that fails with an attempt to replace the Object pointer
+with a string value.
+
+Change-Id: I1aded3be7c9a33e2912010c011047c887a6f2354
+Reviewed-by: Artem Dyomin <artem.dyomin@qt.io>
+(cherry picked from commit ad993827301206b9d179f35b88cbf8621b008853)
+Reviewed-by: Volker Hilsheimer <volker.hilsheimer@qt.io>
+---
+ src/corelib/itemmodels/qrangemodel_impl.h     | 72 ++++++++++---------
+ .../qrangemodel/tst_qrangemodel.cpp           | 22 ++++++
+ 2 files changed, 59 insertions(+), 35 deletions(-)
+
+diff --git a/src/corelib/itemmodels/qrangemodel_impl.h b/src/corelib/itemmodels/qrangemodel_impl.h
+index f9543cb78b4..88bed395c79 100644
+--- a/src/corelib/itemmodels/qrangemodel_impl.h
++++ b/src/corelib/itemmodels/qrangemodel_impl.h
+@@ -1336,45 +1336,47 @@ public:
+                 using wrapped_value_type = QRangeModelDetails::wrapped_t<value_type>;
+                 using multi_role = QRangeModelDetails::is_multi_role<value_type>;
+                 if constexpr (has_metaobject<value_type>) {
+-                    if (role == Qt::RangeModelDataRole) {
+-                        auto &targetRef = QRangeModelDetails::refTo(target);
+-                        constexpr auto targetMetaType = QMetaType::fromType<value_type>();
+-                        const auto dataMetaType = data.metaType();
+-                        if constexpr (!std::is_copy_assignable_v<wrapped_value_type>) {
+-                            // This covers move-only types, but also polymorph types like QObject.
+-                            // We don't support replacing a stored object with another one, as this
+-                            // makes object ownership very messy.
+-                            // fall through to error handling
+-                        } else if constexpr (QRangeModelDetails::is_wrapped<value_type>()) {
+-                            if (QRangeModelDetails::isValid(target)) {
+-                                // we need to get a wrapped value type out of the QVariant, which
+-                                // might carry a pointer. We have to try all alternatives.
+-                                if (const auto mt = QMetaType::fromType<wrapped_value_type>();
+-                                    data.canConvert(mt)) {
+-                                    targetRef = data.value<wrapped_value_type>();
+-                                    return true;
+-                                } else if (const auto mtp = QMetaType::fromType<wrapped_value_type *>();
+-                                           data.canConvert(mtp)) {
+-                                    targetRef = *data.value<wrapped_value_type *>();
+-                                    return true;
++                    if (row_traits::fixed_size() <= 1) { // multi-role value
++                        if (role == Qt::RangeModelDataRole) {
++                            auto &targetRef = QRangeModelDetails::refTo(target);
++                            constexpr auto targetMetaType = QMetaType::fromType<value_type>();
++                            const auto dataMetaType = data.metaType();
++                            if constexpr (!std::is_copy_assignable_v<wrapped_value_type>) {
++                                // This covers move-only types, but also polymorph types like QObject.
++                                // We don't support replacing a stored object with another one, as this
++                                // makes object ownership very messy.
++                                // fall through to error handling
++                            } else if constexpr (QRangeModelDetails::is_wrapped<value_type>()) {
++                                if (QRangeModelDetails::isValid(target)) {
++                                    // we need to get a wrapped value type out of the QVariant, which
++                                    // might carry a pointer. We have to try all alternatives.
++                                    if (const auto mt = QMetaType::fromType<wrapped_value_type>();
++                                        data.canConvert(mt)) {
++                                        targetRef = data.value<wrapped_value_type>();
++                                        return true;
++                                    } else if (const auto mtp = QMetaType::fromType<wrapped_value_type *>();
++                                            data.canConvert(mtp)) {
++                                        targetRef = *data.value<wrapped_value_type *>();
++                                        return true;
++                                    }
+                                 }
++                            } else if (targetMetaType == dataMetaType) {
++                                targetRef = data.value<value_type>();
++                                return true;
++                            } else if (dataMetaType.flags() & QMetaType::PointerToGadget) {
++                                targetRef = *data.value<value_type *>();
++                                return true;
+                             }
+-                        } else if (targetMetaType == dataMetaType) {
+-                            targetRef = data.value<value_type>();
+-                            return true;
+-                        } else if (dataMetaType.flags() & QMetaType::PointerToGadget) {
+-                            targetRef = *data.value<value_type *>();
+-                            return true;
++    #ifndef QT_NO_DEBUG
++                            qCritical("Not able to assign %s to %s",
++                                      qPrintable(QDebug::toString(data)), targetMetaType.name());
++    #endif
++                            return false;
+                         }
+-#ifndef QT_NO_DEBUG
+-                        qCritical("Not able to assign %s to %s",
+-                                  qPrintable(QDebug::toString(data)), targetMetaType.name());
+-#endif
+-                        return false;
+-                    } else if (row_traits::fixed_size() <= 1) {
+                         return writeRole(role, QRangeModelDetails::pointerTo(target), data);
+-                    } else if (column <= row_traits::fixed_size()
+-                            && (role == Qt::DisplayRole || role == Qt::EditRole)) {
++                    } else if (column <= row_traits::fixed_size() // multi-column
++                            && (role == Qt::DisplayRole || role == Qt::EditRole
++                                || role == Qt::RangeModelDataRole)) {
+                         return writeProperty(column, QRangeModelDetails::pointerTo(target), data);
+                     }
+                 } else if constexpr (multi_role::value) {
+diff --git a/tests/auto/corelib/itemmodels/qrangemodel/tst_qrangemodel.cpp b/tests/auto/corelib/itemmodels/qrangemodel/tst_qrangemodel.cpp
+index 292a31cc407..89bb766a506 100644
+--- a/tests/auto/corelib/itemmodels/qrangemodel/tst_qrangemodel.cpp
++++ b/tests/auto/corelib/itemmodels/qrangemodel/tst_qrangemodel.cpp
+@@ -51,6 +51,8 @@ private slots:
+     void clearItemData();
+     void modelData_data() { createTestData(); }
+     void modelData();
++    void rangeModelDataInTable();
++
+     void insertRows_data() { createTestData(); }
+     void insertRows();
+     void removeRows_data() { createTestData(); }
+@@ -951,6 +953,26 @@ void tst_QRangeModel::modelData()
+     }
+ }
+ 
++void tst_QRangeModel::rangeModelDataInTable()
++{
++    std::vector<Object *> table = {
++        new Object,
++        new Object,
++        new Object
++    };
++    QRangeModel model(std::ref(table));
++    QCOMPARE(model.rowCount(), 3);
++    QCOMPARE(model.columnCount(), 2);
++
++    const QModelIndex topLeft = model.index(0, 0);
++    const QModelIndex bottomRight = model.index(2, 1);
++    QCOMPARE(model.data(topLeft), table.at(topLeft.row())->string());
++    QCOMPARE(model.data(bottomRight), table.at(bottomRight.row())->number());
++
++    QVERIFY(model.setData(topLeft, "fortyTwo", Qt::RangeModelDataRole));
++    QVERIFY(model.setData(bottomRight, 42, Qt::RangeModelDataRole));
++}
++
+ void tst_QRangeModel::insertRows()
+ {
+     QFETCH(Factory, factory);
+-- 
+2.51.2
+

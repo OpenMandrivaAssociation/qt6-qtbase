@@ -1,0 +1,70 @@
+From 4776071fd63b2d4e077737b9a9c261879cbf5c15 Mon Sep 17 00:00:00 2001
+From: Thiago Macieira <thiago.macieira@intel.com>
+Date: Wed, 17 Sep 2025 20:51:03 -0700
+Subject: [PATCH 166/553] QFSFileEngine: remove unused open() overloads
+
+These two-arg open() functions aren't used anywhere. I couldn't find the
+last obvious use of either, so gave up doing further searches as
+unnecessary work.
+
+Pick-to: 6.9 6.8
+Change-Id: Ie02540f8ed968591d009fffd6bbf11b568f6916f
+Reviewed-by: Ahmad Samir <a.samirh78@gmail.com>
+(cherry picked from commit de47f5b7696483c3d5876cef82dbb35ab1a35f1e)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/io/qfsfileengine.cpp | 10 ----------
+ src/corelib/io/qfsfileengine_p.h |  2 --
+ 2 files changed, 12 deletions(-)
+
+diff --git a/src/corelib/io/qfsfileengine.cpp b/src/corelib/io/qfsfileengine.cpp
+index acb9675c2de..0771c15584b 100644
+--- a/src/corelib/io/qfsfileengine.cpp
++++ b/src/corelib/io/qfsfileengine.cpp
+@@ -225,11 +225,6 @@ bool QFSFileEngine::open(QIODevice::OpenMode openMode,
+     Opens the file handle \a fh in \a openMode mode. Returns \c true on
+     success; otherwise returns \c false.
+ */
+-bool QFSFileEngine::open(QIODevice::OpenMode openMode, FILE *fh)
+-{
+-    return open(openMode, fh, QFile::DontCloseHandle);
+-}
+-
+ bool QFSFileEngine::open(QIODevice::OpenMode openMode, FILE *fh, QFile::FileHandleFlags handleFlags)
+ {
+     Q_ASSERT_X(openMode & QIODevice::Unbuffered, "QFSFileEngine::open",
+@@ -290,11 +285,6 @@ bool QFSFileEnginePrivate::openFh(QIODevice::OpenMode openMode, FILE *fh)
+     Opens the file descriptor \a fd in \a openMode mode. Returns \c true
+     on success; otherwise returns \c false.
+ */
+-bool QFSFileEngine::open(QIODevice::OpenMode openMode, int fd)
+-{
+-    return open(openMode, fd, QFile::DontCloseHandle);
+-}
+-
+ bool QFSFileEngine::open(QIODevice::OpenMode openMode, int fd, QFile::FileHandleFlags handleFlags)
+ {
+     Q_D(QFSFileEngine);
+diff --git a/src/corelib/io/qfsfileengine_p.h b/src/corelib/io/qfsfileengine_p.h
+index d002fefa181..2de6cb0cb73 100644
+--- a/src/corelib/io/qfsfileengine_p.h
++++ b/src/corelib/io/qfsfileengine_p.h
+@@ -51,7 +51,6 @@ public:
+     ~QFSFileEngine();
+ 
+     bool open(QIODevice::OpenMode openMode, std::optional<QFile::Permissions> permissions) override;
+-    bool open(QIODevice::OpenMode flags, FILE *fh);
+     bool close() override;
+     bool flush() override;
+     bool syncToDisk() override;
+@@ -103,7 +102,6 @@ public:
+     bool supportsExtension(Extension extension) const override;
+ 
+     //FS only!!
+-    bool open(QIODevice::OpenMode flags, int fd);
+     bool open(QIODevice::OpenMode flags, int fd, QFile::FileHandleFlags handleFlags);
+     bool open(QIODevice::OpenMode flags, FILE *fh, QFile::FileHandleFlags handleFlags);
+     static bool setCurrentPath(const QString &path);
+-- 
+2.51.2
+

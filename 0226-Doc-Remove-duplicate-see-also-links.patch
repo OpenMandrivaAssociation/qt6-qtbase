@@ -1,0 +1,84 @@
+From 242e6a21b0e74a8eaadcd655c27b856768b422af Mon Sep 17 00:00:00 2001
+From: David Boddie <david.boddie@qt.io>
+Date: Tue, 10 Jun 2025 14:01:30 +0200
+Subject: [PATCH 226/553] Doc: Remove duplicate "see also" links
+
+Also make certain links specific to avoid ambiguity.
+
+Pick-to: 6.9
+Change-Id: I77499a1c9c4f4356e2f9957092c16c6572a13569
+Task-number: QTBUG-137048
+Reviewed-by: Paul Wicking <paul.wicking@qt.io>
+Reviewed-by: Marc Mutz <marc.mutz@qt.io>
+(cherry picked from commit bb30dc9f00598e1f2e079c847c9d784050fe0a66)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/serialization/qcbormap.cpp   | 6 ++----
+ src/corelib/serialization/qcborvalue.cpp | 6 ++----
+ src/corelib/serialization/qjsonarray.cpp | 2 +-
+ 3 files changed, 5 insertions(+), 9 deletions(-)
+
+diff --git a/src/corelib/serialization/qcbormap.cpp b/src/corelib/serialization/qcbormap.cpp
+index e6075dcfc36..32d6d563ac4 100644
+--- a/src/corelib/serialization/qcbormap.cpp
++++ b/src/corelib/serialization/qcbormap.cpp
+@@ -1234,8 +1234,7 @@ QCborValue QCborMap::extract(iterator it)
+ 
+     For more information on CBOR equality in Qt, see, QCborValue::compare().
+ 
+-    \sa compare(), QCborValue::operator==(), QCborMap::operator==(),
+-        operator!=(), operator<()
++    \sa compare(), QCborValue::operator==(), operator!=(), operator<()
+  */
+ 
+ /*!
+@@ -1253,8 +1252,7 @@ QCborValue QCborMap::extract(iterator it)
+ 
+     For more information on CBOR equality in Qt, see, QCborValue::compare().
+ 
+-    \sa compare(), QCborValue::operator==(), QCborMap::operator==(),
+-        operator==(), operator<()
++    \sa compare(), QCborValue::operator==(), operator==(), operator<()
+  */
+ 
+ /*!
+diff --git a/src/corelib/serialization/qcborvalue.cpp b/src/corelib/serialization/qcborvalue.cpp
+index 5b7ec705079..f905b97a164 100644
+--- a/src/corelib/serialization/qcborvalue.cpp
++++ b/src/corelib/serialization/qcborvalue.cpp
+@@ -1350,8 +1350,7 @@ inline int QCborContainerPrivate::compareElement_helper(const QCborContainerPriv
+ 
+     For more information on CBOR equality in Qt, see, compare().
+ 
+-    \sa compare(), QCborValue::operator==(), QCborMap::operator==(),
+-        operator!=(), operator<()
++    \sa compare(), QCborMap::operator==(), operator!=(), operator<()
+  */
+ 
+ /*!
+@@ -1363,8 +1362,7 @@ inline int QCborContainerPrivate::compareElement_helper(const QCborContainerPriv
+ 
+     For more information on CBOR equality in Qt, see, QCborValue::compare().
+ 
+-    \sa compare(), QCborValue::operator==(), QCborMap::operator==(),
+-        operator==(), operator<()
++    \sa compare(), QCborMap::operator==(), operator==(), operator<()
+  */
+ bool comparesEqual(const QCborValue &lhs,
+                    const QCborValue &rhs) noexcept
+diff --git a/src/corelib/serialization/qjsonarray.cpp b/src/corelib/serialization/qjsonarray.cpp
+index ec376212701..5e04c4160b4 100644
+--- a/src/corelib/serialization/qjsonarray.cpp
++++ b/src/corelib/serialization/qjsonarray.cpp
+@@ -407,7 +407,7 @@ void QJsonArray::insert(qsizetype i, const QJsonValue &value)
+     Inserts \a value before the position pointed to by \a before, and returns an iterator
+     pointing to the newly inserted item.
+ 
+-    \sa erase(), insert()
++    \sa erase(), insert(qsizetype, const QJsonValue &)
+ */
+ 
+ /*!
+-- 
+2.51.2
+

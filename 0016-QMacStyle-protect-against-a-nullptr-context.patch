@@ -1,0 +1,137 @@
+From bc9732701b4f47964be6720eef5988df95510593 Mon Sep 17 00:00:00 2001
+From: Timur Pocheptsov <timur.pocheptsov@qt.io>
+Date: Fri, 5 Sep 2025 14:32:45 +0200
+Subject: [PATCH 016/553] QMacStyle: protect against a nullptr context
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Found in the stylesheet auto-test that started crashing after a recent
+change (introducing a manual slider painting). The test is using QImage
+with format QImage::Format_ARGB32 to render to and CGBitmapCreateContext
+fails for such format. Previously was not a problem, since we did not
+use the context directly.
+
+Protect against nullptr in the NSView drawing function and in functions
+like drawControl etc. (but do not skip the parts using QPainter without
+triggering NSControl/CGContextRef-related code-paths).
+
+Fixes: QTBUG-139983
+Pick-to: 6.9 6.8 6.5
+Change-Id: Iee1aa23549b29b489b870be3c7660700eba2cbc2
+Reviewed-by: Tor Arne Vestbø <tor.arne.vestbo@qt.io>
+(cherry picked from commit c51b2b1bfaee1ed674e6d860196f6d6db4d50ec8)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/plugins/styles/mac/qmacstyle_mac.mm | 27 ++++++++++++++++++++++---
+ 1 file changed, 24 insertions(+), 3 deletions(-)
+
+diff --git a/src/plugins/styles/mac/qmacstyle_mac.mm b/src/plugins/styles/mac/qmacstyle_mac.mm
+index 267f62bec3a..63f63cd994e 100644
+--- a/src/plugins/styles/mac/qmacstyle_mac.mm
++++ b/src/plugins/styles/mac/qmacstyle_mac.mm
+@@ -17,6 +17,7 @@
+ #include <QtCore/qoperatingsystemversion.h>
+ #include <QtCore/qvariant.h>
+ #include <QtCore/qvarlengtharray.h>
++#include <QtCore/qloggingcategory.h>
+ 
+ #include <QtCore/private/qcore_mac_p.h>
+ 
+@@ -48,6 +49,8 @@
+ 
+ QT_USE_NAMESPACE
+ 
++Q_STATIC_LOGGING_CATEGORY(lcMacStyle, "qt.widgets.styles.macos");
++
+ @interface QT_MANGLE_NAMESPACE(QIndeterminateProgressIndicator) : NSProgressIndicator
+ 
+ @property (readonly, nonatomic) NSInteger animators;
+@@ -2135,6 +2138,10 @@ void QMacStylePrivate::drawNSViewInRect(NSView *view, const QRectF &rect, QPaint
+                                         __attribute__((noescape)) DrawRectBlock drawRectBlock) const
+ {
+     QMacCGContext ctx(p);
++    if (!ctx) {
++        qCWarning(lcMacStyle) << "Invalid (nullptr) graphics context, cannot draw NSView.";
++        return;
++    }
+     setupNSGraphicsContext(ctx, YES);
+ 
+     // FIXME: The rect that we get in is relative to the widget that we're drawing
+@@ -3167,6 +3174,9 @@ void QMacStyle::drawPrimitive(PrimitiveElement pe, const QStyleOption *opt, QPai
+ {
+     Q_D(const QMacStyle);
+     QMacCGContext cg(p);
++    if (!cg)
++        qCWarning(lcMacStyle) << "drawPrimitive:" << pe << "invalid (nullptr) graphics context";
++
+     QWindow *window = w && w->window() ? w->window()->windowHandle() : nullptr;
+     d->resolveCurrentNSView(window);
+     switch (pe) {
+@@ -3401,6 +3411,8 @@ void QMacStyle::drawPrimitive(PrimitiveElement pe, const QStyleOption *opt, QPai
+         }
+         break;
+     case PE_IndicatorMenuCheckMark: {
++        if (!cg) // CoreGraphics does not like nullptr contexts.
++            break;
+         QColor pc;
+         if (opt->state & State_On)
+             pc = opt->palette.highlightedText().color();
+@@ -3487,6 +3499,8 @@ void QMacStyle::drawPrimitive(PrimitiveElement pe, const QStyleOption *opt, QPai
+     case PE_IndicatorBranch: {
+         if (!(opt->state & State_Children))
+             break;
++        if (!cg)
++            break;
+         const auto cw = QMacStylePrivate::CocoaControl(QMacStylePrivate::Button_Disclosure, QStyleHelper::SizeLarge);
+         NSButtonCell *triangleCell = static_cast<NSButtonCell *>(d->cocoaCell(cw));
+         [triangleCell setState:(opt->state & State_Open) ? NSControlStateValueOn : NSControlStateValueOff];
+@@ -3705,6 +3719,9 @@ void QMacStyle::drawControl(ControlElement ce, const QStyleOption *opt, QPainter
+     Q_D(const QMacStyle);
+     const QMacAutoReleasePool pool;
+     QMacCGContext cg(p);
++    if (!cg)
++        qCWarning(lcMacStyle) << "drawControl:" << ce << "invalid (nullptr) graphics context";
++
+     QWindow *window = w && w->window() ? w->window()->windowHandle() : nullptr;
+     d->resolveCurrentNSView(window);
+     switch (ce) {
+@@ -4705,7 +4722,7 @@ void QMacStyle::drawControl(ControlElement ce, const QStyleOption *opt, QPainter
+ 
+                 if (qt_apple_runningWithLiquidGlass()) {
+                     d->drawProgressBar(p, pb);
+-                } else {
++                } else if (cg) {
+                     if (vertical)
+                       rect = rect.transposed();
+                     d->setupNSGraphicsContext(cg, NO);
+@@ -5440,12 +5457,15 @@ void QMacStyle::drawComplexControl(ComplexControl cc, const QStyleOptionComplex
+ {
+     Q_D(const QMacStyle);
+     QMacCGContext cg(p);
++    if (!cg)
++        qCWarning(lcMacStyle) << "drawComplexControl:" << cc << "invalid (nullptr) graphics context";
+     QWindow *window = widget && widget->window() ? widget->window()->windowHandle() : nullptr;
+     d->resolveCurrentNSView(window);
+     switch (cc) {
+     case CC_ScrollBar:
+         if (const QStyleOptionSlider *sb = qstyleoption_cast<const QStyleOptionSlider *>(opt)) {
+-
++            if (!cg) // Scroll bar rendering is either using NSControl or CoreGraphics directly ...
++                break;
+             const bool drawTrack = sb->subControls & SC_ScrollBarGroove;
+             const bool drawKnob = sb->subControls & SC_ScrollBarSlider && sb->minimum != sb->maximum;
+             if (!drawTrack && !drawKnob)
+@@ -5802,7 +5822,8 @@ void QMacStyle::drawComplexControl(ComplexControl cc, const QStyleOptionComplex
+             if (sb->subControls & (SC_SpinBoxUp | SC_SpinBoxDown)) {
+                 const QRect updown = proxy()->subControlRect(CC_SpinBox, sb, SC_SpinBoxUp, widget)
+                                    | proxy()->subControlRect(CC_SpinBox, sb, SC_SpinBoxDown, widget);
+-
++                if (!cg) // Using controls or CoreGraphics, needs a valid context.
++                    break;
+                 d->setupNSGraphicsContext(cg, NO);
+ 
+                 const auto aquaSize = d->effectiveAquaSizeConstrain(opt, widget);
+-- 
+2.51.2
+

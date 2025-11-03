@@ -1,0 +1,51 @@
+From d47952e7a9f60b3977ed71cbd1d58b88f2d9df36 Mon Sep 17 00:00:00 2001
+From: Thiago Macieira <thiago.macieira@intel.com>
+Date: Sun, 5 Oct 2025 17:25:25 -0700
+Subject: [PATCH 290/553] QAbstractSocket/QHostAddress: ensure definition of
+ static constexprs (II)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Amends 043590b891a98350edb23715a86f4af6d3f1ecdb, which wasn't complete
+because half the change was in the wrong commit.
+
+  Amends commit 969337bcfd6af6d91b988e4b412703274a0b5877, which introduced
+  these constants. We've since learned that those either need an
+  out-of-line definition or need to be in a non-exported base[1]. This
+  commit uses both strategies: an out-of-line definition for the symbols
+  that are used in Qt 6 and thus have an ABI requirement to stay the same,
+  and moving to a base class for the Qt 7 ones, which don't yet.
+
+  [1] https://lists.qt-project.org/pipermail/development/2024-January/044888.html
+
+Pick-to: 6.8 6.5
+Change-Id: Iaad6d22475eba5eb5d16fffd2a31a74d2633a7b8
+Reviewed-by: Mårten Nordheim <marten.nordheim@qt.io>
+(cherry picked from commit d5f8292f89997f9916f49db166ffb18028276dfa)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/network/kernel/qhostaddress.cpp | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/src/network/kernel/qhostaddress.cpp b/src/network/kernel/qhostaddress.cpp
+index 9b3ae42bd2f..24b7e4ccebb 100644
+--- a/src/network/kernel/qhostaddress.cpp
++++ b/src/network/kernel/qhostaddress.cpp
+@@ -29,6 +29,13 @@
+ 
+ QT_BEGIN_NAMESPACE
+ 
++#if QT_VERSION < QT_VERSION_CHECK(7, 0, 0)
++const QAbstractSocket::NetworkLayerProtocol QHostAddress::IPv4Protocol;
++const QAbstractSocket::NetworkLayerProtocol QHostAddress::IPv6Protocol;
++const QAbstractSocket::NetworkLayerProtocol QHostAddress::AnyIPProtocol;
++const QAbstractSocket::NetworkLayerProtocol QHostAddress::UnknownNetworkLayerProtocol;
++#endif
++
+ QHostAddressPrivate::QHostAddressPrivate()
+     : a(0), protocol(QHostAddress::UnknownNetworkLayerProtocol)
+ {
+-- 
+2.51.2
+

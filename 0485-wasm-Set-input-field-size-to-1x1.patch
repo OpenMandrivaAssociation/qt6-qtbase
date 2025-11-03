@@ -1,0 +1,38 @@
+From 3c8256c9d24eb63ccabaea97407f92f069b746dc Mon Sep 17 00:00:00 2001
+From: Even Oscar Andersen <even.oscar.andersen@qt.io>
+Date: Tue, 21 Oct 2025 13:21:56 +0200
+Subject: [PATCH 485/553] wasm: Set input field size to 1x1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+It seems, for 6.10.x, the size of the input field affects
+the user interface. Set to 1x1 to minimize the effect.
+
+Fixes: QTBUG-141054
+Change-Id: Id9cc0a84d7cf2f700c4df2155210569b1372e19f
+Reviewed-by: Morten Johan Sørvig <morten.sorvig@qt.io>
+(cherry picked from commit 354e84f7d5b11b48f211cf826bf2d4628057f28a)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/plugins/platforms/wasm/qwasminputcontext.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/plugins/platforms/wasm/qwasminputcontext.cpp b/src/plugins/platforms/wasm/qwasminputcontext.cpp
+index 191e2947629..076a735b247 100644
+--- a/src/plugins/platforms/wasm/qwasminputcontext.cpp
++++ b/src/plugins/platforms/wasm/qwasminputcontext.cpp
+@@ -221,8 +221,8 @@ void QWasmInputContext::updateGeometry()
+         qCDebug(qLcQpaWasmInputContext) << Q_FUNC_INFO << "propagating inputItemRectangle:" << inputItemRectangle;
+         m_inputElement["style"].set("left", std::to_string(inputItemRectangle.x()) + "px");
+         m_inputElement["style"].set("top", std::to_string(inputItemRectangle.y()) + "px");
+-        m_inputElement["style"].set("width", std::to_string(inputItemRectangle.width()) + "px");
+-        m_inputElement["style"].set("height", std::to_string(inputItemRectangle.height()) + "px");
++        m_inputElement["style"].set("width", "1px");
++        m_inputElement["style"].set("height", "1px");
+     }
+ }
+ 
+-- 
+2.51.2
+

@@ -1,0 +1,118 @@
+From 04c750ffdf262960eb19713cec57dfdc61e71339 Mon Sep 17 00:00:00 2001
+From: Tim Blechmann <tim.blechmann@qt.io>
+Date: Wed, 29 Oct 2025 09:43:31 +0800
+Subject: [PATCH 545/553] QLibrary: expose QLibraryPrivate::unload to autotests
+
+tst_QLibrary::cleanup did not have any effect, as QLibrary::unload does
+not unload anything, if the library has not been loaded via this
+instances. There is no public API to "attach" a QLibrary instance to a
+library.
+Exposing QLibraryPrivate::unload will allow us to unload libraries that
+the unit tests might be leaking.
+
+Change-Id: I0ac32ac5dcf681f117e88890eb529000b7d583e6
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit ed8206e039d9d279360f9b3858b8d83edd289b27)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/plugin/qlibrary.h                         | 1 +
+ src/corelib/plugin/qlibrary_p.h                       | 7 ++++++-
+ tests/auto/corelib/plugin/CMakeLists.txt              | 4 +++-
+ tests/auto/corelib/plugin/qlibrary/tst/CMakeLists.txt | 2 +-
+ tests/auto/corelib/plugin/qlibrary/tst_qlibrary.cpp   | 8 +++++++-
+ 5 files changed, 18 insertions(+), 4 deletions(-)
+
+diff --git a/src/corelib/plugin/qlibrary.h b/src/corelib/plugin/qlibrary.h
+index f31047b214a..95c14178b22 100644
+--- a/src/corelib/plugin/qlibrary.h
++++ b/src/corelib/plugin/qlibrary.h
+@@ -63,6 +63,7 @@ private:
+         Loaded
+     };
+ 
++    friend class QLibraryPrivate;
+     QTaggedPointer<QLibraryPrivate, LoadStatusTag> d = nullptr;
+     Q_DISABLE_COPY(QLibrary)
+ };
+diff --git a/src/corelib/plugin/qlibrary_p.h b/src/corelib/plugin/qlibrary_p.h
+index b4e29a79e28..2331c86d844 100644
+--- a/src/corelib/plugin/qlibrary_p.h
++++ b/src/corelib/plugin/qlibrary_p.h
+@@ -67,7 +67,7 @@ public:
+ 
+     bool load();
+     QtPluginInstanceFunction loadPlugin(); // loads and resolves instance
+-    bool unload(UnloadFlag flag = UnloadSys);
++    Q_AUTOTEST_EXPORT bool unload(UnloadFlag flag = UnloadSys);
+     void release();
+     QFunctionPointer resolve(const char *);
+ 
+@@ -103,6 +103,11 @@ public:
+     void updatePluginState();
+     bool isPlugin();
+ 
++    static QLibraryPrivate* get(QLibrary* lib)
++    {
++        return lib->d.data();
++    }
++
+ private:
+     explicit QLibraryPrivate(const QString &canonicalFileName, const QString &version, QLibrary::LoadHints loadHints);
+     ~QLibraryPrivate();
+diff --git a/tests/auto/corelib/plugin/CMakeLists.txt b/tests/auto/corelib/plugin/CMakeLists.txt
+index 5518231ace2..82fa9d18749 100644
+--- a/tests/auto/corelib/plugin/CMakeLists.txt
++++ b/tests/auto/corelib/plugin/CMakeLists.txt
+@@ -7,7 +7,9 @@ endif()
+ add_subdirectory(quuid)
+ if(QT_FEATURE_library)
+     add_subdirectory(qpluginloader)
+-    add_subdirectory(qlibrary)
++    if(QT_FEATURE_private_tests)
++        add_subdirectory(qlibrary)
++    endif()
+ endif()
+ if(QT_BUILD_SHARED_LIBS AND QT_FEATURE_library)
+     add_subdirectory(qplugin)
+diff --git a/tests/auto/corelib/plugin/qlibrary/tst/CMakeLists.txt b/tests/auto/corelib/plugin/qlibrary/tst/CMakeLists.txt
+index fc452f37f53..62dd4a06c17 100644
+--- a/tests/auto/corelib/plugin/qlibrary/tst/CMakeLists.txt
++++ b/tests/auto/corelib/plugin/qlibrary/tst/CMakeLists.txt
+@@ -13,7 +13,7 @@ qt_internal_add_test(tst_qlibrary
+     SOURCES
+         ../tst_qlibrary.cpp
+     TESTDATA ${test_data}
+-    LIBRARIES mylib mylib2
++    LIBRARIES mylib mylib2 Qt::CorePrivate
+ )
+ 
+ add_dependencies(tst_qlibrary mylib mylib2)
+diff --git a/tests/auto/corelib/plugin/qlibrary/tst_qlibrary.cpp b/tests/auto/corelib/plugin/qlibrary/tst_qlibrary.cpp
+index 5ae49ff1707..d708f6def1c 100644
+--- a/tests/auto/corelib/plugin/qlibrary/tst_qlibrary.cpp
++++ b/tests/auto/corelib/plugin/qlibrary/tst_qlibrary.cpp
+@@ -6,6 +6,7 @@
+ #include <qdir.h>
+ #include <qlibrary.h>
+ #include <QtCore/QRegularExpression>
++#include <QtCore/private/qlibrary_p.h>
+ 
+ 
+ // Helper macros to let us know if some suffixes and prefixes are valid
+@@ -162,7 +163,12 @@ void tst_QLibrary::cleanup()
+ 
+     };
+     for (const auto &entry : libs) {
+-        do {} while (QLibrary(entry.name, entry.version).unload());
++        bool unloaded = false;
++        do {
++            QLibrary lib(entry.name, entry.version);
++            auto libPrivate = QLibraryPrivate::get(&lib);
++            unloaded = libPrivate->unload();
++        } while (unloaded);
+     }
+ }
+ 
+-- 
+2.51.2
+

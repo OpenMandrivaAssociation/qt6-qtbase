@@ -1,0 +1,85 @@
+From 579011c7e08a14f0b933a1b236c90b9b2dd40fc1 Mon Sep 17 00:00:00 2001
+From: Friedemann Kleint <Friedemann.Kleint@qt.io>
+Date: Wed, 8 Oct 2025 13:28:31 +0200
+Subject: [PATCH 328/553] Fix scrolling of QTableWidget within QGraphicsView
+
+In the QGraphicsView branch of QWidget::scroll, scroll the children,
+too.
+
+Task-number: QTBUG-138381
+Change-Id: I77cb9288d5b9630dca659d7ef987d11914ed1e43
+Reviewed-by: Christian Ehrlicher <ch.ehrlicher@gmx.de>
+Reviewed-by: Volker Hilsheimer <volker.hilsheimer@qt.io>
+(cherry picked from commit fe65df06c346086cccc658b0a42300766ffed12d)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/widgets/kernel/qwidget.cpp                |  1 +
+ .../tst_qgraphicsproxywidget.cpp              | 27 +++++++++++++++++++
+ 2 files changed, 28 insertions(+)
+
+diff --git a/src/widgets/kernel/qwidget.cpp b/src/widgets/kernel/qwidget.cpp
+index 2835884ea7e..42e6574bd95 100644
+--- a/src/widgets/kernel/qwidget.cpp
++++ b/src/widgets/kernel/qwidget.cpp
+@@ -11135,6 +11135,7 @@ void QWidget::scroll(int dx, int dy)
+         for (const QRect &rect : d->dirty)
+             proxy->update(rect.translated(dx, dy));
+         proxy->scroll(dx, dy, proxy->subWidgetRect(this));
++        d->scrollChildren(dx, dy); // QTBUG-138381: scroll item view cell widgets
+         return;
+     }
+ #endif
+diff --git a/tests/auto/widgets/graphicsview/qgraphicsproxywidget/tst_qgraphicsproxywidget.cpp b/tests/auto/widgets/graphicsview/qgraphicsproxywidget/tst_qgraphicsproxywidget.cpp
+index 5295a2f8740..17acdea014e 100644
+--- a/tests/auto/widgets/graphicsview/qgraphicsproxywidget/tst_qgraphicsproxywidget.cpp
++++ b/tests/auto/widgets/graphicsview/qgraphicsproxywidget/tst_qgraphicsproxywidget.cpp
+@@ -22,6 +22,7 @@
+ #include <QtWidgets/qscrollbar.h>
+ #include <QtWidgets/qspinbox.h>
+ #include <QtWidgets/qstylefactory.h>
++#include <QtWidgets/qtablewidget.h>
+ 
+ #include <QtGui/qevent.h>
+ #include <QtGui/private/qhighdpiscaling_p.h>
+@@ -173,6 +174,7 @@ private slots:
+ #endif
+     void forwardTouchEvent();
+     void touchEventPropagation();
++    void itemViewScroll();
+ };
+ 
+ // Subclass that exposes the protected functions.
+@@ -4070,5 +4072,30 @@ void tst_QGraphicsProxyWidget::touchEventPropagation()
+     QCOMPARE(clickedSpy.size(), 0); // multi-touch event does not synthesize a mouse event
+ }
+ 
++void tst_QGraphicsProxyWidget::itemViewScroll()
++{
++    // QTBUG-138381: When scrolling an embedded item view, the cell widgets should move as well.
++    QGraphicsScene scene;
++    QGraphicsView view(&scene);
++
++    QLabel *label{};
++    auto *table = new QTableWidget(1, 10);
++    for (int i = 0; i < 10; ++i) {
++        label = new QLabel(QString::number(1 + i));
++        table->setCellWidget(0, i, label);
++    }
++    scene.addWidget(table);
++    table->resize(300, 200);
++    table->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
++    table->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
++    view.resize(600, 600);
++    view.show();
++    QVERIFY(QTest::qWaitForWindowActive(&view));
++    const int oldPos = label->x();
++    auto *horizontalScrollBar = table->horizontalScrollBar();
++    horizontalScrollBar->setValue(horizontalScrollBar->maximum() * 3 / 2);
++    QTRY_VERIFY(label->x() < oldPos);
++}
++
+ QTEST_MAIN(tst_QGraphicsProxyWidget)
+ #include "tst_qgraphicsproxywidget.moc"
+-- 
+2.51.2
+

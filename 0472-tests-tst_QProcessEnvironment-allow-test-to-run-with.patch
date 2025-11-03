@@ -1,0 +1,36 @@
+From 06578440098bed19b1aa7a46d4b736d4ebf208c4 Mon Sep 17 00:00:00 2001
+From: Tim Blechmann <tim.blechmann@qt.io>
+Date: Thu, 23 Oct 2025 12:50:07 +0800
+Subject: [PATCH 472/553] tests: tst_QProcessEnvironment - allow test to run
+ with -repeat
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The putenv caused test failures with -repeat. This is a little too
+strict and it would be more graceful to QSKIP instead.
+
+Change-Id: I835ef384518f4f3c466feda6fc8cdf99d6f6deda
+Reviewed-by: Tor Arne Vestbø <tor.arne.vestbo@qt.io>
+(cherry picked from commit 6a814c56642c7623c613944d2525451542eb9982)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../corelib/io/qprocessenvironment/tst_qprocessenvironment.cpp  | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/auto/corelib/io/qprocessenvironment/tst_qprocessenvironment.cpp b/tests/auto/corelib/io/qprocessenvironment/tst_qprocessenvironment.cpp
+index 560d4196b28..6a898e7af0d 100644
+--- a/tests/auto/corelib/io/qprocessenvironment/tst_qprocessenvironment.cpp
++++ b/tests/auto/corelib/io/qprocessenvironment/tst_qprocessenvironment.cpp
+@@ -291,7 +291,7 @@ void tst_QProcessEnvironment::putenv()
+     static bool testRan = false;
+ 
+     if (testRan)
+-        QFAIL("You cannot run this test more than once, since we modify the environment");
++        QSKIP("You cannot run this test more than once, since we modify the environment");
+     testRan = true;
+ 
+     QByteArray valBefore = qgetenv(envname);
+-- 
+2.51.2
+

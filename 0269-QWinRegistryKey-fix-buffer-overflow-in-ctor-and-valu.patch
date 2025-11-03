@@ -1,0 +1,253 @@
+From 20457b4cb431fc65cb86d600ac768d25429f3c35 Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Tue, 30 Sep 2025 08:02:11 +0200
+Subject: [PATCH 269/553] QWinRegistryKey: fix buffer overflow in ctor and
+ value()
+
+String views (like QString) need not be NULL-terminated. However, on
+QString, calling utf16() will NULL-terminate; but not so on
+QStringView.
+
+If the functions are passed non-NULL-terminated string views, they may
+either overflow the underlying buffer (causing UB) or read past the
+intended end of the data, accessing a different key (e.g. "data32"
+instead of "data").
+
+Fix by porting from QStringView to {const wchar_t*, QString}
+
+String views work very badly when the function taking them needs to
+call C APIs that expects NULL-terminated strings, because string
+views, in general, are not NULL-terminated. So don't use them
+here. Use const wchar_t*, and, for the time being, overload with
+QString. The goal should be to kick the QString uses out and replace
+them with std::wstring, to reduce the impedance mismatch of
+char16_t-using QString and wchar_t-using Win API.
+
+All calls are either passing QString or const wchar_t* already, except
+the test, which passed QStringView, so ported that to const wchar_t*.
+
+Amends 05a829f923a88e69b2ceaa372820a2dcb8c083cd.
+
+As a drive-by, Extract Method to_optional<T>() from value<T>(), and,
+in it, use the new-ish rvalue overload of qvariant_cast, amending
+40523b68c14bf618bdc2d5438deebf34627be3af.
+
+Pick-to: 6.8 6.5
+Change-Id: If27a0cb5e1e10e664b794593a5dad5ee85d9e678
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit 86f0f1aebe36d04971052d81ece361a558a47eec)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/kernel/qwinregistry.cpp           | 37 ++++++++++++++-----
+ src/corelib/kernel/qwinregistry_p.h           | 33 +++++++++++++----
+ .../qwinregistrykey/tst_qwinregistrykey.cpp   |  8 ++--
+ 3 files changed, 57 insertions(+), 21 deletions(-)
+
+diff --git a/src/corelib/kernel/qwinregistry.cpp b/src/corelib/kernel/qwinregistry.cpp
+index 303bae7136e..9740edbf299 100644
+--- a/src/corelib/kernel/qwinregistry.cpp
++++ b/src/corelib/kernel/qwinregistry.cpp
+@@ -22,6 +22,12 @@ QT_BEGIN_NAMESPACE
+ 
+ using namespace Qt::StringLiterals;
+ 
++static const wchar_t *nullTerminate(const QString &s)
++{
++    // ### port to QString::nullTerminate() if this stays around for longer
++    return reinterpret_cast<const wchar_t*>(s.utf16());
++}
++
+ QWinRegistryKey::QWinRegistryKey(QObject *parent)
+     : QObject(parent)
+ {
+@@ -29,17 +35,23 @@ QWinRegistryKey::QWinRegistryKey(QObject *parent)
+ 
+ // Open a key with the specified permissions (KEY_READ/KEY_WRITE).
+ // "access" is to explicitly use the 32- or 64-bit branch.
+-QWinRegistryKey::QWinRegistryKey(HKEY parentHandle, QStringView subKey,
++QWinRegistryKey::QWinRegistryKey(HKEY parentHandle, const wchar_t *subKey,
+                                  REGSAM permissions, REGSAM access,
+                                  QObject *parent)
+     : QObject(parent)
+ {
+-    if (RegOpenKeyExW(parentHandle, reinterpret_cast<const wchar_t *>(subKey.utf16()),
++    if (RegOpenKeyExW(parentHandle, subKey,
+                       0, permissions | access, &m_key) != ERROR_SUCCESS) {
+         m_key = nullptr;
+     }
+ }
+ 
++QWinRegistryKey::QWinRegistryKey(HKEY parentHandle, const QString &subKey,
++                                 REGSAM permissions, REGSAM access, QObject *parent)
++    : QWinRegistryKey(parentHandle, nullTerminate(subKey), permissions, access, parent)
++{
++}
++
+ QWinRegistryKey::~QWinRegistryKey()
+ {
+     close();
+@@ -86,7 +98,7 @@ QString QWinRegistryKey::name() const
+     return {};
+ }
+ 
+-QVariant QWinRegistryKey::value(QStringView subKey) const
++QVariant QWinRegistryKey::value(const wchar_t *subKey) const
+ {
+     // NOTE: Empty value name is allowed in Windows registry, it means the default
+     // or unnamed value of a key, you can read/write/delete such value normally.
+@@ -94,13 +106,10 @@ QVariant QWinRegistryKey::value(QStringView subKey) const
+     if (!isValid())
+         return {};
+ 
+-    // Use nullptr when we need to access the default value.
+-    const auto subKeyC = subKey.isEmpty() ? nullptr : reinterpret_cast<const wchar_t *>(subKey.utf16());
+-
+     // Get the size and type of the value.
+     DWORD dataType = REG_NONE;
+     DWORD dataSize = 0;
+-    LONG ret = RegQueryValueExW(m_key, subKeyC, nullptr, &dataType, nullptr, &dataSize);
++    LONG ret = RegQueryValueExW(m_key, subKey, nullptr, &dataType, nullptr, &dataSize);
+     if (ret != ERROR_SUCCESS)
+         return {};
+ 
+@@ -114,7 +123,7 @@ QVariant QWinRegistryKey::value(QStringView subKey) const
+     QVarLengthArray<unsigned char> data(dataSize);
+     std::fill(data.data(), data.data() + dataSize, 0u);
+ 
+-    ret = RegQueryValueExW(m_key, subKeyC, nullptr, nullptr, data.data(), &dataSize);
++    ret = RegQueryValueExW(m_key, subKey, nullptr, nullptr, data.data(), &dataSize);
+     if (ret != ERROR_SUCCESS)
+         return {};
+ 
+@@ -170,15 +179,25 @@ QVariant QWinRegistryKey::value(QStringView subKey) const
+     return {};
+ }
+ 
++QVariant QWinRegistryKey::value(const QString &subKey) const
++{
++    return value(nullTerminate(subKey));
++}
++
+ // Returns the value of the specified subKey as a string, obtained using
+ // qvariant_cast from the underlying QVariant. If that value is not a string,
+ // or the subKey has no value, a string whose isNull() is true is returned.
+ // Otherwise, the resulting string (which may be empty) is returned.
+-QString QWinRegistryKey::stringValue(QStringView subKey) const
++QString QWinRegistryKey::stringValue(const wchar_t *subKey) const
+ {
+     return value<QString>(subKey).value_or(QString());
+ }
+ 
++QString QWinRegistryKey::stringValue(const QString &subKey) const
++{
++    return stringValue(nullTerminate(subKey));
++}
++
+ void QWinRegistryKey::connectNotify(const QMetaMethod &signal)
+ {
+     if (signal != QMetaMethod::fromSignal(&QWinRegistryKey::valueChanged))
+diff --git a/src/corelib/kernel/qwinregistry_p.h b/src/corelib/kernel/qwinregistry_p.h
+index bb0c58f84a3..5643a35363b 100644
+--- a/src/corelib/kernel/qwinregistry_p.h
++++ b/src/corelib/kernel/qwinregistry_p.h
+@@ -32,7 +32,10 @@ class Q_CORE_EXPORT QWinRegistryKey : public QObject
+ 
+ public:
+     QWinRegistryKey(QObject *parent = nullptr);
+-    explicit QWinRegistryKey(HKEY parentHandle, QStringView subKey,
++    explicit QWinRegistryKey(HKEY parentHandle, const wchar_t *subKey,
++                             REGSAM permissions = KEY_READ, REGSAM access = 0,
++                             QObject *parent = nullptr);
++    explicit QWinRegistryKey(HKEY parentHandle, const QString &subKey,
+                              REGSAM permissions = KEY_READ, REGSAM access = 0,
+                              QObject *parent = nullptr);
+     ~QWinRegistryKey();
+@@ -55,17 +58,23 @@ public:
+ 
+     QString name() const;
+ 
+-    [[nodiscard]] QVariant value(QStringView subKey) const;
++    [[nodiscard]] QVariant value(const wchar_t *subKey) const;
++    [[nodiscard]] QVariant value(const QString &subKey) const;
++
+     template<typename T>
+-    [[nodiscard]] std::optional<T> value(QStringView subKey) const
++    [[nodiscard]] std::optional<T> value(const wchar_t *subKey) const
+     {
+-        const QVariant var = value(subKey);
+-        if (var.isValid())
+-            return qvariant_cast<T>(var);
+-        return std::nullopt;
++        return to_optional<T>(value(subKey));
+     }
+ 
+-    QString stringValue(QStringView subKey) const;
++    template<typename T>
++    [[nodiscard]] std::optional<T> value(const QString &subKey) const
++    {
++        return to_optional<T>(value(subKey));
++    }
++
++    QString stringValue(const wchar_t *subKey) const;
++    QString stringValue(const QString &subKey) const;
+ 
+ #ifndef QT_NO_DEBUG_STREAM
+     friend Q_CORE_EXPORT QDebug operator<<(QDebug dbg, const QWinRegistryKey &);
+@@ -78,6 +87,14 @@ protected:
+     void connectNotify(const QMetaMethod &signal) override;
+ 
+ private:
++    template<typename T>
++    static std::optional<T> to_optional(QVariant v)
++    {
++        if (v.isValid())
++            return qvariant_cast<T>(std::move(v));
++        return std::nullopt;
++    }
++
+     HKEY m_key = nullptr;
+     QUniqueWin32NullHandle m_keyChangedEvent;
+ };
+diff --git a/tests/auto/corelib/kernel/qwinregistrykey/tst_qwinregistrykey.cpp b/tests/auto/corelib/kernel/qwinregistrykey/tst_qwinregistrykey.cpp
+index 9a05de0dc92..5f1f4835af7 100644
+--- a/tests/auto/corelib/kernel/qwinregistrykey/tst_qwinregistrykey.cpp
++++ b/tests/auto/corelib/kernel/qwinregistrykey/tst_qwinregistrykey.cpp
+@@ -21,7 +21,7 @@ const std::pair TEST_BINARY{L"binary", "binary\0"_ba};
+ const std::pair TEST_NOT_EXIST{L"not_exist", QVariant()};
+ const std::pair TEST_DEFAULT{L"", u"default"_s};
+ 
+-[[nodiscard]] static inline bool write(const HKEY key, const QStringView name, const QVariant &value)
++[[nodiscard]] static inline bool write(const HKEY key, const wchar_t *name, const QVariant &value)
+ {
+     DWORD type = REG_NONE;
+     QByteArray buf = {};
+@@ -84,7 +84,7 @@ const std::pair TEST_DEFAULT{L"", u"default"_s};
+         }
+     }
+ 
+-    const LONG ret = RegSetValueExW(key, reinterpret_cast<const wchar_t *>(name.utf16()),
++    const LONG ret = RegSetValueExW(key, name,
+                                     0, type, reinterpret_cast<LPBYTE>(buf.data()), buf.size());
+     return ret == ERROR_SUCCESS;
+ }
+@@ -274,7 +274,7 @@ void tst_qwinregistrykey::valueChanged()
+     QWinRegistryKey testKey(HKEY_CURRENT_USER, TEST_KEY, KEY_READ | KEY_WRITE);
+     QVERIFY(testKey.isValid());
+ 
+-    QVERIFY(write(testKey, u"valueThatCanChange", -1));
++    QVERIFY(write(testKey, L"valueThatCanChange", -1));
+ 
+     bool valueChanged = false;
+     QObject::connect(&testKey, &QWinRegistryKey::valueChanged, [&] {
+@@ -283,7 +283,7 @@ void tst_qwinregistrykey::valueChanged()
+ 
+     for (int i = 0; i < 10; ++i) {
+         valueChanged = false;
+-        QVERIFY(write(testKey, u"valueThatCanChange", i));
++        QVERIFY(write(testKey, L"valueThatCanChange", i));
+         QTRY_VERIFY(valueChanged);
+     }
+ }
+-- 
+2.51.2
+

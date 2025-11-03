@@ -1,0 +1,32 @@
+From c56c6582d0dab5c8526c612583fe4c5a703ed3d7 Mon Sep 17 00:00:00 2001
+From: Tim Blechmann <tim.blechmann@qt.io>
+Date: Wed, 1 Oct 2025 09:46:53 +0800
+Subject: [PATCH 259/553] QStringView: remove unused header
+
+qstringview.h includes qstringliteral.h without using any of its
+content. So it can be removed.
+
+Pick-to: 6.8
+Change-Id: I83920f424d3878bd5dcabcd402071beda4b50363
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit 602d0aa1f604ea997a2f112f259b57ef10964056)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/text/qstringview.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/corelib/text/qstringview.h b/src/corelib/text/qstringview.h
+index a910dbd2762..53d91cf315a 100644
+--- a/src/corelib/text/qstringview.h
++++ b/src/corelib/text/qstringview.h
+@@ -10,7 +10,6 @@
+ #include <QtCore/qcontainerfwd.h>
+ #include <QtCore/qbytearray.h>
+ #include <QtCore/qstringfwd.h>
+-#include <QtCore/qstringliteral.h>
+ #include <QtCore/qstringalgorithms.h>
+ 
+ #include <string>
+-- 
+2.51.2
+

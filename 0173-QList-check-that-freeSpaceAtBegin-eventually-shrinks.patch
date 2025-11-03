@@ -1,0 +1,58 @@
+From 98c77fa4101d877312858e5df90cdfed8be27dee Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Fri, 19 Sep 2025 07:49:51 +0200
+Subject: [PATCH 173/553] QList: check that freeSpaceAtBegin() eventually
+ shrinks
+
+We used to have a bug in this area, so add a test that checks that
+when QList is used as a queue, its capacity doesn't grow unbounded by
+never shrinking freeSpaceAtBegin().
+
+This should probably be in tst_ContainerSymmetry...
+
+Pick-to: 6.8 6.5
+Change-Id: I5cb117e0177c71238e377f3bb05cb237694350ad
+Reviewed-by: Fabian Kosmale <fabian.kosmale@qt.io>
+(cherry picked from commit 7ff2ecca660be0ef4e5b7f7ce206d23c79f148ea)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ tests/auto/corelib/tools/qlist/tst_qlist.cpp | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/tests/auto/corelib/tools/qlist/tst_qlist.cpp b/tests/auto/corelib/tools/qlist/tst_qlist.cpp
+index b45d59211e2..e84c35691da 100644
+--- a/tests/auto/corelib/tools/qlist/tst_qlist.cpp
++++ b/tests/auto/corelib/tools/qlist/tst_qlist.cpp
+@@ -293,6 +293,7 @@ private slots:
+     void fillDetachMovable() const { fillDetach<Movable>(); }
+     void fillDetachCustom() const { fillDetach<Custom>(); }
+     void first() const;
++    void freeSpaceAtBeginEventuallyShrinks() const;
+     void fromListInt() const { fromList<int>(); }
+     void fromListMovable() const { fromList<Movable>(); }
+     void fromListCustom() const { fromList<Custom>(); }
+@@ -1652,6 +1653,21 @@ void tst_QList::first() const
+     QCOMPARE(myvec.first(3), myvec);
+ }
+ 
++void tst_QList::freeSpaceAtBeginEventuallyShrinks() const
++{
++    QList<int> list = {-10, -9, -8, -6, -5, -4, -3, -2, -1};
++    qsizetype last = list.d.freeSpaceAtBegin();
++    for (int i = 0; i < 10'000'000; ++i) {
++        list.push_back(i);
++        list.pop_front();
++        const qsizetype cur = list.d.freeSpaceAtBegin();
++        if (cur < last)
++            return; // success
++        last = cur;
++    }
++    QFAIL("The freeSpaceAtBegin() never shrank.");
++}
++
+ void tst_QList::constFirst() const
+ {
+     QList<int> myvec;
+-- 
+2.51.2
+

@@ -1,0 +1,83 @@
+From 9c8f1c8132063abd69bf90ca29c99f18d3c9dd96 Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Tue, 21 Oct 2025 12:23:40 +0200
+Subject: [PATCH 515/553] QUnicodeTools: port some functions to QStringIterator
+
+(those which don't have nested loops due to the need for look-ahead).
+
+Use QStringIterator's new nextOrRawCodeUnit() to replace a
+Clang-21-Wcharacter-conversion-prone pattern of parsing a UTF-16
+string.
+
+Amends cbfdec66033d14020d3e8a49bacc0d12d2b6798e (getGraphemeBreaks();
+though that commit merely moved the code there from Harfbuzz) and
+824180a12249e48c0e3280fec64940825ce0aa6e (getWhiteSpaces()).
+
+Pick-to: 6.8 6.5
+Change-Id: I26b64fca6a26bb7ea4ab8ad14ba590213e949190
+Reviewed-by: Edward Welbourne <edward.welbourne@qt.io>
+(cherry picked from commit 8565f645e02195fad3f7c4f94a73e041fa52f953)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/text/qunicodetools.cpp | 31 +++++++++---------------------
+ 1 file changed, 9 insertions(+), 22 deletions(-)
+
+diff --git a/src/corelib/text/qunicodetools.cpp b/src/corelib/text/qunicodetools.cpp
+index c0cb43a0685..862bd2cd0e9 100644
+--- a/src/corelib/text/qunicodetools.cpp
++++ b/src/corelib/text/qunicodetools.cpp
+@@ -4,6 +4,7 @@
+ 
+ #include "qunicodetools_p.h"
+ 
++#include <QtCore/private/qstringiterator_p.h>
+ #include "qunicodetables_p.h"
+ #include "qvarlengtharray.h"
+ #if QT_CONFIG(library)
+@@ -122,16 +123,10 @@ static void getGraphemeBreaks(const char16_t *string, qsizetype len, QCharAttrib
+ {
+     QUnicodeTables::GraphemeBreakClass lcls = QUnicodeTables::GraphemeBreak_LF; // to meet GB1
+     GB::State state = GB::State::Normal;
+-    for (qsizetype i = 0; i != len; ++i) {
+-        qsizetype pos = i;
+-        char32_t ucs4 = string[i];
+-        if (QChar::isHighSurrogate(ucs4) && i + 1 != len) {
+-            ushort low = string[i + 1];
+-            if (QChar::isLowSurrogate(low)) {
+-                ucs4 = QChar::surrogateToUcs4(ucs4, low);
+-                ++i;
+-            }
+-        }
++    QStringIterator it(QStringView{string, len});
++    while (it.hasNext()) {
++        const qsizetype pos = it.index();
++        const char32_t ucs4 = it.nextOrRawCodeUnit();
+ 
+         const QUnicodeTables::Properties *prop = QUnicodeTables::properties(ucs4);
+         QUnicodeTables::GraphemeBreakClass cls = (QUnicodeTables::GraphemeBreakClass) prop->graphemeBreakClass;
+@@ -1121,18 +1116,10 @@ static void getLineBreaks(const char16_t *string, qsizetype len, QCharAttributes
+ 
+ static void getWhiteSpaces(const char16_t *string, qsizetype len, QCharAttributes *attributes)
+ {
+-    for (qsizetype i = 0; i != len; ++i) {
+-        const auto pos = i;
+-        uint ucs4 = string[i];
+-        if (QChar::isHighSurrogate(ucs4) && i + 1 != len) {
+-            ushort low = string[i + 1];
+-            if (QChar::isLowSurrogate(low)) {
+-                ucs4 = QChar::surrogateToUcs4(ucs4, low);
+-                ++i;
+-            }
+-        }
+-
+-        if (Q_UNLIKELY(QChar::isSpace(ucs4)))
++    QStringIterator it(QStringView{string, len});
++    while (it.hasNext()) {
++        const auto pos = it.index();
++        if (Q_UNLIKELY(QChar::isSpace(it.nextOrRawCodeUnit())))
+             attributes[pos].whiteSpace = true;
+     }
+ }
+-- 
+2.51.2
+

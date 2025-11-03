@@ -1,0 +1,61 @@
+From a60364183666e0dc6aa2b47a9a4599c164ea6de1 Mon Sep 17 00:00:00 2001
+From: Thiago Macieira <thiago.macieira@intel.com>
+Date: Tue, 21 Oct 2025 08:23:48 -0700
+Subject: [PATCH 494/553] QFileSystemEngine/Unix: work around copy_file_range()
+ returning EINVAL
+
+Looks like Linux does return EINVAL with ecryptfs. I didn't know anyone
+still used it, because there had been discussions in 2023 that it was
+deprecated and going stale on its crypto.
+
+> Hi - I don't think an additional reviewer is going to be sufficient to
+> get eCryptfs into a good state long term. There are fairly large
+> design problems that need more attention. I'll send a patch to
+> deprecate and mark for removal in 2025.
+
+The 2025 removal hasn't happened, though the discussion has
+reoccurred[2] with the subject "ecryptfs is unmaintained and untested".
+
+I suppose people who installed systems when Ubuntu recommended it may
+still have such systems around.
+
+[1] https://lore.kernel.org/lkml/20230403134432.46726-1-frank.li@vivo.com/T/#ecc899c0c24fbcb7ad0ed78301cf812dd33cc594b
+[2] https://lore.kernel.org/lkml/Zx-ndBo7wpYSHWPK@casper.infradead.org/
+
+Pick-to: 6.8
+Fixes: QTBUG-141371
+Change-Id: I7a04c783b344e774d253fffd26474ffc012583c8
+Reviewed-by: Ivan Solovev <ivan.solovev@qt.io>
+(cherry picked from commit c63b68dab2ad824d7f7fd34930af5e0f8a40897a)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/io/qfilesystemengine_unix.cpp | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/src/corelib/io/qfilesystemengine_unix.cpp b/src/corelib/io/qfilesystemengine_unix.cpp
+index 477a0892d92..94349295d5e 100644
+--- a/src/corelib/io/qfilesystemengine_unix.cpp
++++ b/src/corelib/io/qfilesystemengine_unix.cpp
+@@ -1197,8 +1197,18 @@ auto QFileSystemEngine::cloneFile(int srcfd, int dstfd, const QFileSystemMetaDat
+         copied = ftruncate(dstfd, 0);
+         return TriStateResult::Failed;
+     }
+-    if (errno != EXDEV)
++
++    // We failed with no bytes copied, so is this a real filesystem failure
++    // that will remain with sendfile() or the copy pump? Or is it a
++    // copy_file_range() condition?
++    switch (errno) {
++    case EINVAL: // observed with some obscure filesystem combinations
++    case EXDEV: // Linux can't do xdev file copies (FreeBSD can)
++        break;
++
++    default:
+         return TriStateResult::Failed;
++    }
+ #endif
+ 
+ #if defined(Q_OS_LINUX)
+-- 
+2.51.2
+

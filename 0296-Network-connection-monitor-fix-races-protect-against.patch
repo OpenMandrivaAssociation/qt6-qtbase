@@ -1,0 +1,161 @@
+From 33acef6377924ffca01e6b34b3b53bd0484a2b73 Mon Sep 17 00:00:00 2001
+From: Timur Pocheptsov <timur.pocheptsov@qt.io>
+Date: Mon, 29 Sep 2025 14:14:57 +0200
+Subject: [PATCH 296/553] Network connection monitor: fix races, protect
+ against a dangling pointer
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+nw_path_monitor's update handler calls our 'updateState' on a dispatch
+queue, potentially from a different thread. 'this' pointer captured
+by the handler's lambda can be already invalid (if the backend was deleted).
+We call nw_path_monitor_cancel in 'stopMonitoring', but it's not enough
+to prevent update handler from accessing the (now-invalid) pointer.
+To resolve this issue we move the lock and 'this' pointer to the separate
+object, which is essentially owned by the callback and will be deleted
+by the monitor's cancellation handler, set via
+nw_path_monitor_set_cancel_handler.
+
+Change-Id: Iba8f77a5f9bc0e4986e57608a2bafd69f05ba31a
+Reviewed-by: Mårten Nordheim <marten.nordheim@qt.io>
+---
+ src/network/kernel/qnetconmonitor_darwin.mm | 65 +++++++++++++++------
+ 1 file changed, 46 insertions(+), 19 deletions(-)
+
+diff --git a/src/network/kernel/qnetconmonitor_darwin.mm b/src/network/kernel/qnetconmonitor_darwin.mm
+index 7ee3d320b05..874dc656369 100644
+--- a/src/network/kernel/qnetconmonitor_darwin.mm
++++ b/src/network/kernel/qnetconmonitor_darwin.mm
+@@ -8,7 +8,7 @@
+ 
+ #include <Network/Network.h>
+ 
+-#include <QtCore/qreadwritelock.h>
++#include <QtCore/qmutex.h>
+ 
+ QT_BEGIN_NAMESPACE
+ 
+@@ -55,7 +55,13 @@ class QNetworkConnectionMonitorPrivate : public QObjectPrivate
+ {
+ public:
+     nw_path_status_t status = nw_path_status_invalid;
+-    mutable QReadWriteLock monitorLock;
++
++    struct QueueCallbackData
++    {
++        QMutex monitorMutex;
++        QNetworkConnectionMonitorPrivate *backend = nullptr;
++    } *callbackData = nullptr;
++
+     nw_path_monitor_t monitor = nullptr;
+     using InterfaceType = QNetworkConnectionMonitor::InterfaceType;
+     InterfaceType interface = InterfaceType::Unknown;
+@@ -74,12 +80,13 @@ public:
+ 
+ void QNetworkConnectionMonitorPrivate::updateState(nw_path_t state)
+ {
+-    QReadLocker lock(&monitorLock);
+-    if (monitor == nullptr)
+-        return;
++    Q_Q(QNetworkConnectionMonitor);
++
++    Q_ASSERT(callbackData);
++
++    // Lock is acquired in the callback (which is calling us).
+ 
+     // To be executed only on the reachability queue.
+-    Q_Q(QNetworkConnectionMonitor);
+ 
+     // NETMONTODO: for now, 'online' for us means nw_path_status_satisfied
+     // is set. There are more possible flags that require more tests/some special
+@@ -139,17 +146,17 @@ QNetworkConnectionMonitor::InterfaceType QNetworkConnectionMonitorPrivate::getIn
+ 
+ bool QNetworkConnectionMonitorPrivate::startMonitoring()
+ {
+-    QWriteLocker lock(&monitorLock);
++    if (callbackData) {
++        qCWarning(lcNetMon, "Monitor is already active, call stopMonitoring() first");
++        return false;
++    }
++
+     monitor = nw_path_monitor_create();
+     if (monitor == nullptr) {
+         qCWarning(lcNetMon, "Failed to create a path monitor, cannot determine current reachability.");
+         return false;
+     }
+ 
+-    nw_path_monitor_set_update_handler(monitor, [this](nw_path_t path){
+-        updateState(path);
+-    });
+-
+     auto queue = qt_reachability_queue();
+     if (!queue) {
+         qCWarning(lcNetMon, "Failed to create a dispatch queue to schedule a probe on");
+@@ -158,6 +165,22 @@ bool QNetworkConnectionMonitorPrivate::startMonitoring()
+         return false;
+     }
+ 
++    callbackData = new QueueCallbackData;
++    auto *data = callbackData;
++    callbackData->backend = this;
++
++    nw_path_monitor_set_update_handler(monitor, [data](nw_path_t path){
++        const QMutexLocker lock(&data->monitorMutex);
++        if (data->backend)
++            data->backend->updateState(path);
++        // Else - we were cancelled and will delete 'data' in the callback below.
++        // Presumably, this never gets called after 'cancel handler'.
++    });
++
++    nw_path_monitor_set_cancel_handler(monitor, [data]{
++        delete data;
++    });
++
+     nw_path_monitor_set_queue(monitor, queue);
+     nw_path_monitor_start(monitor);
+     return true;
+@@ -165,8 +188,18 @@ bool QNetworkConnectionMonitorPrivate::startMonitoring()
+ 
+ void QNetworkConnectionMonitorPrivate::stopMonitoring()
+ {
+-    QWriteLocker lock(&monitorLock);
+-    if (monitor != nullptr) {
++    if (!callbackData) {
++        Q_ASSERT(!monitor);
++        return;
++    }
++
++    {
++        const QMutexLocker lock(&callbackData->monitorMutex); // Release the lock _before_ cancelling.
++        callbackData->backend = nullptr; // This will prevent updateState calls from the queue.
++        callbackData = nullptr; // To be deleted in the cancellation callback.
++    }
++
++    if (monitor) {
+         nw_path_monitor_cancel(monitor);
+         nw_release(monitor);
+         monitor = nullptr;
+@@ -181,7 +214,6 @@ void QNetworkConnectionMonitor::stopMonitoring()
+ 
+ bool QNetworkConnectionMonitorPrivate::isMonitoring() const
+ {
+-    QReadLocker lock(&monitorLock);
+     return monitor != nullptr;
+ }
+ 
+@@ -210,11 +242,6 @@ bool QNetworkConnectionMonitor::startMonitoring()
+ {
+     Q_D(QNetworkConnectionMonitor);
+ 
+-    if (d->isMonitoring()) {
+-        qCWarning(lcNetMon, "Monitor is already active, call stopMonitoring() first");
+-        return false;
+-    }
+-
+     return d->startMonitoring();
+ }
+ 
+-- 
+2.51.2
+

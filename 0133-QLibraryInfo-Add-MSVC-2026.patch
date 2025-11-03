@@ -1,0 +1,35 @@
+From 4d0e6a70b6d62ac1bd50cbc6623c822462a313de Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?M=C3=A5rten=20Nordheim?= <marten.nordheim@qt.io>
+Date: Mon, 15 Sep 2025 16:18:28 +0200
+Subject: [PATCH 133/553] QLibraryInfo: Add MSVC 2026
+
+Currently _MSC_VER is defined to 1950 for the preview build.
+
+Pick-to: 6.9 6.8 6.5
+Change-Id: I81a4191715307d347d17c811456ea7bd7cfa283c
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit 07c5b579a3a2ed23596877182e1a639b8fa57f9c)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/global/qlibraryinfo.cpp | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/corelib/global/qlibraryinfo.cpp b/src/corelib/global/qlibraryinfo.cpp
+index 87daa9b4c73..e8b954a7d53 100644
+--- a/src/corelib/global/qlibraryinfo.cpp
++++ b/src/corelib/global/qlibraryinfo.cpp
+@@ -195,8 +195,10 @@ QLibraryInfo::QLibraryInfo()
+ #    define COMPILER_STRING "MSVC 2017"
+ #  elif _MSC_VER < 1930
+ #    define COMPILER_STRING "MSVC 2019"
+-#  elif _MSC_VER < 2000
++#  elif _MSC_VER < 1950
+ #    define COMPILER_STRING "MSVC 2022"
++#  elif _MSC_VER < 2000
++#    define COMPILER_STRING "MSVC 2026"
+ #  else
+ #    define COMPILER_STRING "MSVC _MSC_VER " QT_STRINGIFY(_MSC_VER)
+ #  endif
+-- 
+2.51.2
+

@@ -1,0 +1,42 @@
+From 07e01a6019a1c0c355a26222f18191d221d1439f Mon Sep 17 00:00:00 2001
+From: Julian Greilich <j.greilich@gmx.de>
+Date: Thu, 11 Sep 2025 15:11:18 +0200
+Subject: [PATCH 065/553] a11y iOS: Do not set UIAccessibilityTraitAdjustable
+ for ProgressBar
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The ProgressBar does implement the ValueInterface to represent the
+current progress, but the progress is readonly.
+
+With the UIAccessibilityTraitAdjustable set, iOS would announce the
+value of the ProgressBar as "adjustable" and give instruction to
+swipe to change the value.
+
+Task-number: QTBUG-139712
+Pick-to: 6.9 6.8
+Change-Id: Ife4ef14b2db58217c94c3cc4edb8cd69496245fa
+Reviewed-by: Tor Arne Vestbø <tor.arne.vestbo@qt.io>
+(cherry picked from commit d6cc7562689d8a07bc933178ea367706ca38e4ac)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/plugins/platforms/ios/quiaccessibilityelement.mm | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/plugins/platforms/ios/quiaccessibilityelement.mm b/src/plugins/platforms/ios/quiaccessibilityelement.mm
+index 33321a626ef..d228f090438 100644
+--- a/src/plugins/platforms/ios/quiaccessibilityelement.mm
++++ b/src/plugins/platforms/ios/quiaccessibilityelement.mm
+@@ -175,7 +175,7 @@ QT_NAMESPACE_ALIAS_OBJC_CLASS(QMacAccessibilityElement);
+         traits |= UIAccessibilityTraitStaticText;
+     }
+ 
+-    if (iface->valueInterface())
++    if (iface->valueInterface() && iface->role() != QAccessible::ProgressBar)
+         traits |= UIAccessibilityTraitAdjustable;
+ 
+     return traits;
+-- 
+2.51.2
+

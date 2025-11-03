@@ -1,0 +1,64 @@
+From a0f09867f7f09fa43edfc87f8de48f6bf765002c Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Thu, 4 Sep 2025 17:13:30 +0200
+Subject: [PATCH 002/553] QDataStream: fix -Werror,-Wshorten-64-to-32 on 32-bit
+ Clang
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+On 32-bit platforms qsizetype is int, so assigning a qint64 to it
+narrows.
+
+It's benign, because we perform the overflow check in the next line,
+but that doesn't help -Werror.
+
+Fix by making the narrowing explicit. As a drive-by, mark `n` const.
+
+Amends fd48ce0b73c74dafd5db27bc1f2752ef665df7ef.
+
+Reported-by: Karim Pinter <karim.pinter@qt.io>
+Pick-to: 6.9 6.8
+Change-Id: I14d95c54c501df14a0b76d11262f22605fbb583b
+Reviewed-by: Øystein Heskestad <oystein.heskestad@qt.io>
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit d812e32bcba17f4be5a54c48651c3068487478f7)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/serialization/qdatastream.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/corelib/serialization/qdatastream.h b/src/corelib/serialization/qdatastream.h
+index 150673777e9..ff598f50c09 100644
+--- a/src/corelib/serialization/qdatastream.h
++++ b/src/corelib/serialization/qdatastream.h
+@@ -299,7 +299,7 @@ QDataStream &readArrayBasedContainer(QDataStream &s, Container &c)
+ 
+     c.clear();
+     qint64 size = QDataStream::readQSizeType(s);
+-    qsizetype n = size;
++    const auto n = qsizetype(size);
+     if (size != n || size < 0) {
+         s.setStatus(QDataStream::SizeLimitExceeded);
+         return s;
+@@ -324,7 +324,7 @@ QDataStream &readListBasedContainer(QDataStream &s, Container &c)
+ 
+     c.clear();
+     qint64 size = QDataStream::readQSizeType(s);
+-    qsizetype n = size;
++    const auto n = qsizetype(size);
+     if (size != n || size < 0) {
+         s.setStatus(QDataStream::SizeLimitExceeded);
+         return s;
+@@ -348,7 +348,7 @@ QDataStream &readAssociativeContainer(QDataStream &s, Container &c)
+ 
+     c.clear();
+     qint64 size = QDataStream::readQSizeType(s);
+-    qsizetype n = size;
++    const auto n = qsizetype(size);
+     if (size != n || size < 0) {
+         s.setStatus(QDataStream::SizeLimitExceeded);
+         return s;
+-- 
+2.51.2
+

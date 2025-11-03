@@ -1,0 +1,74 @@
+From 780c54461925b1e858b6c2b848ae65e0e2601529 Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Wed, 22 Oct 2025 19:43:07 +0200
+Subject: [PATCH 505/553] QUnicodeTools: fix weird variable assignment in
+ initScripts() loop
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The old code updated the `eor` variable in the third field of the for
+loop, after the increment of the loop variable, `i`, to the then-value
+of `i`. The variable was initialized as zero.
+
+This is a very roundabout way of doing things, because, if you look at
+it from the right angle, `eor` will always have the value 'i' has when
+entering the loop body.
+
+Proof:
+- First round: i = 0, eor = 0. So i == eor. Check.
+
+- Next round: i = 1 + whatever value `i` had at the end of the
+  previous iteration. eor := i, so i == eor. Check.
+
+So rewrite the code to create `eor` at the beginning of the loop body,
+with the then-value of 'i'. This allows marking it const, too, and
+scoping it correctly, drastically improving readability.
+
+The tighter scoping runs afoul of the assert(eor == string.size())
+after the loop, which, however, is pointless, because it's true by
+construction: the loop has no break statement, so the only way it can
+be exited is by failing the loop condition. At that point, eor := i
+and i == string.size(), so eor == string.size().
+
+Partially reverts 3df159ba174c1775a0e77d2305a639eeab1ea71d, but the
+loose scope of the variable was present even before that.
+
+Pick-to: 6.8 6.5
+Change-Id: I983aef94caa8a3bc09ab378b8bb9bb4a18dabeb4
+Reviewed-by: Mårten Nordheim <marten.nordheim@qt.io>
+Reviewed-by: Edward Welbourne <edward.welbourne@qt.io>
+(cherry picked from commit dae484f08252194d0d4978d72e97f68a693d47dd)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/text/qunicodetools.cpp | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/src/corelib/text/qunicodetools.cpp b/src/corelib/text/qunicodetools.cpp
+index 040b39e4621..51e63d3ec39 100644
+--- a/src/corelib/text/qunicodetools.cpp
++++ b/src/corelib/text/qunicodetools.cpp
+@@ -2821,10 +2821,10 @@ Q_CORE_EXPORT void initCharAttributes(QStringView string,
+ Q_CORE_EXPORT void initScripts(QStringView string, ScriptItemArray *scripts)
+ {
+     qsizetype sor = 0;
+-    qsizetype eor = 0;
+     QChar::Script script = QChar::Script_Common;
+ 
+-    for (qsizetype i = 0; i < string.size(); ++i, eor = i) {
++    for (qsizetype i = 0; i < string.size(); ++i) {
++        const auto eor = i;
+         char32_t ucs4 = string[i].unicode();
+         if (QChar::isHighSurrogate(ucs4) && i + 1 < string.size()) {
+             ushort low = string[i + 1].unicode();
+@@ -2865,7 +2865,6 @@ Q_CORE_EXPORT void initScripts(QStringView string, ScriptItemArray *scripts)
+     }
+ 
+     Q_ASSERT(script >= QChar::Script_Common);
+-    Q_ASSERT(eor == string.size());
+     scripts->append(ScriptItem{sor, script});
+ }
+ 
+-- 
+2.51.2
+

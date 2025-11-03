@@ -1,0 +1,46 @@
+From eb9abd562b7272082a24dac1dd62a6f0205194cb Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?M=C3=A5rten=20Nordheim?= <marten.nordheim@qt.io>
+Date: Fri, 1 Aug 2025 16:38:56 +0200
+Subject: [PATCH 088/553] tst_qnetworkreply_local: shorten the local socket
+ names
+
+It seems to be failing with some test cases on some Linux systems.
+It doesn't actually fail to listen on the server-side, but it seems the
+client-side socket instead fails to connect.
+
+Instead of using the full test case names and process id, hash it
+together and use the HEX of that instead for the local socket
+identifier.
+
+Change in 6.10 cherry-pick:
+ - Resolved conflict due to 0b3d7b9e60480f0721019a0fe4b35ecd8f52d9a8
+   not being cherry-picked.
+
+Pick-to: 6.9 6.8
+Change-Id: Ibcd0f6af29652d68470596efe84fba954cda57ce
+Reviewed-by: Edward Welbourne <edward.welbourne@qt.io>
+(cherry picked from commit ea5471e3b84a1ccaa5b02618d91bec6130efc3b1)
+---
+ .../access/qnetworkreply_local/tst_qnetworkreply_local.cpp   | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/tests/auto/network/access/qnetworkreply_local/tst_qnetworkreply_local.cpp b/tests/auto/network/access/qnetworkreply_local/tst_qnetworkreply_local.cpp
+index 6d78c815930..58b45a7b13f 100644
+--- a/tests/auto/network/access/qnetworkreply_local/tst_qnetworkreply_local.cpp
++++ b/tests/auto/network/access/qnetworkreply_local/tst_qnetworkreply_local.cpp
+@@ -49,9 +49,10 @@ static std::unique_ptr<MiniHttpServerV2> getServerForCurrentScheme()
+     if (scheme.startsWith("unix"_L1) || scheme.startsWith("local"_L1)) {
+ #if QT_CONFIG(localserver)
+         QLocalServer *localServer = new QLocalServer(server.get());
++        const size_t hash = qHashMulti(0, QByteArrayView(QTest::currentTestFunction()),
++                                       QCoreApplication::applicationPid());
+         localServer->listen(u"qt_networkreply_test_"_s
+-                            % QLatin1StringView(QTest::currentTestFunction())
+-                            % QString::number(QCoreApplication::applicationPid()));
++                            % QString::number(hash, 16));
+         server->bind(localServer);
+ #endif
+     } else if (scheme == "http") {
+-- 
+2.51.2
+

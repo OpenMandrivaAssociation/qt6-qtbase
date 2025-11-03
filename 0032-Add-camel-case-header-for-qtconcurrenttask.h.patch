@@ -1,0 +1,45 @@
+From 97790e91ae6461cc93f7711179edb37a41ecb3fb Mon Sep 17 00:00:00 2001
+From: Ivan Solovev <ivan.solovev@qt.io>
+Date: Tue, 2 Sep 2025 12:09:32 +0200
+Subject: [PATCH 032/553] Add camel-case header for qtconcurrenttask.h
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Camel-case headers are a de-facto standard way to include various Qt
+classes into the user projects.
+Other headers from QtConcurrent module provide the CamelCase versions,
+so let's add one for qtconcurrenttask.h as well.
+
+[ChangeLog][QtConcurrent] Added a camel-case QtConcurrentTask header,
+which is the same as QtConcurrent/qtconcurrenttask.h.
+
+Task-number: QTBUG-114663
+Pick-to: 6.9 6.8
+Change-Id: Ice2f3dba70e56af2d55e826b8df98ab6cf0e8894
+Reviewed-by: Edward Welbourne <edward.welbourne@qt.io>
+Reviewed-by: Mårten Nordheim <marten.nordheim@qt.io>
+(cherry picked from commit d6054c5f41424d57a4cee7f47bc1ad2fcdafe72b)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/concurrent/qtconcurrenttask.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/concurrent/qtconcurrenttask.h b/src/concurrent/qtconcurrenttask.h
+index f269b193d20..3811b14e976 100644
+--- a/src/concurrent/qtconcurrenttask.h
++++ b/src/concurrent/qtconcurrenttask.h
+@@ -5,6 +5,10 @@
+ #ifndef QTCONCURRENTTASK_H
+ #define QTCONCURRENTTASK_H
+ 
++#if 0
++#pragma qt_class(QtConcurrentTask)
++#endif
++
+ #if !defined(QT_NO_CONCURRENT)
+ 
+ #include <QtConcurrent/qtaskbuilder.h>
+-- 
+2.51.2
+

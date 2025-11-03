@@ -1,0 +1,35 @@
+From 0b16ef7f8c8d7e988448e5e0d66a41f467bacf58 Mon Sep 17 00:00:00 2001
+From: Tim Blechmann <tim.blechmann@qt.io>
+Date: Tue, 7 Oct 2025 09:26:37 +0800
+Subject: [PATCH 323/553] cmake: enable msvc_obj_debug_info when using a
+ compiler launcher
+
+Compiler launchers like ccache or sccache do not enforce synchronous
+writes to pdb files, even if /FS is specified. This can cause compile errors when performing parallel builds. Embedding debug info into the object files works around this issue, so enabling msvc_obj_debug_info
+when a compiler launcher is specified is a good sane default.
+
+Change-Id: I3c896700c1a9e884615cdb0e07131348ff06de83
+Reviewed-by: Joerg Bornemann <joerg.bornemann@qt.io>
+Reviewed-by: Alexandru Croitor <alexandru.croitor@qt.io>
+(cherry picked from commit c71d9b0212e515682c7d4670981bac89fea94238)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ configure.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.cmake b/configure.cmake
+index 49cb0baaa64..9ea73eb36c6 100644
+--- a/configure.cmake
++++ b/configure.cmake
+@@ -585,7 +585,7 @@ qt_feature("optimize_full"
+ qt_feature_config("optimize_full" QMAKE_PRIVATE_CONFIG)
+ qt_feature("msvc_obj_debug_info"
+     LABEL "Embed debug info in object files (MSVC)"
+-    ENABLE QT_USE_CCACHE
++    ENABLE QT_USE_CCACHE OR CMAKE_CXX_COMPILER_LAUNCHER
+     AUTODETECT OFF
+     EMIT_IF MSVC
+ )
+-- 
+2.51.2
+

@@ -1,0 +1,100 @@
+From cb8fbd71dbd50a22fbe7f8f25c304c63321d0d62 Mon Sep 17 00:00:00 2001
+From: Dennis Oberst <dennis.oberst@qt.io>
+Date: Thu, 18 Sep 2025 16:01:28 +0200
+Subject: [PATCH 174/553] QDecompressHelper: export class for private usage
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The qtgrpc module requires functionality to decompress message bodies.
+This logic is already implemented within the private QDecompressHelper
+class.
+
+To avoid code duplication and promote reuse, this change exports
+QDecompressHelper, making it accessible for private use.
+
+Pick-to: 6.9 6.8
+Change-Id: I23c064b9b24b9da5d175467ca088accd83278481
+Reviewed-by: Mårten Nordheim <marten.nordheim@qt.io>
+(cherry picked from commit 93aac0332bbffaa561bce97996c8a1ddbc46cfbb)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/network/access/qdecompresshelper_p.h | 38 +++++++++++++-----------
+ 1 file changed, 20 insertions(+), 18 deletions(-)
+
+diff --git a/src/network/access/qdecompresshelper_p.h b/src/network/access/qdecompresshelper_p.h
+index 2a8668bad5f..15ba29da9f6 100644
+--- a/src/network/access/qdecompresshelper_p.h
++++ b/src/network/access/qdecompresshelper_p.h
+@@ -16,7 +16,9 @@
+ // We mean it.
+ //
+ 
++#include <QtNetwork/qtnetworkexports.h>
+ #include <QtNetwork/private/qtnetworkglobal_p.h>
++
+ #include <QtCore/private/qbytedata_p.h>
+ 
+ #include <memory>
+@@ -24,7 +26,7 @@
+ QT_BEGIN_NAMESPACE
+ 
+ class QIODevice;
+-class Q_AUTOTEST_EXPORT QDecompressHelper
++class QDecompressHelper
+ {
+ public:
+     enum ContentEncoding {
+@@ -36,32 +38,32 @@ public:
+     };
+ 
+     QDecompressHelper() = default;
+-    ~QDecompressHelper();
++    Q_NETWORK_EXPORT ~QDecompressHelper();
+ 
+-    bool setEncoding(QByteArrayView contentEncoding);
++    Q_NETWORK_EXPORT bool setEncoding(QByteArrayView contentEncoding);
+ 
+-    bool isCountingBytes() const;
+-    void setCountingBytesEnabled(bool shouldCount);
++    Q_NETWORK_EXPORT bool isCountingBytes() const;
++    Q_NETWORK_EXPORT void setCountingBytesEnabled(bool shouldCount);
+ 
+-    qint64 uncompressedSize() const;
++    Q_NETWORK_EXPORT qint64 uncompressedSize() const;
+ 
+-    bool hasData() const;
+-    void feed(const QByteArray &data);
+-    void feed(QByteArray &&data);
+-    void feed(const QByteDataBuffer &buffer);
+-    void feed(QByteDataBuffer &&buffer);
+-    qsizetype read(char *data, qsizetype maxSize);
++    Q_NETWORK_EXPORT bool hasData() const;
++    Q_NETWORK_EXPORT void feed(const QByteArray &data);
++    Q_NETWORK_EXPORT void feed(QByteArray &&data);
++    Q_NETWORK_EXPORT void feed(const QByteDataBuffer &buffer);
++    Q_NETWORK_EXPORT void feed(QByteDataBuffer &&buffer);
++    Q_NETWORK_EXPORT qsizetype read(char *data, qsizetype maxSize);
+ 
+-    bool isValid() const;
++    Q_NETWORK_EXPORT bool isValid() const;
+ 
+-    void clear();
++    Q_NETWORK_EXPORT void clear();
+ 
+-    void setDecompressedSafetyCheckThreshold(qint64 threshold);
++    Q_NETWORK_EXPORT void setDecompressedSafetyCheckThreshold(qint64 threshold);
+ 
+-    static bool isSupportedEncoding(QByteArrayView encoding);
+-    static QByteArrayList acceptedEncoding();
++    Q_NETWORK_EXPORT static bool isSupportedEncoding(QByteArrayView encoding);
++    Q_NETWORK_EXPORT static QByteArrayList acceptedEncoding();
+ 
+-    QString errorString() const;
++    Q_NETWORK_EXPORT QString errorString() const;
+ 
+ private:
+     bool isPotentialArchiveBomb() const;
+-- 
+2.51.2
+

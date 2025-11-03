@@ -1,0 +1,670 @@
+From 08f28406cca2b8ea07e1c711c2f20b0bb07695f2 Mon Sep 17 00:00:00 2001
+From: MohammadHossein Qanbari <mohammad.qanbari@qt.io>
+Date: Thu, 18 Sep 2025 18:07:53 +0200
+Subject: [PATCH 187/553] CRA review: src/widgets/kernel/*
+
+No critical security level found for these reviewed files.
+QApplication, QWidget and QSizePolicy files are reviewed in separate
+patches.
+
+QUIP: 23
+Fixes: QTBUG-135741
+Pick-to: 6.8
+Change-Id: Iee10987c9a99606bc0a4c1faeeed354be53076bb
+Reviewed-by: Volker Hilsheimer <volker.hilsheimer@qt.io>
+(cherry picked from commit 8825bcdbdab5f37b185261d7ba06260dc8e9930d)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/widgets/kernel/qaction.h                 | 1 +
+ src/widgets/kernel/qaction_widgets.cpp       | 1 +
+ src/widgets/kernel/qaction_widgets_p.h       | 1 +
+ src/widgets/kernel/qactiongroup.h            | 1 +
+ src/widgets/kernel/qboxlayout.cpp            | 1 +
+ src/widgets/kernel/qboxlayout.h              | 1 +
+ src/widgets/kernel/qformlayout.cpp           | 1 +
+ src/widgets/kernel/qformlayout.h             | 1 +
+ src/widgets/kernel/qgesture.cpp              | 1 +
+ src/widgets/kernel/qgesture.h                | 1 +
+ src/widgets/kernel/qgesture_p.h              | 1 +
+ src/widgets/kernel/qgesturemanager.cpp       | 1 +
+ src/widgets/kernel/qgesturemanager_p.h       | 1 +
+ src/widgets/kernel/qgesturerecognizer.cpp    | 1 +
+ src/widgets/kernel/qgesturerecognizer.h      | 1 +
+ src/widgets/kernel/qgridlayout.cpp           | 1 +
+ src/widgets/kernel/qgridlayout.h             | 1 +
+ src/widgets/kernel/qlayout.cpp               | 1 +
+ src/widgets/kernel/qlayout.h                 | 1 +
+ src/widgets/kernel/qlayout_p.h               | 1 +
+ src/widgets/kernel/qlayoutengine.cpp         | 1 +
+ src/widgets/kernel/qlayoutengine_p.h         | 1 +
+ src/widgets/kernel/qlayoutitem.cpp           | 1 +
+ src/widgets/kernel/qlayoutitem.h             | 1 +
+ src/widgets/kernel/qmacgesturerecognizer.cpp | 1 +
+ src/widgets/kernel/qmacgesturerecognizer_p.h | 1 +
+ src/widgets/kernel/qrhiwidget.cpp            | 1 +
+ src/widgets/kernel/qrhiwidget.h              | 1 +
+ src/widgets/kernel/qrhiwidget_p.h            | 1 +
+ src/widgets/kernel/qshortcut.h               | 1 +
+ src/widgets/kernel/qshortcut_widgets.cpp     | 1 +
+ src/widgets/kernel/qstackedlayout.cpp        | 1 +
+ src/widgets/kernel/qstackedlayout.h          | 1 +
+ src/widgets/kernel/qstandardgestures.cpp     | 1 +
+ src/widgets/kernel/qstandardgestures_p.h     | 1 +
+ src/widgets/kernel/qt_widgets_pch.h          | 1 +
+ src/widgets/kernel/qtestsupport_widgets.cpp  | 1 +
+ src/widgets/kernel/qtestsupport_widgets.h    | 1 +
+ src/widgets/kernel/qtooltip.cpp              | 1 +
+ src/widgets/kernel/qtooltip.h                | 1 +
+ src/widgets/kernel/qtwidgetsglobal.h         | 1 +
+ src/widgets/kernel/qtwidgetsglobal_p.h       | 1 +
+ src/widgets/kernel/qwhatsthis.cpp            | 1 +
+ src/widgets/kernel/qwhatsthis.h              | 1 +
+ src/widgets/kernel/qwidgetaction.cpp         | 1 +
+ src/widgets/kernel/qwidgetaction.h           | 1 +
+ src/widgets/kernel/qwidgetaction_p.h         | 1 +
+ src/widgets/kernel/qwidgetrepaintmanager.cpp | 1 +
+ src/widgets/kernel/qwidgetrepaintmanager_p.h | 1 +
+ src/widgets/kernel/qwidgetsvariant.cpp       | 1 +
+ src/widgets/kernel/qwidgetwindow.cpp         | 1 +
+ src/widgets/kernel/qwidgetwindow_p.h         | 1 +
+ src/widgets/kernel/qwindowcontainer.cpp      | 1 +
+ src/widgets/kernel/qwindowcontainer_p.h      | 1 +
+ 54 files changed, 54 insertions(+)
+
+diff --git a/src/widgets/kernel/qaction.h b/src/widgets/kernel/qaction.h
+index 4311d503d78..bc4a408c6d2 100644
+--- a/src/widgets/kernel/qaction.h
++++ b/src/widgets/kernel/qaction.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QtGui/QAction>
+ 
+diff --git a/src/widgets/kernel/qaction_widgets.cpp b/src/widgets/kernel/qaction_widgets.cpp
+index ad282ab1046..87f34783202 100644
+--- a/src/widgets/kernel/qaction_widgets.cpp
++++ b/src/widgets/kernel/qaction_widgets.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qaction.h"
+ 
+diff --git a/src/widgets/kernel/qaction_widgets_p.h b/src/widgets/kernel/qaction_widgets_p.h
+index 77c3d8a6807..618d2530c61 100644
+--- a/src/widgets/kernel/qaction_widgets_p.h
++++ b/src/widgets/kernel/qaction_widgets_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QACTION_WIDGETS_P_H
+ #define QACTION_WIDGETS_P_H
+diff --git a/src/widgets/kernel/qactiongroup.h b/src/widgets/kernel/qactiongroup.h
+index 2592eb17b41..f9dcdd1304c 100644
+--- a/src/widgets/kernel/qactiongroup.h
++++ b/src/widgets/kernel/qactiongroup.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QtGui/QActionGroup>
+ 
+diff --git a/src/widgets/kernel/qboxlayout.cpp b/src/widgets/kernel/qboxlayout.cpp
+index 91aa286e807..ad3744986d7 100644
+--- a/src/widgets/kernel/qboxlayout.cpp
++++ b/src/widgets/kernel/qboxlayout.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qapplication.h"
+ #include "qboxlayout.h"
+diff --git a/src/widgets/kernel/qboxlayout.h b/src/widgets/kernel/qboxlayout.h
+index a1adb2809b7..43ec0c6a3f9 100644
+--- a/src/widgets/kernel/qboxlayout.h
++++ b/src/widgets/kernel/qboxlayout.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QBOXLAYOUT_H
+ #define QBOXLAYOUT_H
+diff --git a/src/widgets/kernel/qformlayout.cpp b/src/widgets/kernel/qformlayout.cpp
+index 9aa1bd0a5fb..3cc7256d957 100644
+--- a/src/widgets/kernel/qformlayout.cpp
++++ b/src/widgets/kernel/qformlayout.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qapplication.h"
+ #include "qdebug.h"
+diff --git a/src/widgets/kernel/qformlayout.h b/src/widgets/kernel/qformlayout.h
+index b24fe131a09..784a1178cac 100644
+--- a/src/widgets/kernel/qformlayout.h
++++ b/src/widgets/kernel/qformlayout.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QFORMLAYOUT_H
+ #define QFORMLAYOUT_H
+diff --git a/src/widgets/kernel/qgesture.cpp b/src/widgets/kernel/qgesture.cpp
+index 1ae671d9d92..736c95ac296 100644
+--- a/src/widgets/kernel/qgesture.cpp
++++ b/src/widgets/kernel/qgesture.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qgesture.h"
+ #include "private/qgesture_p.h"
+diff --git a/src/widgets/kernel/qgesture.h b/src/widgets/kernel/qgesture.h
+index 7e7041ef763..ef2fdac0846 100644
+--- a/src/widgets/kernel/qgesture.h
++++ b/src/widgets/kernel/qgesture.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QGESTURE_H
+ #define QGESTURE_H
+diff --git a/src/widgets/kernel/qgesture_p.h b/src/widgets/kernel/qgesture_p.h
+index 4b7aaa8daed..5e9961a0dc4 100644
+--- a/src/widgets/kernel/qgesture_p.h
++++ b/src/widgets/kernel/qgesture_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QGESTURE_P_H
+ #define QGESTURE_P_H
+diff --git a/src/widgets/kernel/qgesturemanager.cpp b/src/widgets/kernel/qgesturemanager.cpp
+index b50b825cef3..86f8882fddd 100644
+--- a/src/widgets/kernel/qgesturemanager.cpp
++++ b/src/widgets/kernel/qgesturemanager.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "private/qgesturemanager_p.h"
+ #include "private/qstandardgestures_p.h"
+diff --git a/src/widgets/kernel/qgesturemanager_p.h b/src/widgets/kernel/qgesturemanager_p.h
+index d30e4e5af2e..faac42b8377 100644
+--- a/src/widgets/kernel/qgesturemanager_p.h
++++ b/src/widgets/kernel/qgesturemanager_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QGESTUREMANAGER_P_H
+ #define QGESTUREMANAGER_P_H
+diff --git a/src/widgets/kernel/qgesturerecognizer.cpp b/src/widgets/kernel/qgesturerecognizer.cpp
+index 23f4f55f7c5..b094573174e 100644
+--- a/src/widgets/kernel/qgesturerecognizer.cpp
++++ b/src/widgets/kernel/qgesturerecognizer.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qgesturerecognizer.h"
+ 
+diff --git a/src/widgets/kernel/qgesturerecognizer.h b/src/widgets/kernel/qgesturerecognizer.h
+index de48fec3993..8483aaac2f9 100644
+--- a/src/widgets/kernel/qgesturerecognizer.h
++++ b/src/widgets/kernel/qgesturerecognizer.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QGESTURERECOGNIZER_H
+ #define QGESTURERECOGNIZER_H
+diff --git a/src/widgets/kernel/qgridlayout.cpp b/src/widgets/kernel/qgridlayout.cpp
+index 7998567a214..77c6b558aec 100644
+--- a/src/widgets/kernel/qgridlayout.cpp
++++ b/src/widgets/kernel/qgridlayout.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qapplication.h"
+ #include "qgridlayout.h"
+diff --git a/src/widgets/kernel/qgridlayout.h b/src/widgets/kernel/qgridlayout.h
+index bb4887e2fd0..00af2ac8ef9 100644
+--- a/src/widgets/kernel/qgridlayout.h
++++ b/src/widgets/kernel/qgridlayout.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QGRIDLAYOUT_H
+ #define QGRIDLAYOUT_H
+diff --git a/src/widgets/kernel/qlayout.cpp b/src/widgets/kernel/qlayout.cpp
+index 0c86fa6003b..00f9766af29 100644
+--- a/src/widgets/kernel/qlayout.cpp
++++ b/src/widgets/kernel/qlayout.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qlayout.h"
+ 
+diff --git a/src/widgets/kernel/qlayout.h b/src/widgets/kernel/qlayout.h
+index 3d0560fd78e..f591006c755 100644
+--- a/src/widgets/kernel/qlayout.h
++++ b/src/widgets/kernel/qlayout.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QLAYOUT_H
+ #define QLAYOUT_H
+diff --git a/src/widgets/kernel/qlayout_p.h b/src/widgets/kernel/qlayout_p.h
+index c1f0288c94d..642f6611089 100644
+--- a/src/widgets/kernel/qlayout_p.h
++++ b/src/widgets/kernel/qlayout_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QLAYOUT_P_H
+ #define QLAYOUT_P_H
+diff --git a/src/widgets/kernel/qlayoutengine.cpp b/src/widgets/kernel/qlayoutengine.cpp
+index 576678ad0ad..dde7a8d103e 100644
+--- a/src/widgets/kernel/qlayoutengine.cpp
++++ b/src/widgets/kernel/qlayoutengine.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qlayout.h"
+ #include "private/qlayoutengine_p.h"
+diff --git a/src/widgets/kernel/qlayoutengine_p.h b/src/widgets/kernel/qlayoutengine_p.h
+index ff7b4107e16..76c63a640be 100644
+--- a/src/widgets/kernel/qlayoutengine_p.h
++++ b/src/widgets/kernel/qlayoutengine_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QLAYOUTENGINE_P_H
+ #define QLAYOUTENGINE_P_H
+diff --git a/src/widgets/kernel/qlayoutitem.cpp b/src/widgets/kernel/qlayoutitem.cpp
+index 08cf7962e7d..bbf687b89e9 100644
+--- a/src/widgets/kernel/qlayoutitem.cpp
++++ b/src/widgets/kernel/qlayoutitem.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qlayout.h"
+ 
+diff --git a/src/widgets/kernel/qlayoutitem.h b/src/widgets/kernel/qlayoutitem.h
+index 531498ea4bd..e24c429f7b3 100644
+--- a/src/widgets/kernel/qlayoutitem.h
++++ b/src/widgets/kernel/qlayoutitem.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QLAYOUTITEM_H
+ #define QLAYOUTITEM_H
+diff --git a/src/widgets/kernel/qmacgesturerecognizer.cpp b/src/widgets/kernel/qmacgesturerecognizer.cpp
+index 8149bea30d8..12b732bc91a 100644
+--- a/src/widgets/kernel/qmacgesturerecognizer.cpp
++++ b/src/widgets/kernel/qmacgesturerecognizer.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qmacgesturerecognizer_p.h"
+ #include "qgesture.h"
+diff --git a/src/widgets/kernel/qmacgesturerecognizer_p.h b/src/widgets/kernel/qmacgesturerecognizer_p.h
+index 9ce3ece051d..38daff33d41 100644
+--- a/src/widgets/kernel/qmacgesturerecognizer_p.h
++++ b/src/widgets/kernel/qmacgesturerecognizer_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QMACSWIPEGESTURERECOGNIZER_MAC_P_H
+ #define QMACSWIPEGESTURERECOGNIZER_MAC_P_H
+diff --git a/src/widgets/kernel/qrhiwidget.cpp b/src/widgets/kernel/qrhiwidget.cpp
+index 96dec9cd9e6..731605dc58d 100644
+--- a/src/widgets/kernel/qrhiwidget.cpp
++++ b/src/widgets/kernel/qrhiwidget.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2023 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qrhiwidget_p.h"
+ #include <private/qguiapplication_p.h>
+diff --git a/src/widgets/kernel/qrhiwidget.h b/src/widgets/kernel/qrhiwidget.h
+index 68f0ae46ad4..896174ea93e 100644
+--- a/src/widgets/kernel/qrhiwidget.h
++++ b/src/widgets/kernel/qrhiwidget.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2023 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QRHIWIDGET_H
+ #define QRHIWIDGET_H
+diff --git a/src/widgets/kernel/qrhiwidget_p.h b/src/widgets/kernel/qrhiwidget_p.h
+index 06d08ff188f..9afcb5f5fa6 100644
+--- a/src/widgets/kernel/qrhiwidget_p.h
++++ b/src/widgets/kernel/qrhiwidget_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2023 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QRHIWIDGET_P_H
+ #define QRHIWIDGET_P_H
+diff --git a/src/widgets/kernel/qshortcut.h b/src/widgets/kernel/qshortcut.h
+index 6cec8d45ea1..8ecac8d7c85 100644
+--- a/src/widgets/kernel/qshortcut.h
++++ b/src/widgets/kernel/qshortcut.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QtGui/QShortcut>
+ 
+diff --git a/src/widgets/kernel/qshortcut_widgets.cpp b/src/widgets/kernel/qshortcut_widgets.cpp
+index 6e25d79bd6a..67713ca1016 100644
+--- a/src/widgets/kernel/qshortcut_widgets.cpp
++++ b/src/widgets/kernel/qshortcut_widgets.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qshortcut.h"
+ #include "private/qshortcut_p.h"
+diff --git a/src/widgets/kernel/qstackedlayout.cpp b/src/widgets/kernel/qstackedlayout.cpp
+index 979bc21067c..29ed4870d6b 100644
+--- a/src/widgets/kernel/qstackedlayout.cpp
++++ b/src/widgets/kernel/qstackedlayout.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qstackedlayout.h"
+ #include "qlayout_p.h"
+diff --git a/src/widgets/kernel/qstackedlayout.h b/src/widgets/kernel/qstackedlayout.h
+index 5b5a8f283fa..323b726115f 100644
+--- a/src/widgets/kernel/qstackedlayout.h
++++ b/src/widgets/kernel/qstackedlayout.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSTACKEDLAYOUT_H
+ #define QSTACKEDLAYOUT_H
+diff --git a/src/widgets/kernel/qstandardgestures.cpp b/src/widgets/kernel/qstandardgestures.cpp
+index fe331419ca4..e9de82d2357 100644
+--- a/src/widgets/kernel/qstandardgestures.cpp
++++ b/src/widgets/kernel/qstandardgestures.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qstandardgestures_p.h"
+ #include "qgesture.h"
+diff --git a/src/widgets/kernel/qstandardgestures_p.h b/src/widgets/kernel/qstandardgestures_p.h
+index ef1c1cb97cd..8d5610e7aec 100644
+--- a/src/widgets/kernel/qstandardgestures_p.h
++++ b/src/widgets/kernel/qstandardgestures_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSTANDARDGESTURES_P_H
+ #define QSTANDARDGESTURES_P_H
+diff --git a/src/widgets/kernel/qt_widgets_pch.h b/src/widgets/kernel/qt_widgets_pch.h
+index 7594f73c70d..8d4122c289b 100644
+--- a/src/widgets/kernel/qt_widgets_pch.h
++++ b/src/widgets/kernel/qt_widgets_pch.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ /*
+  * This is a precompiled header file for use in Xcode / Mac GCC /
+diff --git a/src/widgets/kernel/qtestsupport_widgets.cpp b/src/widgets/kernel/qtestsupport_widgets.cpp
+index 0a1083ea17e..23f775c84af 100644
+--- a/src/widgets/kernel/qtestsupport_widgets.cpp
++++ b/src/widgets/kernel/qtestsupport_widgets.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qtestsupport_widgets.h"
+ 
+diff --git a/src/widgets/kernel/qtestsupport_widgets.h b/src/widgets/kernel/qtestsupport_widgets.h
+index 4b5e5ff7772..84ab0fa04d7 100644
+--- a/src/widgets/kernel/qtestsupport_widgets.h
++++ b/src/widgets/kernel/qtestsupport_widgets.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QTESTSUPPORT_WIDGETS_H
+ #define QTESTSUPPORT_WIDGETS_H
+diff --git a/src/widgets/kernel/qtooltip.cpp b/src/widgets/kernel/qtooltip.cpp
+index eeb79ef7033..9e6aaf4b95f 100644
+--- a/src/widgets/kernel/qtooltip.cpp
++++ b/src/widgets/kernel/qtooltip.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QtWidgets/private/qtwidgetsglobal_p.h>
+ 
+diff --git a/src/widgets/kernel/qtooltip.h b/src/widgets/kernel/qtooltip.h
+index 863162e15b3..9e6f4a60587 100644
+--- a/src/widgets/kernel/qtooltip.h
++++ b/src/widgets/kernel/qtooltip.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QTOOLTIP_H
+ #define QTOOLTIP_H
+diff --git a/src/widgets/kernel/qtwidgetsglobal.h b/src/widgets/kernel/qtwidgetsglobal.h
+index bfa7272f190..350be704f07 100644
+--- a/src/widgets/kernel/qtwidgetsglobal.h
++++ b/src/widgets/kernel/qtwidgetsglobal.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QTWIDGETSGLOBAL_H
+ #define QTWIDGETSGLOBAL_H
+diff --git a/src/widgets/kernel/qtwidgetsglobal_p.h b/src/widgets/kernel/qtwidgetsglobal_p.h
+index 535071891e6..ec092f130bb 100644
+--- a/src/widgets/kernel/qtwidgetsglobal_p.h
++++ b/src/widgets/kernel/qtwidgetsglobal_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QTWIDGETSGLOBAL_P_H
+ #define QTWIDGETSGLOBAL_P_H
+diff --git a/src/widgets/kernel/qwhatsthis.cpp b/src/widgets/kernel/qwhatsthis.cpp
+index 4c988e4af3c..75e916fa511 100644
+--- a/src/widgets/kernel/qwhatsthis.cpp
++++ b/src/widgets/kernel/qwhatsthis.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qwhatsthis.h"
+ #include "qpointer.h"
+diff --git a/src/widgets/kernel/qwhatsthis.h b/src/widgets/kernel/qwhatsthis.h
+index 0ab32d8bd61..b0cf02a7c16 100644
+--- a/src/widgets/kernel/qwhatsthis.h
++++ b/src/widgets/kernel/qwhatsthis.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QWHATSTHIS_H
+ #define QWHATSTHIS_H
+diff --git a/src/widgets/kernel/qwidgetaction.cpp b/src/widgets/kernel/qwidgetaction.cpp
+index 13f386d3ecd..12422521e36 100644
+--- a/src/widgets/kernel/qwidgetaction.cpp
++++ b/src/widgets/kernel/qwidgetaction.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qwidgetaction.h"
+ #include "qwidget.h"
+diff --git a/src/widgets/kernel/qwidgetaction.h b/src/widgets/kernel/qwidgetaction.h
+index 296ff52d1e9..ec3dbaf3bd8 100644
+--- a/src/widgets/kernel/qwidgetaction.h
++++ b/src/widgets/kernel/qwidgetaction.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QWIDGETACTION_H
+ #define QWIDGETACTION_H
+diff --git a/src/widgets/kernel/qwidgetaction_p.h b/src/widgets/kernel/qwidgetaction_p.h
+index 6a1cd8c1863..56b083db21d 100644
+--- a/src/widgets/kernel/qwidgetaction_p.h
++++ b/src/widgets/kernel/qwidgetaction_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QWIDGETACTION_P_H
+ #define QWIDGETACTION_P_H
+diff --git a/src/widgets/kernel/qwidgetrepaintmanager.cpp b/src/widgets/kernel/qwidgetrepaintmanager.cpp
+index 0dee380a911..93464264506 100644
+--- a/src/widgets/kernel/qwidgetrepaintmanager.cpp
++++ b/src/widgets/kernel/qwidgetrepaintmanager.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qplatformdefs.h"
+ 
+diff --git a/src/widgets/kernel/qwidgetrepaintmanager_p.h b/src/widgets/kernel/qwidgetrepaintmanager_p.h
+index fb390501ccb..62c1325838f 100644
+--- a/src/widgets/kernel/qwidgetrepaintmanager_p.h
++++ b/src/widgets/kernel/qwidgetrepaintmanager_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QWIDGETREPAINTMANAGER_P_H
+ #define QWIDGETREPAINTMANAGER_P_H
+diff --git a/src/widgets/kernel/qwidgetsvariant.cpp b/src/widgets/kernel/qwidgetsvariant.cpp
+index 17a19aa780d..894e7f75a81 100644
+--- a/src/widgets/kernel/qwidgetsvariant.cpp
++++ b/src/widgets/kernel/qwidgetsvariant.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qvariant.h"
+ 
+diff --git a/src/widgets/kernel/qwidgetwindow.cpp b/src/widgets/kernel/qwidgetwindow.cpp
+index b85446121bd..737ccb0e807 100644
+--- a/src/widgets/kernel/qwidgetwindow.cpp
++++ b/src/widgets/kernel/qwidgetwindow.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "private/qwindow_p.h"
+ #include "qwidgetwindow_p.h"
+diff --git a/src/widgets/kernel/qwidgetwindow_p.h b/src/widgets/kernel/qwidgetwindow_p.h
+index 342794ee3d3..97ab9e70c5f 100644
+--- a/src/widgets/kernel/qwidgetwindow_p.h
++++ b/src/widgets/kernel/qwidgetwindow_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QWIDGETWINDOW_P_H
+ #define QWIDGETWINDOW_P_H
+diff --git a/src/widgets/kernel/qwindowcontainer.cpp b/src/widgets/kernel/qwindowcontainer.cpp
+index 721bffebf2b..8472704c027 100644
+--- a/src/widgets/kernel/qwindowcontainer.cpp
++++ b/src/widgets/kernel/qwindowcontainer.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qwindowcontainer_p.h"
+ #include "qwidget_p.h"
+diff --git a/src/widgets/kernel/qwindowcontainer_p.h b/src/widgets/kernel/qwindowcontainer_p.h
+index 0cbcc5321d4..b3d23361b55 100644
+--- a/src/widgets/kernel/qwindowcontainer_p.h
++++ b/src/widgets/kernel/qwindowcontainer_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QWINDOWCONTAINER_H
+ #define QWINDOWCONTAINER_H
+-- 
+2.51.2
+

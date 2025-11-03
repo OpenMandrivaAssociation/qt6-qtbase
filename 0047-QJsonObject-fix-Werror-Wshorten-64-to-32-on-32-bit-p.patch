@@ -1,0 +1,48 @@
+From 02814dd9408609169360b902f8df34bd2a5a8977 Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Mon, 8 Sep 2025 10:21:40 +0200
+Subject: [PATCH 047/553] QJsonObject: fix -Werror,-Wshorten-64-to-32 on 32-bit
+ platforms
+
+The `index` member is a quint64 bitfield, so on 32-bit platforms,
+where qsizetype is just int, the return expression, indeed, narrows,
+causing warnings, which may break the build if -Werror is in effect
+(either for the Qt build itself, or, seeing as this is a public
+header, for user projects).
+
+Pick-to: 6.9 6.8 6.5
+Task-number: QTBUG-139951
+Change-Id: I06602ce85234207cf90e1acbbbba4d89998ac399
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+Reviewed-by: Edward Welbourne <edward.welbourne@qt.io>
+(cherry picked from commit a3572dd5e8a27e6c308255ddcf05de4dc9036cdd)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/serialization/qjsonobject.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/corelib/serialization/qjsonobject.h b/src/corelib/serialization/qjsonobject.h
+index 09988088663..1642bcf4f5c 100644
+--- a/src/corelib/serialization/qjsonobject.h
++++ b/src/corelib/serialization/qjsonobject.h
+@@ -141,7 +141,7 @@ public:
+         inline iterator operator-(qsizetype j) const { return operator+(-j); }
+         inline iterator &operator+=(qsizetype j) { item.index += quint64(j); return *this; }
+         inline iterator &operator-=(qsizetype j) { item.index -= quint64(j); return *this; }
+-        qsizetype operator-(iterator j) const { return item.index - j.item.index; }
++        qsizetype operator-(iterator j) const { return qsizetype(item.index - j.item.index); }
+ 
+     public:
+ #if QT_CORE_REMOVED_SINCE(6, 8)
+@@ -254,7 +254,7 @@ public:
+         inline const_iterator operator-(qsizetype j) const { return operator+(-j); }
+         inline const_iterator &operator+=(qsizetype j) { item.index += quint64(j); return *this; }
+         inline const_iterator &operator-=(qsizetype j) { item.index -= quint64(j); return *this; }
+-        qsizetype operator-(const_iterator j) const { return item.index - j.item.index; }
++        qsizetype operator-(const_iterator j) const { return qsizetype(item.index - j.item.index); }
+ #if QT_CORE_REMOVED_SINCE(6, 8)
+         inline bool operator==(const iterator &other) const
+         { return item.d == other.item.d && item.index == other.item.index; }
+-- 
+2.51.2
+

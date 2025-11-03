@@ -1,0 +1,44 @@
+From 4b3e8f916729444a973412249142d81c5d2cd534 Mon Sep 17 00:00:00 2001
+From: Ahmad Samir <a.samirh78@gmail.com>
+Date: Sun, 5 Oct 2025 22:44:08 +0300
+Subject: [PATCH 321/553] QObject: use a view instead of allocating a temporary
+ QByteArray
+
+Also use slice() since its preconditions are checked.
+
+Drive-by, the function must have a name, so openParen must be > 0.
+
+Amends 352c8ef1997542de2d471a8d929442529b876263.
+
+Pick-to: 6.8 6.5
+Change-Id: I15ef991eca4e5bd0dee39af94c13783e46ed7205
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+Reviewed-by: Friedemann Kleint <Friedemann.Kleint@qt.io>
+(cherry picked from commit d5b30a4eff46db2736a789fb5db66ec67ac77816)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/kernel/qobject.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/corelib/kernel/qobject.cpp b/src/corelib/kernel/qobject.cpp
+index 2eb5b24e0ef..78e946102c4 100644
+--- a/src/corelib/kernel/qobject.cpp
++++ b/src/corelib/kernel/qobject.cpp
+@@ -3794,11 +3794,11 @@ static QByteArray formatConnectionSignature(const char *className, const QMetaMe
+     const auto signature = method.methodSignature();
+     Q_ASSERT(signature.endsWith(')'));
+     const qsizetype openParen = signature.indexOf('(');
+-    const bool hasParameters = openParen >= 0 && openParen < signature.size() - 2;
++    const bool hasParameters = openParen > 0 && openParen < signature.size() - 2;
+     QByteArray result;
+     if (hasParameters) {
+-        result += "qOverload<"
+-            + signature.mid(openParen + 1, signature.size() - openParen - 2) + ">(";
++        const qsizetype len = signature.size() - openParen - 2;
++        result += "qOverload<" + QByteArrayView{signature}.slice(openParen + 1, len) + ">(";
+     }
+     result += '&';
+     result += className + QByteArrayLiteral("::") + method.name();
+-- 
+2.51.2
+

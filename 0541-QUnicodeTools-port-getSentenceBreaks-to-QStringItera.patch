@@ -1,0 +1,79 @@
+From 67fa2900a41cc34b1ea93ac0b35e422da18bebb6 Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Tue, 21 Oct 2025 18:10:31 +0200
+Subject: [PATCH 541/553] QUnicodeTools: port getSentenceBreaks() to
+ QStringIterator
+
+Like getWordBreaks(), this one is a bit more complicated than the
+first two, since there's a nested loop. Solve it by using a copy of
+the QStringIterator for look-ahead loop.
+
+To see that old and new version are equivalent, observe that qsizetype
+`i` and `lookahead` always pointed _onto_, while QStringIterator
+always points to just _after_ the last-consumed code-unit.
+
+Pick-to: 6.8 6.5
+Change-Id: Id272b1a1597912eb611acb544b5ef0ac1d13a754
+Reviewed-by: Edward Welbourne <edward.welbourne@qt.io>
+(cherry picked from commit e08bcaaa87d7832c158e631cb6df2aecd71fe62d)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/text/qunicodetools.cpp | 28 ++++++++--------------------
+ 1 file changed, 8 insertions(+), 20 deletions(-)
+
+diff --git a/src/corelib/text/qunicodetools.cpp b/src/corelib/text/qunicodetools.cpp
+index b0c2036a5a1..a1867f747f9 100644
+--- a/src/corelib/text/qunicodetools.cpp
++++ b/src/corelib/text/qunicodetools.cpp
+@@ -401,16 +401,11 @@ static const uchar breakTable[BAfter + 1][QUnicodeTables::NumSentenceBreakClasse
+ static void getSentenceBreaks(const char16_t *string, qsizetype len, QCharAttributes *attributes)
+ {
+     uchar state = SB::BAfter; // to meet SB1
+-    for (qsizetype i = 0; i != len; ++i) {
+-        const qsizetype pos = i;
+-        char32_t ucs4 = string[i];
+-        if (QChar::isHighSurrogate(ucs4) && i + 1 != len) {
+-            ushort low = string[i + 1];
+-            if (QChar::isLowSurrogate(low)) {
+-                ucs4 = QChar::surrogateToUcs4(ucs4, low);
+-                ++i;
+-            }
+-        }
++
++    QStringIterator it(QStringView{string, len});
++    while (it.hasNext()) {
++        const qsizetype pos = it.index();
++        const char32_t ucs4 = it.nextOrRawCodeUnit();
+ 
+         const auto prop = QUnicodeTables::properties(ucs4);
+         QUnicodeTables::SentenceBreakClass ncls = (QUnicodeTables::SentenceBreakClass) prop->sentenceBreakClass;
+@@ -419,15 +414,8 @@ static void getSentenceBreaks(const char16_t *string, qsizetype len, QCharAttrib
+         state = SB::breakTable[state][ncls];
+         if (Q_UNLIKELY(state == SB::Lookup)) { // SB8
+             state = SB::Break;
+-            for (qsizetype lookahead = i + 1; lookahead < len; ++lookahead) {
+-                char32_t ucs4 = string[lookahead];
+-                if (QChar::isHighSurrogate(ucs4) && lookahead + 1 != len) {
+-                    ushort low = string[lookahead + 1];
+-                    if (QChar::isLowSurrogate(low)) {
+-                        ucs4 = QChar::surrogateToUcs4(ucs4, low);
+-                        ++lookahead;
+-                    }
+-                }
++            for (auto lookahead = it; lookahead.hasNext(); /**/) {
++                const char32_t ucs4 = lookahead.nextOrRawCodeUnit();
+ 
+                 const auto prop = QUnicodeTables::properties(ucs4);
+                 QUnicodeTables::SentenceBreakClass tcls = (QUnicodeTables::SentenceBreakClass) prop->sentenceBreakClass;
+@@ -440,7 +428,7 @@ static void getSentenceBreaks(const char16_t *string, qsizetype len, QCharAttrib
+                 case QUnicodeTables::SentenceBreak_Close:
+                     continue;
+                 case QUnicodeTables::SentenceBreak_Lower:
+-                    i = lookahead;
++                    it = lookahead;
+                     state = SB::Initial;
+                     break;
+                 default:
+-- 
+2.51.2
+

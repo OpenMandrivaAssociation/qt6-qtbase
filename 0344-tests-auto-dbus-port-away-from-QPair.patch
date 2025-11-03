@@ -1,0 +1,59 @@
+From b14e97dcf5bc18b240c42e32086e2d52d6aadde1 Mon Sep 17 00:00:00 2001
+From: Ahmad Samir <a.samirh78@gmail.com>
+Date: Wed, 8 Oct 2025 01:00:53 +0300
+Subject: [PATCH 344/553] tests/auto/dbus: port away from QPair
+
+Pick-to: 6.8 6.5
+Task-number: QTBUG-115841
+Change-Id: I51a20222e2b723e86d259687098f619e97884214
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit 78cc59c5f30a60beb9f2399b6c08fe72fbfb3633)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ tests/auto/dbus/qdbusmarshall/tst_qdbusmarshall.cpp     | 2 +-
+ tests/auto/dbus/qdbusmetaobject/tst_qdbusmetaobject.cpp | 2 +-
+ tests/auto/dbus/qdbusmetatype/tst_qdbusmetatype.cpp     | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/tests/auto/dbus/qdbusmarshall/tst_qdbusmarshall.cpp b/tests/auto/dbus/qdbusmarshall/tst_qdbusmarshall.cpp
+index 79db456cfbd..fcdc0619e06 100644
+--- a/tests/auto/dbus/qdbusmarshall/tst_qdbusmarshall.cpp
++++ b/tests/auto/dbus/qdbusmarshall/tst_qdbusmarshall.cpp
+@@ -1340,7 +1340,7 @@ void tst_QDBusMarshall::demarshallStrings_data()
+     QTest::addColumn<QVariant>("expectedValue");
+ 
+     // All primitive types demarshall to null string types
+-    typedef QPair<QVariant, char> ValSigPair;
++    using ValSigPair = std::pair<QVariant, char>;
+     const QList<ValSigPair> nullStringTypes = {
+         ValSigPair(QVariant::fromValue(QString()), 's'),
+         ValSigPair(QVariant::fromValue(QDBusObjectPath()), 'o'),
+diff --git a/tests/auto/dbus/qdbusmetaobject/tst_qdbusmetaobject.cpp b/tests/auto/dbus/qdbusmetaobject/tst_qdbusmetaobject.cpp
+index 898667d5d57..68bfcfd46d7 100644
+--- a/tests/auto/dbus/qdbusmetaobject/tst_qdbusmetaobject.cpp
++++ b/tests/auto/dbus/qdbusmetaobject/tst_qdbusmetaobject.cpp
+@@ -31,7 +31,7 @@ private slots:
+     void properties();
+ };
+ 
+-typedef QPair<QString,QString> StringPair;
++using StringPair = std::pair<QString, QString>;
+ 
+ struct Struct1 { };             // (s)
+ struct Struct4                  // (ssa(ss)sayasx)
+diff --git a/tests/auto/dbus/qdbusmetatype/tst_qdbusmetatype.cpp b/tests/auto/dbus/qdbusmetatype/tst_qdbusmetatype.cpp
+index be9a240fd5d..4c078e518db 100644
+--- a/tests/auto/dbus/qdbusmetatype/tst_qdbusmetatype.cpp
++++ b/tests/auto/dbus/qdbusmetatype/tst_qdbusmetatype.cpp
+@@ -25,7 +25,7 @@ private slots:
+     void invalidTypes();
+ };
+ 
+-typedef QPair<QString,QString> StringPair;
++using StringPair = std::pair<QString, QString>;
+ 
+ struct Struct1 { };             // (s)
+ struct Struct2 { };             // (sos)
+-- 
+2.51.2
+

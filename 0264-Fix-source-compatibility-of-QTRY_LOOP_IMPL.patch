@@ -1,0 +1,41 @@
+From 647228eddd9ca7d417ba41d5daf571facf904493 Mon Sep 17 00:00:00 2001
+From: Allan Sandfeld Jensen <allan.jensen@qt.io>
+Date: Thu, 2 Oct 2025 11:58:15 +0200
+Subject: [PATCH 264/553] Fix source compatibility of QTRY_LOOP_IMPL
+
+Allow it to take both integer and std::chrono::duration types.
+
+Amends bca424b792fa38de6e5b38e4a9b17269ec2867ec
+
+Fixes: QTBUG-140784
+Change-Id: I55d94e33e04eea11ef08e3c54bbb364f5bff5873
+Reviewed-by: David Faure <david.faure@kdab.com>
+(cherry picked from commit d84672cef17f13a5b8c1b9072dec8171299e888d)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/testlib/qtestcase.h | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/src/testlib/qtestcase.h b/src/testlib/qtestcase.h
+index 42c601be9c6..4b01fa656c3 100644
+--- a/src/testlib/qtestcase.h
++++ b/src/testlib/qtestcase.h
+@@ -175,10 +175,12 @@ inline void useVerifyThrowsException() {}
+     if (!(expr)) { \
+         QTest::qWait(0); \
+     } \
++    std::chrono::milliseconds timeoutValueMs(timeoutValue); \
++    std::chrono::milliseconds stepMs(step); \
+     auto qt_test_i = std::chrono::milliseconds(0); \
+-    for (; qt_test_i < timeoutValue && !(QTest::runningTest() && QTest::currentTestResolved()) \
+-             && !(expr); qt_test_i += step) { \
+-        QTest::qWait(step); \
++    for (; qt_test_i < timeoutValueMs && !(QTest::runningTest() && QTest::currentTestResolved()) \
++             && !(expr); qt_test_i += stepMs) { \
++        QTest::qWait(stepMs); \
+     }
+ // Ends in a for-block, so doesn't want a following semicolon.
+ 
+-- 
+2.51.2
+

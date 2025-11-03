@@ -1,0 +1,48 @@
+From 9fa1e4b5fa85f6d35db3d4ebee9c889efa89fe2e Mon Sep 17 00:00:00 2001
+From: Christian Heimlich <chris@pcserenity.com>
+Date: Wed, 8 Oct 2025 19:44:26 -0400
+Subject: [PATCH 366/553] Add missing nullptr guard to
+ QTextStreamPrivate::setupDevice(QIODevice*)
+
+Amends commit e3c290e1947515992821e6bf97d74d65c9254271, which missed
+this. The guard is necessary to prevent a connection attempt with a
+nullptr when QTextStream::setDevice(QIODevice*) is called with a nullptr
+as a means to dissociate it from its current device without attaching it
+to a new one.
+
+Change-Id: I51d417fc9d3549b60c1f9e3e5b35e26b2d8fb1a9
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit cbd6e66d8cf2f27d9d12695be484ee94f0028d96)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/serialization/qtextstream.cpp | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/src/corelib/serialization/qtextstream.cpp b/src/corelib/serialization/qtextstream.cpp
+index 08764340d66..dd216ae3dff 100644
+--- a/src/corelib/serialization/qtextstream.cpp
++++ b/src/corelib/serialization/qtextstream.cpp
+@@ -319,12 +319,14 @@ void QTextStreamPrivate::setupDevice(QIODevice *device)
+     disconnectFromDevice();
+ 
+ #ifndef QT_NO_QOBJECT
+-    // Explicitly set a direct connection (though it would have been so
+-    // anyway) so that QTextStream can be used from multiple threads when the
+-    // application code is handling synchronization (see also QTBUG-12055).
+-    aboutToCloseConnection =
+-            QObject::connect(device, &QIODevice::aboutToClose, device,
+-                             [this] { flushWriteBuffer(); }, Qt::DirectConnection);
++    if (device) {
++        // Explicitly set a direct connection (though it would have been so
++        // anyway) so that QTextStream can be used from multiple threads when the
++        // application code is handling synchronization (see also QTBUG-12055).
++        aboutToCloseConnection = QObject::connect(
++                device, &QIODevice::aboutToClose, device, [this] { flushWriteBuffer(); },
++                Qt::DirectConnection);
++    }
+ #else
+     Q_UNUSED(device);
+ #endif
+-- 
+2.51.2
+

@@ -1,0 +1,375 @@
+From 2a8c5cb6f0e3e4f013efc6d87c359500cb7c73a7 Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Thu, 2 Oct 2025 14:32:29 +0200
+Subject: [PATCH 420/553] Prefer using namespace Qt::StringLiterals
+
+... over Qt::Literals::StringLiterals.
+
+The latter works, but is needlessly verbose. Since such code is
+copy'n'pasted, use the preferred form everywhere, to avoid
+proliferation.
+
+The docs have been fixed to suggest the shortcut in a separate commit.
+
+As a drive-by, move them to their preferred location, after the
+QT_BEGIN_NAMESPACE, but only if they were far away to begin with.
+
+Pick-to: 6.8 6.5
+Change-Id: I0325f749f3b5a331d9c6af458a9bd3bb70d4aa3b
+Reviewed-by: Paul Wicking <paul.wicking@qt.io>
+(cherry picked from commit 64521e36c453e2ad945a60cb9e70fe9b9970c43c)
+Reviewed-by: Ivan Solovev <ivan.solovev@qt.io>
+---
+ src/corelib/doc/snippets/qmetatype/registerConverters.cpp   | 2 ++
+ src/corelib/doc/snippets/qstring/main.cpp                   | 2 ++
+ src/corelib/platform/wasm/qstdweb.cpp                       | 2 +-
+ src/corelib/text/qbytearray.cpp                             | 2 +-
+ src/corelib/text/qchar.cpp                                  | 2 +-
+ src/corelib/text/qlatin1stringview.qdoc                     | 2 +-
+ src/corelib/text/qstring.cpp                                | 2 +-
+ src/corelib/text/qstringview.cpp                            | 2 +-
+ src/gui/accessible/linux/qspiapplicationadaptor.cpp         | 2 +-
+ src/network/kernel/qnetworkinformation.cpp                  | 5 +++--
+ src/plugins/platforms/cocoa/qcocoaaccessibilityelement.mm   | 2 +-
+ src/plugins/platforms/haiku/qhaikuintegration.cpp           | 2 +-
+ src/plugins/platforms/wasm/main.cpp                         | 2 +-
+ src/plugins/platforms/windows/qwindowscursor.cpp            | 2 +-
+ src/plugins/platforms/windows/qwindowsdropdataobject.cpp    | 2 +-
+ src/plugins/platforms/windows/qwindowssystemtrayicon.cpp    | 2 +-
+ .../windows/uiautomation/qwindowsuiaaccessibility.cpp       | 2 +-
+ src/plugins/platforms/xcb/qxcbdrag.cpp                      | 2 +-
+ src/plugins/tracing/qctfserver.cpp                          | 2 +-
+ .../text/qlatin1stringmatcher/tst_qlatin1stringmatcher.cpp  | 2 +-
+ .../text/qlatin1stringview/tst_qlatin1stringview.cpp        | 6 +++---
+ .../text/qtextboundaryfinder/tst_qtextboundaryfinder.cpp    | 2 +-
+ tests/auto/tools/qt_cmake_create/tst_qt_cmake_create.cpp    | 2 +-
+ 23 files changed, 29 insertions(+), 24 deletions(-)
+
+diff --git a/src/corelib/doc/snippets/qmetatype/registerConverters.cpp b/src/corelib/doc/snippets/qmetatype/registerConverters.cpp
+index f53d04b7a60..91efb9ad67c 100644
+--- a/src/corelib/doc/snippets/qmetatype/registerConverters.cpp
++++ b/src/corelib/doc/snippets/qmetatype/registerConverters.cpp
+@@ -5,6 +5,8 @@
+ #include <QMetaType>
+ #include <QString>
+ 
++using namespace Qt::StringLiterals;
++
+ int main() {
+   //! [member]
+   struct Coordinates {
+diff --git a/src/corelib/doc/snippets/qstring/main.cpp b/src/corelib/doc/snippets/qstring/main.cpp
+index 578c7ae53aa..fc557441603 100644
+--- a/src/corelib/doc/snippets/qstring/main.cpp
++++ b/src/corelib/doc/snippets/qstring/main.cpp
+@@ -5,6 +5,8 @@
+ #include <QApplication>
+ #include <stdio.h>
+ 
++using namespace Qt::StringLiterals;
++
+ class Widget : public QWidget
+ {
+ public:
+diff --git a/src/corelib/platform/wasm/qstdweb.cpp b/src/corelib/platform/wasm/qstdweb.cpp
+index badb6a73cc6..d1fff5388c6 100644
+--- a/src/corelib/platform/wasm/qstdweb.cpp
++++ b/src/corelib/platform/wasm/qstdweb.cpp
+@@ -23,7 +23,7 @@
+ 
+ QT_BEGIN_NAMESPACE
+ 
+-using namespace Qt::Literals::StringLiterals;
++using namespace Qt::StringLiterals;
+ using emscripten::val;
+ 
+ namespace qstdweb {
+diff --git a/src/corelib/text/qbytearray.cpp b/src/corelib/text/qbytearray.cpp
+index ea9f46ca45c..71a77993345 100644
+--- a/src/corelib/text/qbytearray.cpp
++++ b/src/corelib/text/qbytearray.cpp
+@@ -5110,7 +5110,7 @@ emscripten::val QByteArray::toEcmaUint8Array()
+ 
+     The following code creates a QByteArray:
+     \code
+-    using namespace Qt::Literals::StringLiterals;
++    using namespace Qt::StringLiterals;
+ 
+     auto str = "hello"_ba;
+     \endcode
+diff --git a/src/corelib/text/qchar.cpp b/src/corelib/text/qchar.cpp
+index 7a8db1aa067..684c9fbe23d 100644
+--- a/src/corelib/text/qchar.cpp
++++ b/src/corelib/text/qchar.cpp
+@@ -1817,7 +1817,7 @@ char32_t QChar::toCaseFolded(char32_t ucs4) noexcept
+ 
+     The following code creates a QLatin1Char:
+     \code
+-    using namespace Qt::Literals::StringLiterals;
++    using namespace Qt::StringLiterals;
+ 
+     auto ch = 'a'_L1;
+     \endcode
+diff --git a/src/corelib/text/qlatin1stringview.qdoc b/src/corelib/text/qlatin1stringview.qdoc
+index d81a4cc0d0e..d28b61c4276 100644
+--- a/src/corelib/text/qlatin1stringview.qdoc
++++ b/src/corelib/text/qlatin1stringview.qdoc
+@@ -1331,7 +1331,7 @@
+ 
+     The following code creates a QLatin1StringView:
+     \code
+-    using namespace Qt::Literals::StringLiterals;
++    using namespace Qt::StringLiterals;
+ 
+     auto str = "hello"_L1;
+     \endcode
+diff --git a/src/corelib/text/qstring.cpp b/src/corelib/text/qstring.cpp
+index 1d4b0280abe..eea66810b0b 100644
+--- a/src/corelib/text/qstring.cpp
++++ b/src/corelib/text/qstring.cpp
+@@ -10268,7 +10268,7 @@ QString QString::toHtmlEscaped() const
+ 
+     The following code creates a QString:
+     \code
+-    using namespace Qt::Literals::StringLiterals;
++    using namespace Qt::StringLiterals;
+ 
+     auto str = u"hello"_s;
+     \endcode
+diff --git a/src/corelib/text/qstringview.cpp b/src/corelib/text/qstringview.cpp
+index d61fb669e8d..7c66bcaf131 100644
+--- a/src/corelib/text/qstringview.cpp
++++ b/src/corelib/text/qstringview.cpp
+@@ -1521,7 +1521,7 @@ or the character \a ch
+     namespace(s):
+ 
+     \code
+-    using namespace Qt::Literals::StringLiterals;
++    using namespace Qt::StringLiterals;
+     auto sv = u"peace"_sv;
+     \endcode
+ 
+diff --git a/src/gui/accessible/linux/qspiapplicationadaptor.cpp b/src/gui/accessible/linux/qspiapplicationadaptor.cpp
+index c3593b9f060..088ef09ef47 100644
+--- a/src/gui/accessible/linux/qspiapplicationadaptor.cpp
++++ b/src/gui/accessible/linux/qspiapplicationadaptor.cpp
+@@ -20,7 +20,7 @@
+ 
+ QT_BEGIN_NAMESPACE
+ 
+-using namespace Qt::Literals::StringLiterals;
++using namespace Qt::StringLiterals;
+ 
+ /*!
+     \class QSpiApplicationAdaptor
+diff --git a/src/network/kernel/qnetworkinformation.cpp b/src/network/kernel/qnetworkinformation.cpp
+index 66be77c383a..80551b64633 100644
+--- a/src/network/kernel/qnetworkinformation.cpp
++++ b/src/network/kernel/qnetworkinformation.cpp
+@@ -19,6 +19,9 @@
+ #include <mutex>
+ 
+ QT_BEGIN_NAMESPACE
++
++using namespace Qt::StringLiterals;
++
+ Q_DECLARE_LOGGING_CATEGORY(lcNetInfo)
+ Q_LOGGING_CATEGORY(lcNetInfo, "qt.network.info");
+ 
+@@ -51,8 +54,6 @@ static void networkInfoCleanup()
+     dataHolder->instanceHolder.reset();
+ }
+ 
+-using namespace Qt::Literals::StringLiterals;
+-
+ class QNetworkInformationDummyBackend : public QNetworkInformationBackend {
+     Q_OBJECT
+ public:
+diff --git a/src/plugins/platforms/cocoa/qcocoaaccessibilityelement.mm b/src/plugins/platforms/cocoa/qcocoaaccessibilityelement.mm
+index e3d5f5d9c29..e517ac00449 100644
+--- a/src/plugins/platforms/cocoa/qcocoaaccessibilityelement.mm
++++ b/src/plugins/platforms/cocoa/qcocoaaccessibilityelement.mm
+@@ -18,7 +18,7 @@ QT_USE_NAMESPACE
+ 
+ Q_STATIC_LOGGING_CATEGORY(lcAccessibilityTable, "qt.accessibility.table")
+ 
+-using namespace Qt::Literals::StringLiterals;
++using namespace Qt::StringLiterals;
+ 
+ #if QT_CONFIG(accessibility)
+ 
+diff --git a/src/plugins/platforms/haiku/qhaikuintegration.cpp b/src/plugins/platforms/haiku/qhaikuintegration.cpp
+index cf63f3039a8..5bead900ef0 100644
+--- a/src/plugins/platforms/haiku/qhaikuintegration.cpp
++++ b/src/plugins/platforms/haiku/qhaikuintegration.cpp
+@@ -20,7 +20,7 @@
+ 
+ QT_BEGIN_NAMESPACE
+ 
+-using namespace Qt::Literals::StringLiterals;
++using namespace Qt::StringLiterals;
+ 
+ static long int startApplicationThread(void *data)
+ {
+diff --git a/src/plugins/platforms/wasm/main.cpp b/src/plugins/platforms/wasm/main.cpp
+index f32ef5aab82..ff57a26b753 100644
+--- a/src/plugins/platforms/wasm/main.cpp
++++ b/src/plugins/platforms/wasm/main.cpp
+@@ -6,7 +6,7 @@
+ 
+ QT_BEGIN_NAMESPACE
+ 
+-using namespace Qt::Literals::StringLiterals;
++using namespace Qt::StringLiterals;
+ 
+ class QWasmIntegrationPlugin : public QPlatformIntegrationPlugin
+ {
+diff --git a/src/plugins/platforms/windows/qwindowscursor.cpp b/src/plugins/platforms/windows/qwindowscursor.cpp
+index d08e1a180fa..36f87663f62 100644
+--- a/src/plugins/platforms/windows/qwindowscursor.cpp
++++ b/src/plugins/platforms/windows/qwindowscursor.cpp
+@@ -30,7 +30,7 @@ static bool initResources()
+ 
+ QT_BEGIN_NAMESPACE
+ 
+-using namespace Qt::Literals::StringLiterals;
++using namespace Qt::StringLiterals;
+ 
+ /*!
+     \class QWindowsCursorCacheKey
+diff --git a/src/plugins/platforms/windows/qwindowsdropdataobject.cpp b/src/plugins/platforms/windows/qwindowsdropdataobject.cpp
+index 1dd910dff57..1ececbe7f45 100644
+--- a/src/plugins/platforms/windows/qwindowsdropdataobject.cpp
++++ b/src/plugins/platforms/windows/qwindowsdropdataobject.cpp
+@@ -9,7 +9,7 @@
+ 
+ QT_BEGIN_NAMESPACE
+ 
+-using namespace Qt::Literals::StringLiterals;
++using namespace Qt::StringLiterals;
+ 
+ /*!
+     \class QWindowsDropDataObject
+diff --git a/src/plugins/platforms/windows/qwindowssystemtrayicon.cpp b/src/plugins/platforms/windows/qwindowssystemtrayicon.cpp
+index c7c606e6f07..96317df08d0 100644
+--- a/src/plugins/platforms/windows/qwindowssystemtrayicon.cpp
++++ b/src/plugins/platforms/windows/qwindowssystemtrayicon.cpp
+@@ -26,7 +26,7 @@
+ 
+ QT_BEGIN_NAMESPACE
+ 
+-using namespace Qt::Literals::StringLiterals;
++using namespace Qt::StringLiterals;
+ 
+ static const UINT q_uNOTIFYICONID = 0;
+ 
+diff --git a/src/plugins/platforms/windows/uiautomation/qwindowsuiaaccessibility.cpp b/src/plugins/platforms/windows/uiautomation/qwindowsuiaaccessibility.cpp
+index 638d684ce4f..7a9454b2490 100644
+--- a/src/plugins/platforms/windows/uiautomation/qwindowsuiaaccessibility.cpp
++++ b/src/plugins/platforms/windows/uiautomation/qwindowsuiaaccessibility.cpp
+@@ -21,7 +21,7 @@
+ QT_BEGIN_NAMESPACE
+ 
+ using namespace QWindowsUiAutomation;
+-using namespace Qt::Literals::StringLiterals;
++using namespace Qt::StringLiterals;
+ 
+ bool QWindowsUiaAccessibility::m_accessibleActive = false;
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbdrag.cpp b/src/plugins/platforms/xcb/qxcbdrag.cpp
+index 8814f91d916..130153940b3 100644
+--- a/src/plugins/platforms/xcb/qxcbdrag.cpp
++++ b/src/plugins/platforms/xcb/qxcbdrag.cpp
+@@ -28,7 +28,7 @@
+ 
+ QT_BEGIN_NAMESPACE
+ 
+-using namespace Qt::Literals::StringLiterals;
++using namespace Qt::StringLiterals;
+ 
+ const int xdnd_version = 5;
+ 
+diff --git a/src/plugins/tracing/qctfserver.cpp b/src/plugins/tracing/qctfserver.cpp
+index 1d75cd466df..8fc9cbb23b8 100644
+--- a/src/plugins/tracing/qctfserver.cpp
++++ b/src/plugins/tracing/qctfserver.cpp
+@@ -9,7 +9,7 @@
+ #include <zstd.h>
+ #endif
+ 
+-using namespace Qt::Literals::StringLiterals;
++using namespace Qt::StringLiterals;
+ 
+ Q_LOGGING_CATEGORY(lcCtfInfoTrace, "qt.core.ctfserver", QtWarningMsg)
+ 
+diff --git a/tests/auto/corelib/text/qlatin1stringmatcher/tst_qlatin1stringmatcher.cpp b/tests/auto/corelib/text/qlatin1stringmatcher/tst_qlatin1stringmatcher.cpp
+index f37be056c74..fdec87443c6 100644
+--- a/tests/auto/corelib/text/qlatin1stringmatcher/tst_qlatin1stringmatcher.cpp
++++ b/tests/auto/corelib/text/qlatin1stringmatcher/tst_qlatin1stringmatcher.cpp
+@@ -17,7 +17,7 @@
+ #    undef interface
+ #endif
+ 
+-using namespace Qt::Literals::StringLiterals;
++using namespace Qt::StringLiterals;
+ 
+ class tst_QLatin1StringMatcher : public QObject
+ {
+diff --git a/tests/auto/corelib/text/qlatin1stringview/tst_qlatin1stringview.cpp b/tests/auto/corelib/text/qlatin1stringview/tst_qlatin1stringview.cpp
+index 1e79d8837a4..7ae2470d10a 100644
+--- a/tests/auto/corelib/text/qlatin1stringview/tst_qlatin1stringview.cpp
++++ b/tests/auto/corelib/text/qlatin1stringview/tst_qlatin1stringview.cpp
+@@ -148,7 +148,7 @@ void tst_QLatin1StringView::construction()
+ void tst_QLatin1StringView::userDefinedLiterals()
+ {
+     {
+-        using namespace Qt::Literals::StringLiterals;
++        using namespace Qt::StringLiterals;
+ 
+         auto str = "abcd"_L1;
+         static_assert(std::is_same_v<decltype(str), QLatin1StringView>);
+@@ -421,13 +421,13 @@ void tst_QLatin1StringView::count()
+     QCOMPARE(emptyStr.count(QLatin1StringView()), 1);
+     QCOMPARE(emptyStr.count(QLatin1StringView("")), 1);
+ 
+-    using namespace Qt::Literals::StringLiterals;
++    using namespace Qt::StringLiterals;
+     QCOMPARE("a\0b"_L1.count(QChar::SpecialCharacter::LineSeparator), 0);
+ }
+ 
+ void tst_QLatin1StringView::indexOf_data()
+ {
+-    using namespace Qt::Literals::StringLiterals;
++    using namespace Qt::StringLiterals;
+ 
+     QTest::addColumn<QLatin1StringView>("needle");
+     QTest::addColumn<QLatin1StringView>("haystack");
+diff --git a/tests/auto/corelib/text/qtextboundaryfinder/tst_qtextboundaryfinder.cpp b/tests/auto/corelib/text/qtextboundaryfinder/tst_qtextboundaryfinder.cpp
+index 539762bb564..aaeeb042166 100644
+--- a/tests/auto/corelib/text/qtextboundaryfinder/tst_qtextboundaryfinder.cpp
++++ b/tests/auto/corelib/text/qtextboundaryfinder/tst_qtextboundaryfinder.cpp
+@@ -12,7 +12,7 @@
+ 
+ #include <algorithm>
+ 
+-using namespace Qt::Literals::StringLiterals;
++using namespace Qt::StringLiterals;
+ 
+ class tst_QTextBoundaryFinder : public QObject
+ {
+diff --git a/tests/auto/tools/qt_cmake_create/tst_qt_cmake_create.cpp b/tests/auto/tools/qt_cmake_create/tst_qt_cmake_create.cpp
+index 0bd18de815d..39a7c4588b6 100644
+--- a/tests/auto/tools/qt_cmake_create/tst_qt_cmake_create.cpp
++++ b/tests/auto/tools/qt_cmake_create/tst_qt_cmake_create.cpp
+@@ -13,7 +13,7 @@
+ 
+ #include <array>
+ 
+-using namespace Qt::Literals::StringLiterals;
++using namespace Qt::StringLiterals;
+ 
+ class tst_qt_cmake_create : public QObject
+ {
+-- 
+2.51.2
+

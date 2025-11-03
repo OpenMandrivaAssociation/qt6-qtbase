@@ -1,0 +1,42 @@
+From ec981d7fc79f0601e8be43a0cac1182a23100ffb Mon Sep 17 00:00:00 2001
+From: Thiago Macieira <thiago.macieira@intel.com>
+Date: Thu, 2 Oct 2025 20:24:50 -0700
+Subject: [PATCH 270/553] Do #include <QtNetwork/qhostaddress.h> from
+ qabstractsocket.h in Qt 7
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Amends commit 969337bcfd6af6d91b988e4b412703274a0b5877, which clearly
+added the wrong header. Including qabstractsocket.h from
+qabstractsocket.h would do nothing because the include guard was already
+set. But in Qt 7 we will need QHostAddress.
+
+Pick-to: 6.8
+Change-Id: If6c977a6fba674b2a7edfffd26f672d251018f66
+Reviewed-by: Mårten Nordheim <marten.nordheim@qt.io>
+(cherry picked from commit b20d94453a9959ac18217500a394bebb0a37ea3b)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/network/socket/qabstractsocket.h | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/src/network/socket/qabstractsocket.h b/src/network/socket/qabstractsocket.h
+index ca8d0c9b34a..f3db8b0e722 100644
+--- a/src/network/socket/qabstractsocket.h
++++ b/src/network/socket/qabstractsocket.h
+@@ -6,10 +6,7 @@
+ #define QABSTRACTSOCKET_H
+ 
+ #include <QtNetwork/qtnetworkglobal.h>
+-#if QT_VERSION >= QT_VERSION_CHECK(7, 0, 0)
+-#include <QtNetwork/qabstractsocket.h>
+-#endif
+-#ifdef Q_QDOC
++#if QT_VERSION >= QT_VERSION_CHECK(7, 0, 0) || defined(Q_QDOC)
+ #include <QtNetwork/qhostaddress.h>
+ #endif
+ #include <QtCore/qiodevice.h>
+-- 
+2.51.2
+

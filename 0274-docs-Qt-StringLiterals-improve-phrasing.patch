@@ -1,0 +1,48 @@
+From ff33adc90f6cfbd8f15a63efb26c297611194b3d Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Thu, 2 Oct 2025 13:43:29 +0200
+Subject: [PATCH 274/553] [docs] Qt::StringLiterals: improve phrasing
+
+It's "(user-defined) literal operators for Qt string types", not
+"(user-defined) string literal operators for Qt types".
+
+The latter sounds like there could be string literal operators for
+arbitrary Qt types, which is decidedly not the case. The namespace is
+called StringLiterals, yes, but it means "literals for strings", like
+chrono_literals means "literals for chrono types".
+
+Amends e440fec7fc729342dce7c8421618a95dab11a36b.
+
+Pick-to: 6.8 6.5
+Change-Id: I728ee02ebc971812d5daa9fcc753093f4c0a20a3
+Reviewed-by: Edward Welbourne <edward.welbourne@qt.io>
+Reviewed-by: Paul Wicking <paul.wicking@qt.io>
+(cherry picked from commit fad20ab9e9edc85abffc106ab9901b18f1027e03)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/text/qtliterals.qdoc | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/corelib/text/qtliterals.qdoc b/src/corelib/text/qtliterals.qdoc
+index d108aeb615e..eed98eaacc1 100644
+--- a/src/corelib/text/qtliterals.qdoc
++++ b/src/corelib/text/qtliterals.qdoc
+@@ -21,11 +21,11 @@
+     \inmodule QtCore
+     \inheaderfile QString
+ 
+-    \brief The StringLiterals namespace declares string literal operators
+-    for Qt types.
++    \brief The StringLiterals namespace declares literal operators for Qt
++    string types.
+ 
+-    The inline Qt::Literals::StringLiterals namespace declares string literal
+-    operators for Qt types. Because both \c Literals and \c StringLiterals
++    The inline Qt::Literals::StringLiterals namespace declares literal operators
++    for Qt string types. Because both \c Literals and \c StringLiterals
+     namespaces are declared as inline, the symbols from this namespace can be
+     accessed by adding one of the following to your code:
+ 
+-- 
+2.51.2
+

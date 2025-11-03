@@ -1,0 +1,45 @@
+From 5db6b227aca87457db893990ca1c1b1a4bd020f2 Mon Sep 17 00:00:00 2001
+From: Assam Boudjelthia <assam.boudjelthia@qt.io>
+Date: Wed, 17 Sep 2025 12:54:15 +0300
+Subject: [PATCH 110/553] tst_QWidget: account for resize event after receiving
+ safe margins
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The top level widget in the test might be too big in some Android
+devices and ends up overlapping the system areas, it would then
+receive a non-null safe margins and then a resize event, so the
+test needs to account for that case.
+
+Pick-to: 6.9
+Fixes: QTBUG-140192
+Change-Id: Iff7194e48cc000cc0a37b66f8ac219f54a87d6db
+Reviewed-by: Tor Arne Vestbø <tor.arne.vestbo@qt.io>
+(cherry picked from commit 73e13a88f7e966ebeb2db276642710bf51a6f1bb)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ tests/auto/widgets/kernel/qwidget/tst_qwidget.cpp | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/tests/auto/widgets/kernel/qwidget/tst_qwidget.cpp b/tests/auto/widgets/kernel/qwidget/tst_qwidget.cpp
+index 844de0e2996..dcde8c19c75 100644
+--- a/tests/auto/widgets/kernel/qwidget/tst_qwidget.cpp
++++ b/tests/auto/widgets/kernel/qwidget/tst_qwidget.cpp
+@@ -3445,7 +3445,12 @@ void tst_QWidget::resizeEvent()
+         QCOMPARE (wTopLevel.m_resizeEventCount, 1);
+         QTestPrivate::androidCompatibleShow(&wTopLevel);
+         QVERIFY(QTest::qWaitForWindowExposed(&wTopLevel));
+-        QCOMPARE (wTopLevel.m_resizeEventCount, 2);
++        // The top level widget can receive new margins after show
++        // if the size is big enough to end up overlapping safe areas.
++        int safeMarginsResizeCount = 0;
++        if (!wTopLevel.windowHandle()->safeAreaMargins().isNull())
++            safeMarginsResizeCount = 1;
++        QCOMPARE (wTopLevel.m_resizeEventCount, 2 + safeMarginsResizeCount);
+     }
+ }
+ 
+-- 
+2.51.2
+

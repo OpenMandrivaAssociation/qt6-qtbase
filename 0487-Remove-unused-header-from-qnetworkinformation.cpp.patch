@@ -1,0 +1,32 @@
+From d109a064cf467db17e5c50b6943b3ae728818ed4 Mon Sep 17 00:00:00 2001
+From: Mate Barany <mate.barany@qt.io>
+Date: Thu, 23 Oct 2025 12:02:04 +0200
+Subject: [PATCH 487/553] Remove unused header from qnetworkinformation.cpp
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Change-Id: If5239161254da7e7a9d6c6a6ce2d724841fec330
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+Reviewed-by: Mårten Nordheim <marten.nordheim@qt.io>
+(cherry picked from commit 45bba56bebc213f066c2cc6bf8ef272848fb9347)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/network/kernel/qnetworkinformation.cpp | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/network/kernel/qnetworkinformation.cpp b/src/network/kernel/qnetworkinformation.cpp
+index 80551b64633..5c4e65839c5 100644
+--- a/src/network/kernel/qnetworkinformation.cpp
++++ b/src/network/kernel/qnetworkinformation.cpp
+@@ -16,7 +16,6 @@
+ 
+ #include <algorithm>
+ #include <memory>
+-#include <mutex>
+ 
+ QT_BEGIN_NAMESPACE
+ 
+-- 
+2.51.2
+

@@ -1,0 +1,123 @@
+From 9a8bf3b4bb04559b0974a1274f2a203e6da3347e Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Mon, 29 Sep 2025 00:04:48 +0200
+Subject: [PATCH 239/553] QDBusReply: apply Rule Of Zero
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The copy ctor was defaulted, the copy assignment operator was
+implemented manually as member-wise copy, which is the same as the
+compiler would have done. The rest of the SMFs were missing; in
+particular the move SMFs.
+
+Fix by removing both (RO0), thereby re-enabling the move SMFs,
+too. Add a comment.
+
+Reverts 2cbc5f6f7ae8ba580126a7cafc1898377c2a2407 (which added the
+defaulted copy ctor instead of removing the default-able
+copy-assignment operator) and amends the start of the public history.
+
+[ChangeLog][QtDBus][QDBusReply] Enabled move constructor and
+move assignment operator.
+
+Task-number: QTBUG-53264
+Pick-to: 6.9 6.8
+Change-Id: Ie934eeca3f566cd441e15fbfd90d5ad2593206f4
+Reviewed-by: Mårten Nordheim <marten.nordheim@qt.io>
+(cherry picked from commit 5e4fedb906a47092749824feb21b095185fcf0b4)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/dbus/qdbusreply.cpp | 12 ------------
+ src/dbus/qdbusreply.h   | 20 ++++----------------
+ 2 files changed, 4 insertions(+), 28 deletions(-)
+
+diff --git a/src/dbus/qdbusreply.cpp b/src/dbus/qdbusreply.cpp
+index b9eff2a5251..b49c4af687a 100644
+--- a/src/dbus/qdbusreply.cpp
++++ b/src/dbus/qdbusreply.cpp
+@@ -41,13 +41,6 @@ using namespace Qt::StringLiterals;
+     \sa QDBusMessage, QDBusInterface
+ */
+ 
+-/*!
+-    \fn template<typename T> QDBusReply<T>::QDBusReply(const QDBusReply &other)
+-    \since 5.15
+-
+-    Constructs a copy of \a other.
+-*/
+-
+ /*!
+     \fn template<typename T> QDBusReply<T>::QDBusReply(const QDBusMessage &reply)
+     Automatically construct a QDBusReply object from the reply message \a reply, extracting the
+@@ -75,11 +68,6 @@ using namespace Qt::StringLiterals;
+     Constructs an error reply from the D-Bus error code given by \a error.
+ */
+ 
+-/*!
+-    \fn template <typename T> QDBusReply<T>::operator=(const QDBusReply &other)
+-    Makes this object be a copy of the object \a other.
+-*/
+-
+ /*!
+     \fn template <typename T> QDBusReply<T>::operator=(const QDBusError &dbusError)
+     Sets this object to contain the error code given by \a dbusError. You
+diff --git a/src/dbus/qdbusreply.h b/src/dbus/qdbusreply.h
+index 8605f735b90..eed34ffadea 100644
+--- a/src/dbus/qdbusreply.h
++++ b/src/dbus/qdbusreply.h
+@@ -25,11 +25,12 @@ class QDBusReply
+ {
+     typedef T Type;
+ public:
++    // Rule Of Zero applies!
++
+     inline QDBusReply(const QDBusMessage &reply)
+     {
+         *this = reply;
+     }
+-    inline QDBusReply(const QDBusReply &) = default;
+     inline QDBusReply& operator=(const QDBusMessage &reply)
+     {
+         QVariant data(QMetaType::fromType<Type>());
+@@ -64,13 +65,6 @@ public:
+         return *this;
+     }
+ 
+-    inline QDBusReply& operator=(const QDBusReply& other)
+-    {
+-        m_error = other.m_error;
+-        m_data = other.m_data;
+-        return *this;
+-    }
+-
+     inline bool isValid() const { return !m_error.isValid(); }
+ 
+     inline const QDBusError& error() const { return m_error; }
+@@ -106,6 +100,8 @@ template<>
+ class QDBusReply<void>
+ {
+ public:
++    // Rule Of Zero applies!
++
+     inline QDBusReply(const QDBusMessage &reply)
+         : m_error(reply)
+     {
+@@ -135,14 +131,6 @@ public:
+         return *this;
+     }
+ 
+-    inline QDBusReply(const QDBusReply &) = default;
+-
+-    inline QDBusReply& operator=(const QDBusReply& other)
+-    {
+-        m_error = other.m_error;
+-        return *this;
+-    }
+-
+     inline bool isValid() const { return !m_error.isValid(); }
+ 
+     inline const QDBusError& error() const { return m_error; }
+-- 
+2.51.2
+

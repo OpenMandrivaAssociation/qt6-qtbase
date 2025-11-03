@@ -1,0 +1,774 @@
+From 9e6078294e48b3271284210ab4000256847c588c Mon Sep 17 00:00:00 2001
+From: Volker Hilsheimer <volker.hilsheimer@qt.io>
+Date: Tue, 16 Sep 2025 15:48:01 +0200
+Subject: [PATCH 130/553] Add security tags to the Qt Sql module
+
+Tag code that constructs SQL statements, parses results, or deals with
+user credentials as security critical. This is the driver code, the
+implementation of QSqlResult, QSqlTableModel, and the QSqlDatabase
+implementation (which deals with, and optionally stores, credentials).
+
+The rest of the code is not critical and gets the default tag.
+
+Fixes: QTBUG-135591
+Pick-to: 6.9 6.8
+Change-Id: I18fb565fd27ed8d1c9c1f3a1f572816b718eb3e8
+Reviewed-by: Mate Barany <mate.barany@qt.io>
+(cherry picked from commit 55f46569f3e9688c2a07973923bfda68aa2b0c3e)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/plugins/sqldrivers/db2/main.cpp               | 1 +
+ src/plugins/sqldrivers/db2/qsql_db2.cpp           | 1 +
+ src/plugins/sqldrivers/db2/qsql_db2_p.h           | 1 +
+ src/plugins/sqldrivers/ibase/main.cpp             | 1 +
+ src/plugins/sqldrivers/ibase/qsql_ibase.cpp       | 1 +
+ src/plugins/sqldrivers/ibase/qsql_ibase_p.h       | 1 +
+ src/plugins/sqldrivers/mimer/main.cpp             | 2 ++
+ src/plugins/sqldrivers/mimer/qsql_mimer.cpp       | 2 ++
+ src/plugins/sqldrivers/mimer/qsql_mimer.h         | 2 ++
+ src/plugins/sqldrivers/mysql/main.cpp             | 1 +
+ src/plugins/sqldrivers/mysql/qsql_mysql.cpp       | 1 +
+ src/plugins/sqldrivers/mysql/qsql_mysql_p.h       | 1 +
+ src/plugins/sqldrivers/oci/main.cpp               | 1 +
+ src/plugins/sqldrivers/oci/qsql_oci.cpp           | 1 +
+ src/plugins/sqldrivers/oci/qsql_oci_p.h           | 1 +
+ src/plugins/sqldrivers/odbc/main.cpp              | 1 +
+ src/plugins/sqldrivers/odbc/qsql_odbc.cpp         | 1 +
+ src/plugins/sqldrivers/odbc/qsql_odbc_p.h         | 1 +
+ src/plugins/sqldrivers/psql/main.cpp              | 1 +
+ src/plugins/sqldrivers/psql/qsql_psql.cpp         | 1 +
+ src/plugins/sqldrivers/psql/qsql_psql_p.h         | 1 +
+ src/plugins/sqldrivers/sqlite/qsql_sqlite.cpp     | 1 +
+ src/plugins/sqldrivers/sqlite/qsql_sqlite_p.h     | 1 +
+ src/plugins/sqldrivers/sqlite/qsql_sqlite_vfs.cpp | 1 +
+ src/plugins/sqldrivers/sqlite/qsql_sqlite_vfs_p.h | 1 +
+ src/plugins/sqldrivers/sqlite/smain.cpp           | 1 +
+ src/sql/compat/removed_api.cpp                    | 1 +
+ src/sql/kernel/qsqlcachedresult.cpp               | 1 +
+ src/sql/kernel/qsqlcachedresult_p.h               | 1 +
+ src/sql/kernel/qsqldatabase.cpp                   | 1 +
+ src/sql/kernel/qsqldatabase.h                     | 1 +
+ src/sql/kernel/qsqldriver.cpp                     | 1 +
+ src/sql/kernel/qsqldriver.h                       | 1 +
+ src/sql/kernel/qsqldriver_p.h                     | 1 +
+ src/sql/kernel/qsqldriverplugin.cpp               | 1 +
+ src/sql/kernel/qsqldriverplugin.h                 | 1 +
+ src/sql/kernel/qsqlerror.cpp                      | 1 +
+ src/sql/kernel/qsqlerror.h                        | 1 +
+ src/sql/kernel/qsqlfield.cpp                      | 1 +
+ src/sql/kernel/qsqlfield.h                        | 1 +
+ src/sql/kernel/qsqlindex.cpp                      | 1 +
+ src/sql/kernel/qsqlindex.h                        | 1 +
+ src/sql/kernel/qsqlnulldriver_p.h                 | 1 +
+ src/sql/kernel/qsqlquery.cpp                      | 1 +
+ src/sql/kernel/qsqlquery.h                        | 1 +
+ src/sql/kernel/qsqlrecord.cpp                     | 1 +
+ src/sql/kernel/qsqlrecord.h                       | 1 +
+ src/sql/kernel/qsqlresult.cpp                     | 1 +
+ src/sql/kernel/qsqlresult.h                       | 1 +
+ src/sql/kernel/qsqlresult_p.h                     | 1 +
+ src/sql/kernel/qtsqlglobal.h                      | 1 +
+ src/sql/kernel/qtsqlglobal_p.h                    | 1 +
+ src/sql/models/qsqlquerymodel.cpp                 | 1 +
+ src/sql/models/qsqlquerymodel.h                   | 1 +
+ src/sql/models/qsqlquerymodel_p.h                 | 1 +
+ src/sql/models/qsqlrelationaldelegate.cpp         | 1 +
+ src/sql/models/qsqlrelationaldelegate.h           | 1 +
+ src/sql/models/qsqlrelationaltablemodel.cpp       | 1 +
+ src/sql/models/qsqlrelationaltablemodel.h         | 1 +
+ src/sql/models/qsqltablemodel.cpp                 | 1 +
+ src/sql/models/qsqltablemodel.h                   | 1 +
+ src/sql/models/qsqltablemodel_p.h                 | 1 +
+ 62 files changed, 65 insertions(+)
+
+diff --git a/src/plugins/sqldrivers/db2/main.cpp b/src/plugins/sqldrivers/db2/main.cpp
+index b5aa5a6492a..b0064c28033 100644
+--- a/src/plugins/sqldrivers/db2/main.cpp
++++ b/src/plugins/sqldrivers/db2/main.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <qsqldriverplugin.h>
+ #include <qstringlist.h>
+diff --git a/src/plugins/sqldrivers/db2/qsql_db2.cpp b/src/plugins/sqldrivers/db2/qsql_db2.cpp
+index 5e631cab2a3..50efabe4687 100644
+--- a/src/plugins/sqldrivers/db2/qsql_db2.cpp
++++ b/src/plugins/sqldrivers/db2/qsql_db2.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:critical reason:data-parser
+ 
+ #include "qsql_db2_p.h"
+ #include <qcoreapplication.h>
+diff --git a/src/plugins/sqldrivers/db2/qsql_db2_p.h b/src/plugins/sqldrivers/db2/qsql_db2_p.h
+index 9e580352b25..e95ac05ca63 100644
+--- a/src/plugins/sqldrivers/db2/qsql_db2_p.h
++++ b/src/plugins/sqldrivers/db2/qsql_db2_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQL_DB2_H
+ #define QSQL_DB2_H
+diff --git a/src/plugins/sqldrivers/ibase/main.cpp b/src/plugins/sqldrivers/ibase/main.cpp
+index 24e9dc0864a..2b354ef54e9 100644
+--- a/src/plugins/sqldrivers/ibase/main.cpp
++++ b/src/plugins/sqldrivers/ibase/main.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <qsqldriverplugin.h>
+ #include <qstringlist.h>
+diff --git a/src/plugins/sqldrivers/ibase/qsql_ibase.cpp b/src/plugins/sqldrivers/ibase/qsql_ibase.cpp
+index e68bcaa6070..5694a3a9097 100644
+--- a/src/plugins/sqldrivers/ibase/qsql_ibase.cpp
++++ b/src/plugins/sqldrivers/ibase/qsql_ibase.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2022 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:critical reason:data-parser
+ 
+ #include "qsql_ibase_p.h"
+ #include <QtCore/qcoreapplication.h>
+diff --git a/src/plugins/sqldrivers/ibase/qsql_ibase_p.h b/src/plugins/sqldrivers/ibase/qsql_ibase_p.h
+index 86c7ae1241a..d70ab2982a6 100644
+--- a/src/plugins/sqldrivers/ibase/qsql_ibase_p.h
++++ b/src/plugins/sqldrivers/ibase/qsql_ibase_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQL_IBASE_H
+ #define QSQL_IBASE_H
+diff --git a/src/plugins/sqldrivers/mimer/main.cpp b/src/plugins/sqldrivers/mimer/main.cpp
+index 560b7da7c7a..1bbb6a8a8e4 100644
+--- a/src/plugins/sqldrivers/mimer/main.cpp
++++ b/src/plugins/sqldrivers/mimer/main.cpp
+@@ -1,6 +1,8 @@
+ // Copyright (C) 2022 The Qt Company Ltd.
+ // Copyright (C) 2022 Mimer Information Technology
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
++
+ #include "qsql_mimer.h"
+ 
+ #include <qsqldriverplugin.h>
+diff --git a/src/plugins/sqldrivers/mimer/qsql_mimer.cpp b/src/plugins/sqldrivers/mimer/qsql_mimer.cpp
+index ef2c9e0f95b..cb62a5d03ec 100644
+--- a/src/plugins/sqldrivers/mimer/qsql_mimer.cpp
++++ b/src/plugins/sqldrivers/mimer/qsql_mimer.cpp
+@@ -1,6 +1,8 @@
+ // Copyright (C) 2022 The Qt Company Ltd.
+ // Copyright (C) 2022 Mimer Information Technology
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:critical reason:data-parser
++
+ #include <qcoreapplication.h>
+ #include <qvariant.h>
+ #include <qmetatype.h>
+diff --git a/src/plugins/sqldrivers/mimer/qsql_mimer.h b/src/plugins/sqldrivers/mimer/qsql_mimer.h
+index 03ad8f21f22..b2048dfdf05 100644
+--- a/src/plugins/sqldrivers/mimer/qsql_mimer.h
++++ b/src/plugins/sqldrivers/mimer/qsql_mimer.h
+@@ -1,6 +1,8 @@
+ // Copyright (C) 2022 The Qt Company Ltd.
+ // Copyright (C) 2022 Mimer Information Technology
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
++
+ #ifndef QSQL_MIMER_H
+ #define QSQL_MIMER_H
+ 
+diff --git a/src/plugins/sqldrivers/mysql/main.cpp b/src/plugins/sqldrivers/mysql/main.cpp
+index 2c10c4d348c..d5c60c740f3 100644
+--- a/src/plugins/sqldrivers/mysql/main.cpp
++++ b/src/plugins/sqldrivers/mysql/main.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <qsqldriverplugin.h>
+ #include <qstringlist.h>
+diff --git a/src/plugins/sqldrivers/mysql/qsql_mysql.cpp b/src/plugins/sqldrivers/mysql/qsql_mysql.cpp
+index e93f42d4ea2..50087615d7a 100644
+--- a/src/plugins/sqldrivers/mysql/qsql_mysql.cpp
++++ b/src/plugins/sqldrivers/mysql/qsql_mysql.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:critical reason:data-parser
+ 
+ #include "qsql_mysql_p.h"
+ 
+diff --git a/src/plugins/sqldrivers/mysql/qsql_mysql_p.h b/src/plugins/sqldrivers/mysql/qsql_mysql_p.h
+index ae3334d35ee..20f4cc11bf5 100644
+--- a/src/plugins/sqldrivers/mysql/qsql_mysql_p.h
++++ b/src/plugins/sqldrivers/mysql/qsql_mysql_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQL_MYSQL_H
+ #define QSQL_MYSQL_H
+diff --git a/src/plugins/sqldrivers/oci/main.cpp b/src/plugins/sqldrivers/oci/main.cpp
+index 6cc0062671f..01bd9d6eece 100644
+--- a/src/plugins/sqldrivers/oci/main.cpp
++++ b/src/plugins/sqldrivers/oci/main.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <qsqldriverplugin.h>
+ #include <qstringlist.h>
+diff --git a/src/plugins/sqldrivers/oci/qsql_oci.cpp b/src/plugins/sqldrivers/oci/qsql_oci.cpp
+index c1ef405806c..b7203890f54 100644
+--- a/src/plugins/sqldrivers/oci/qsql_oci.cpp
++++ b/src/plugins/sqldrivers/oci/qsql_oci.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2021 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:critical reason:data-parser
+ 
+ #include "qsql_oci_p.h"
+ 
+diff --git a/src/plugins/sqldrivers/oci/qsql_oci_p.h b/src/plugins/sqldrivers/oci/qsql_oci_p.h
+index 4e44b1050d8..1404b0a3aa7 100644
+--- a/src/plugins/sqldrivers/oci/qsql_oci_p.h
++++ b/src/plugins/sqldrivers/oci/qsql_oci_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQL_OCI_H
+ #define QSQL_OCI_H
+diff --git a/src/plugins/sqldrivers/odbc/main.cpp b/src/plugins/sqldrivers/odbc/main.cpp
+index 0310be0c643..a644370dcbb 100644
+--- a/src/plugins/sqldrivers/odbc/main.cpp
++++ b/src/plugins/sqldrivers/odbc/main.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <qsqldriverplugin.h>
+ #include <qstringlist.h>
+diff --git a/src/plugins/sqldrivers/odbc/qsql_odbc.cpp b/src/plugins/sqldrivers/odbc/qsql_odbc.cpp
+index dfeadf32b70..e9a516b0ab1 100644
+--- a/src/plugins/sqldrivers/odbc/qsql_odbc.cpp
++++ b/src/plugins/sqldrivers/odbc/qsql_odbc.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:critical reason:data-parser
+ 
+ #include "qsql_odbc_p.h"
+ #include <qsqlrecord.h>
+diff --git a/src/plugins/sqldrivers/odbc/qsql_odbc_p.h b/src/plugins/sqldrivers/odbc/qsql_odbc_p.h
+index 23703b5d036..290dda5a9ee 100644
+--- a/src/plugins/sqldrivers/odbc/qsql_odbc_p.h
++++ b/src/plugins/sqldrivers/odbc/qsql_odbc_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQL_ODBC_H
+ #define QSQL_ODBC_H
+diff --git a/src/plugins/sqldrivers/psql/main.cpp b/src/plugins/sqldrivers/psql/main.cpp
+index e473fe1edc8..8f3bb0cebd2 100644
+--- a/src/plugins/sqldrivers/psql/main.cpp
++++ b/src/plugins/sqldrivers/psql/main.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <qsqldriverplugin.h>
+ #include <qstringlist.h>
+diff --git a/src/plugins/sqldrivers/psql/qsql_psql.cpp b/src/plugins/sqldrivers/psql/qsql_psql.cpp
+index 3f82f496b4c..541ad4f0326 100644
+--- a/src/plugins/sqldrivers/psql/qsql_psql.cpp
++++ b/src/plugins/sqldrivers/psql/qsql_psql.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:critical reason:data-parser
+ 
+ #include "qsql_psql_p.h"
+ 
+diff --git a/src/plugins/sqldrivers/psql/qsql_psql_p.h b/src/plugins/sqldrivers/psql/qsql_psql_p.h
+index 0439c26ccce..e55d5499a1b 100644
+--- a/src/plugins/sqldrivers/psql/qsql_psql_p.h
++++ b/src/plugins/sqldrivers/psql/qsql_psql_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQL_PSQL_H
+ #define QSQL_PSQL_H
+diff --git a/src/plugins/sqldrivers/sqlite/qsql_sqlite.cpp b/src/plugins/sqldrivers/sqlite/qsql_sqlite.cpp
+index f639fcc06f6..7b1a6577268 100644
+--- a/src/plugins/sqldrivers/sqlite/qsql_sqlite.cpp
++++ b/src/plugins/sqldrivers/sqlite/qsql_sqlite.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:critical reason:data-parser
+ 
+ #include "qsql_sqlite_p.h"
+ 
+diff --git a/src/plugins/sqldrivers/sqlite/qsql_sqlite_p.h b/src/plugins/sqldrivers/sqlite/qsql_sqlite_p.h
+index db6b76cb692..b6bd3c49bf1 100644
+--- a/src/plugins/sqldrivers/sqlite/qsql_sqlite_p.h
++++ b/src/plugins/sqldrivers/sqlite/qsql_sqlite_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQL_SQLITE_H
+ #define QSQL_SQLITE_H
+diff --git a/src/plugins/sqldrivers/sqlite/qsql_sqlite_vfs.cpp b/src/plugins/sqldrivers/sqlite/qsql_sqlite_vfs.cpp
+index eecd27bb961..b4ab9aee85f 100644
+--- a/src/plugins/sqldrivers/sqlite/qsql_sqlite_vfs.cpp
++++ b/src/plugins/sqldrivers/sqlite/qsql_sqlite_vfs.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2023 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:critical reason:data-parser
+ 
+ #include "qsql_sqlite_vfs_p.h"
+ 
+diff --git a/src/plugins/sqldrivers/sqlite/qsql_sqlite_vfs_p.h b/src/plugins/sqldrivers/sqlite/qsql_sqlite_vfs_p.h
+index 10bfa0e829c..65d8de00d04 100644
+--- a/src/plugins/sqldrivers/sqlite/qsql_sqlite_vfs_p.h
++++ b/src/plugins/sqldrivers/sqlite/qsql_sqlite_vfs_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2023 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQL_SQLITE_VFS_H
+ #define QSQL_SQLITE_VFS_H
+diff --git a/src/plugins/sqldrivers/sqlite/smain.cpp b/src/plugins/sqldrivers/sqlite/smain.cpp
+index 0d201c38d30..c58baca6498 100644
+--- a/src/plugins/sqldrivers/sqlite/smain.cpp
++++ b/src/plugins/sqldrivers/sqlite/smain.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <qsqldriverplugin.h>
+ #include <qstringlist.h>
+diff --git a/src/sql/compat/removed_api.cpp b/src/sql/compat/removed_api.cpp
+index 8a440f87f2a..6cc9de2d28e 100644
+--- a/src/sql/compat/removed_api.cpp
++++ b/src/sql/compat/removed_api.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2022 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #define QT_SQL_BUILD_REMOVED_API
+ 
+diff --git a/src/sql/kernel/qsqlcachedresult.cpp b/src/sql/kernel/qsqlcachedresult.cpp
+index 3cc0b6419ac..6a23d63d72f 100644
+--- a/src/sql/kernel/qsqlcachedresult.cpp
++++ b/src/sql/kernel/qsqlcachedresult.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "private/qsqlcachedresult_p.h"
+ 
+diff --git a/src/sql/kernel/qsqlcachedresult_p.h b/src/sql/kernel/qsqlcachedresult_p.h
+index b8eefceee6a..1e0f7117b71 100644
+--- a/src/sql/kernel/qsqlcachedresult_p.h
++++ b/src/sql/kernel/qsqlcachedresult_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQLCACHEDRESULT_P_H
+ #define QSQLCACHEDRESULT_P_H
+diff --git a/src/sql/kernel/qsqldatabase.cpp b/src/sql/kernel/qsqldatabase.cpp
+index d07afd703bd..35c75d2de88 100644
+--- a/src/sql/kernel/qsqldatabase.cpp
++++ b/src/sql/kernel/qsqldatabase.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:critical reason:credentials
+ 
+ #include "qsqldatabase.h"
+ #include "qsqlquery.h"
+diff --git a/src/sql/kernel/qsqldatabase.h b/src/sql/kernel/qsqldatabase.h
+index fa8ee74ff05..f63a8329e85 100644
+--- a/src/sql/kernel/qsqldatabase.h
++++ b/src/sql/kernel/qsqldatabase.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQLDATABASE_H
+ #define QSQLDATABASE_H
+diff --git a/src/sql/kernel/qsqldriver.cpp b/src/sql/kernel/qsqldriver.cpp
+index e67a8d5d38b..5c458a963a9 100644
+--- a/src/sql/kernel/qsqldriver.cpp
++++ b/src/sql/kernel/qsqldriver.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:critical reason:data-parser
+ 
+ #include "qsqldriver.h"
+ 
+diff --git a/src/sql/kernel/qsqldriver.h b/src/sql/kernel/qsqldriver.h
+index 7385b3787b8..6fe7f70d32c 100644
+--- a/src/sql/kernel/qsqldriver.h
++++ b/src/sql/kernel/qsqldriver.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQLDRIVER_H
+ #define QSQLDRIVER_H
+diff --git a/src/sql/kernel/qsqldriver_p.h b/src/sql/kernel/qsqldriver_p.h
+index 29b86dfc5b0..0713aa6d295 100644
+--- a/src/sql/kernel/qsqldriver_p.h
++++ b/src/sql/kernel/qsqldriver_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQLDRIVER_P_H
+ #define QSQLDRIVER_P_H
+diff --git a/src/sql/kernel/qsqldriverplugin.cpp b/src/sql/kernel/qsqldriverplugin.cpp
+index 6dc5c35f0b1..17ac07cf188 100644
+--- a/src/sql/kernel/qsqldriverplugin.cpp
++++ b/src/sql/kernel/qsqldriverplugin.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qsqldriverplugin.h"
+ 
+diff --git a/src/sql/kernel/qsqldriverplugin.h b/src/sql/kernel/qsqldriverplugin.h
+index 6eda1266675..8fcd5d3b6d3 100644
+--- a/src/sql/kernel/qsqldriverplugin.h
++++ b/src/sql/kernel/qsqldriverplugin.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQLDRIVERPLUGIN_H
+ #define QSQLDRIVERPLUGIN_H
+diff --git a/src/sql/kernel/qsqlerror.cpp b/src/sql/kernel/qsqlerror.cpp
+index 7bf623b3461..04c1afd6cb7 100644
+--- a/src/sql/kernel/qsqlerror.cpp
++++ b/src/sql/kernel/qsqlerror.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qsqlerror.h"
+ #include "qdebug.h"
+diff --git a/src/sql/kernel/qsqlerror.h b/src/sql/kernel/qsqlerror.h
+index c042d0d8255..bc8683aaf92 100644
+--- a/src/sql/kernel/qsqlerror.h
++++ b/src/sql/kernel/qsqlerror.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQLERROR_H
+ #define QSQLERROR_H
+diff --git a/src/sql/kernel/qsqlfield.cpp b/src/sql/kernel/qsqlfield.cpp
+index b625891729a..d521a791f24 100644
+--- a/src/sql/kernel/qsqlfield.cpp
++++ b/src/sql/kernel/qsqlfield.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qsqlfield.h"
+ #include "qdebug.h"
+diff --git a/src/sql/kernel/qsqlfield.h b/src/sql/kernel/qsqlfield.h
+index ad219456fef..23ca8d35846 100644
+--- a/src/sql/kernel/qsqlfield.h
++++ b/src/sql/kernel/qsqlfield.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQLFIELD_H
+ #define QSQLFIELD_H
+diff --git a/src/sql/kernel/qsqlindex.cpp b/src/sql/kernel/qsqlindex.cpp
+index 15ee489928f..31a70a8ae4e 100644
+--- a/src/sql/kernel/qsqlindex.cpp
++++ b/src/sql/kernel/qsqlindex.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qsqlindex.h"
+ 
+diff --git a/src/sql/kernel/qsqlindex.h b/src/sql/kernel/qsqlindex.h
+index 95fa75e0f97..50aa710c502 100644
+--- a/src/sql/kernel/qsqlindex.h
++++ b/src/sql/kernel/qsqlindex.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQLINDEX_H
+ #define QSQLINDEX_H
+diff --git a/src/sql/kernel/qsqlnulldriver_p.h b/src/sql/kernel/qsqlnulldriver_p.h
+index 00226fb18bf..41e631fd795 100644
+--- a/src/sql/kernel/qsqlnulldriver_p.h
++++ b/src/sql/kernel/qsqlnulldriver_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQLNULLDRIVER_P_H
+ #define QSQLNULLDRIVER_P_H
+diff --git a/src/sql/kernel/qsqlquery.cpp b/src/sql/kernel/qsqlquery.cpp
+index 2942cae3871..6b75ad2e22c 100644
+--- a/src/sql/kernel/qsqlquery.cpp
++++ b/src/sql/kernel/qsqlquery.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2022 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qsqlquery.h"
+ 
+diff --git a/src/sql/kernel/qsqlquery.h b/src/sql/kernel/qsqlquery.h
+index ec5f06550e1..a9cb1dc5070 100644
+--- a/src/sql/kernel/qsqlquery.h
++++ b/src/sql/kernel/qsqlquery.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQLQUERY_H
+ #define QSQLQUERY_H
+diff --git a/src/sql/kernel/qsqlrecord.cpp b/src/sql/kernel/qsqlrecord.cpp
+index 6cbf9005ad4..316f4ab4b77 100644
+--- a/src/sql/kernel/qsqlrecord.cpp
++++ b/src/sql/kernel/qsqlrecord.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qsqlrecord.h"
+ 
+diff --git a/src/sql/kernel/qsqlrecord.h b/src/sql/kernel/qsqlrecord.h
+index aea9af72950..ba2ca5c2b56 100644
+--- a/src/sql/kernel/qsqlrecord.h
++++ b/src/sql/kernel/qsqlrecord.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQLRECORD_H
+ #define QSQLRECORD_H
+diff --git a/src/sql/kernel/qsqlresult.cpp b/src/sql/kernel/qsqlresult.cpp
+index 59e9879cf0b..cbdd8817c82 100644
+--- a/src/sql/kernel/qsqlresult.cpp
++++ b/src/sql/kernel/qsqlresult.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:critical reason:data-parser
+ 
+ #include "qsqlresult.h"
+ 
+diff --git a/src/sql/kernel/qsqlresult.h b/src/sql/kernel/qsqlresult.h
+index 4200bbde340..5a9f044cc7b 100644
+--- a/src/sql/kernel/qsqlresult.h
++++ b/src/sql/kernel/qsqlresult.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQLRESULT_H
+ #define QSQLRESULT_H
+diff --git a/src/sql/kernel/qsqlresult_p.h b/src/sql/kernel/qsqlresult_p.h
+index 6eebdaaba41..1ccda320d86 100644
+--- a/src/sql/kernel/qsqlresult_p.h
++++ b/src/sql/kernel/qsqlresult_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQLRESULT_P_H
+ #define QSQLRESULT_P_H
+diff --git a/src/sql/kernel/qtsqlglobal.h b/src/sql/kernel/qtsqlglobal.h
+index 977d97abbf6..e27d8a160c8 100644
+--- a/src/sql/kernel/qtsqlglobal.h
++++ b/src/sql/kernel/qtsqlglobal.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QTSQLGLOBAL_H
+ #define QTSQLGLOBAL_H
+diff --git a/src/sql/kernel/qtsqlglobal_p.h b/src/sql/kernel/qtsqlglobal_p.h
+index df217fb68f0..f4463ca0ed2 100644
+--- a/src/sql/kernel/qtsqlglobal_p.h
++++ b/src/sql/kernel/qtsqlglobal_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QTSQLGLOBAL_P_H
+ #define QTSQLGLOBAL_P_H
+diff --git a/src/sql/models/qsqlquerymodel.cpp b/src/sql/models/qsqlquerymodel.cpp
+index d8e10343854..9211d941211 100644
+--- a/src/sql/models/qsqlquerymodel.cpp
++++ b/src/sql/models/qsqlquerymodel.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qsqlquerymodel.h"
+ #include "qsqlquerymodel_p.h"
+diff --git a/src/sql/models/qsqlquerymodel.h b/src/sql/models/qsqlquerymodel.h
+index 72b9b053f03..23c72475a9f 100644
+--- a/src/sql/models/qsqlquerymodel.h
++++ b/src/sql/models/qsqlquerymodel.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQLQUERYMODEL_H
+ #define QSQLQUERYMODEL_H
+diff --git a/src/sql/models/qsqlquerymodel_p.h b/src/sql/models/qsqlquerymodel_p.h
+index a4c408d081f..08c0d4ad7f1 100644
+--- a/src/sql/models/qsqlquerymodel_p.h
++++ b/src/sql/models/qsqlquerymodel_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQLQUERYMODEL_P_H
+ #define QSQLQUERYMODEL_P_H
+diff --git a/src/sql/models/qsqlrelationaldelegate.cpp b/src/sql/models/qsqlrelationaldelegate.cpp
+index 73a6fbe5016..d45f12822fc 100644
+--- a/src/sql/models/qsqlrelationaldelegate.cpp
++++ b/src/sql/models/qsqlrelationaldelegate.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qglobal.h"
+ 
+diff --git a/src/sql/models/qsqlrelationaldelegate.h b/src/sql/models/qsqlrelationaldelegate.h
+index 35c534eae43..4033d88146a 100644
+--- a/src/sql/models/qsqlrelationaldelegate.h
++++ b/src/sql/models/qsqlrelationaldelegate.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQLRELATIONALDELEGATE_H
+ #define QSQLRELATIONALDELEGATE_H
+diff --git a/src/sql/models/qsqlrelationaltablemodel.cpp b/src/sql/models/qsqlrelationaltablemodel.cpp
+index c359adac44c..c9d95ebdfff 100644
+--- a/src/sql/models/qsqlrelationaltablemodel.cpp
++++ b/src/sql/models/qsqlrelationaltablemodel.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qsqlrelationaltablemodel.h"
+ 
+diff --git a/src/sql/models/qsqlrelationaltablemodel.h b/src/sql/models/qsqlrelationaltablemodel.h
+index 814bae41bbc..c688d805c59 100644
+--- a/src/sql/models/qsqlrelationaltablemodel.h
++++ b/src/sql/models/qsqlrelationaltablemodel.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQLRELATIONALTABLEMODEL_H
+ #define QSQLRELATIONALTABLEMODEL_H
+diff --git a/src/sql/models/qsqltablemodel.cpp b/src/sql/models/qsqltablemodel.cpp
+index 5a6c239ee6a..19710749f62 100644
+--- a/src/sql/models/qsqltablemodel.cpp
++++ b/src/sql/models/qsqltablemodel.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2021 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:critical reason:data-parser
+ 
+ #include "qsqltablemodel.h"
+ 
+diff --git a/src/sql/models/qsqltablemodel.h b/src/sql/models/qsqltablemodel.h
+index 8af3f84c59d..737d2cd140e 100644
+--- a/src/sql/models/qsqltablemodel.h
++++ b/src/sql/models/qsqltablemodel.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQLTABLEMODEL_H
+ #define QSQLTABLEMODEL_H
+diff --git a/src/sql/models/qsqltablemodel_p.h b/src/sql/models/qsqltablemodel_p.h
+index 864c977ebb9..03fc68038b1 100644
+--- a/src/sql/models/qsqltablemodel_p.h
++++ b/src/sql/models/qsqltablemodel_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSQLTABLEMODEL_P_H
+ #define QSQLTABLEMODEL_P_H
+-- 
+2.51.2
+

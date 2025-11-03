@@ -1,0 +1,85 @@
+From a0267ebbb4abc65771b8fbbea30be3bd17ec768e Mon Sep 17 00:00:00 2001
+From: Ivan Solovev <ivan.solovev@qt.io>
+Date: Wed, 24 Sep 2025 16:50:22 +0200
+Subject: [PATCH 334/553] Properly set ReceivePacketInformation socket option
+ for dual-stack
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+On Windows if IPV6_V6ONLY == 0, we need to set both IPV6_PKTINFO and
+IP_PKTINFO options in order to correctly receive the information from
+IPv4 packets.
+
+Instead of explicitly checking the IPv6_V6ONLY option via getsockopt,
+this patch simply tries to unconditionally set the IPv4 option, and
+ignores the potential error if the protocol is not IPv4-only.
+
+Unix implementation is not touched by this patch, because there
+enabling packet info for IPv6 also enables it for IPv4.
+Also, an attempt to set IP_PKTINFO for AF_INET6 socket fails there
+even if IPV6_V6ONLY == 0.
+
+Task-number: QTBUG-80704
+Task-number: QTBUG-139697
+Pick-to: 6.8
+Change-Id: I662ecc7de6ea29174b00b02f1f3a774b45104dc0
+Reviewed-by: Mårten Nordheim <marten.nordheim@qt.io>
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit e9778dfe6ead0c4d704570816a56aead084a0263)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../socket/qnativesocketengine_win.cpp        | 30 ++++++++++++++-----
+ 1 file changed, 23 insertions(+), 7 deletions(-)
+
+diff --git a/src/network/socket/qnativesocketengine_win.cpp b/src/network/socket/qnativesocketengine_win.cpp
+index 7afef9d1036..b8b5022b83a 100644
+--- a/src/network/socket/qnativesocketengine_win.cpp
++++ b/src/network/socket/qnativesocketengine_win.cpp
+@@ -199,13 +199,7 @@ static void convertToLevelAndOption(QNativeSocketEngine::SocketOption opt,
+         }
+         break;
+     case QNativeSocketEngine::ReceivePacketInformation:
+-        if (socketProtocol == QAbstractSocket::IPv6Protocol || socketProtocol == QAbstractSocket::AnyIPProtocol) {
+-            level = IPPROTO_IPV6;
+-            n = IPV6_PKTINFO;
+-        } else if (socketProtocol == QAbstractSocket::IPv4Protocol) {
+-            level = IPPROTO_IP;
+-            n = IP_PKTINFO;
+-        }
++        Q_UNREACHABLE(); // handled in setOption() directly now
+         break;
+     case QNativeSocketEngine::ReceiveHopLimit:
+         if (socketProtocol == QAbstractSocket::IPv6Protocol || socketProtocol == QAbstractSocket::AnyIPProtocol) {
+@@ -425,6 +419,28 @@ bool QNativeSocketEnginePrivate::setOption(QNativeSocketEngine::SocketOption opt
+     case QNativeSocketEngine::MaxStreamsSocketOption:
+         return false;
+ 
++    case QNativeSocketEngine::ReceivePacketInformation: {
++        if (socketProtocol == QAbstractSocket::IPv6Protocol
++            || socketProtocol == QAbstractSocket::AnyIPProtocol) {
++            // set the IPv6 option
++            if (::setsockopt(socketDescriptor, IPPROTO_IPV6, IPV6_PKTINFO,
++                             reinterpret_cast<char *>(&v), sizeof(v)) != 0) {
++                WS_ERROR_DEBUG(WSAGetLastError());
++                return false;
++            }
++        }
++        // Try to set the IPv4 option in any case, but fail only if the
++        // protocol is IPv4
++        if (::setsockopt(socketDescriptor, IPPROTO_IP, IP_PKTINFO,
++                         reinterpret_cast<char *>(&v), sizeof(v)) != 0) {
++            if (socketProtocol == QAbstractSocket::IPv4Protocol) {
++                WS_ERROR_DEBUG(WSAGetLastError());
++                return false;
++            }
++        }
++        return true;
++    }
++
+     default:
+         break;
+     }
+-- 
+2.51.2
+

@@ -1,0 +1,100 @@
+From 9bb3c9264400b9749bf7ba504f3c56dcbfa6f974 Mon Sep 17 00:00:00 2001
+From: Assam Boudjelthia <assam.boudjelthia@qt.io>
+Date: Mon, 6 Oct 2025 14:28:14 +0300
+Subject: [PATCH 391/553] Android: fix QtQuickView fields access level
+
+Some fields under QtView and thus under QtQuickView are marked
+as protected which ends up shown in javadoc. These fiedls are
+internal and shouldn't be treated as public, so instead, make
+them private and provide package-private getters/setters for
+QtQuickView to access those fields internally.
+
+Pick-to: 6.8
+Change-Id: I438b1828a6691199d94c94810591f604f2b4299c
+Reviewed-by: Soheil Armin <soheil.armin@qt.io>
+(cherry picked from commit e381e5087aae67c125496ce672f43d9cfba2032d)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../src/org/qtproject/qt/android/QtView.java  | 49 +++++++++++++++----
+ 1 file changed, 39 insertions(+), 10 deletions(-)
+
+diff --git a/src/android/jar/src/org/qtproject/qt/android/QtView.java b/src/android/jar/src/org/qtproject/qt/android/QtView.java
+index b60c58013f5..e245f731ce8 100644
+--- a/src/android/jar/src/org/qtproject/qt/android/QtView.java
++++ b/src/android/jar/src/org/qtproject/qt/android/QtView.java
+@@ -25,11 +25,11 @@ abstract class QtView extends ViewGroup implements QtNative.AppStateDetailsListe
+         void onQtWindowLoaded();
+     }
+ 
+-    protected QtWindow m_window;
+-    protected long m_windowReference;
+-    protected long m_parentWindowReference;
+-    protected QtWindowListener m_windowListener;
+-    protected final QtEmbeddedViewInterface m_viewInterface;
++    private QtWindow m_window;
++    private long m_windowReference;
++    private long m_parentWindowReference;
++    private QtWindowListener m_windowListener;
++    private final QtEmbeddedViewInterface m_viewInterface;
+     // Implement in subclass to handle the creation of the QWindow and its parent container.
+     // TODO could we take care of the parent window creation and parenting outside of the
+     // window creation method to simplify things if user would extend this? Preferably without
+@@ -164,10 +164,43 @@ abstract class QtView extends ViewGroup implements QtNative.AppStateDetailsListe
+         m_windowReference = windowReference;
+     }
+ 
+-    long windowReference() {
++    long getWindowReference() {
+         return m_windowReference;
+     }
+ 
++    void setQtWindow(QtWindow qtWindow) {
++        m_window = qtWindow;
++    }
++
++    QtWindow getQtWindow() {
++        return m_window;
++    }
++
++    long getParentWindowReference()
++    {
++        return m_parentWindowReference;
++    }
++
++    void setParentWindowReference(long reference)
++    {
++        m_parentWindowReference = reference;
++    }
++
++    QtWindowListener getWindowListener()
++    {
++        return m_windowListener;
++    }
++
++    void setWindowListener(QtWindowListener listner)
++    {
++        m_windowListener = listner;
++    }
++
++    QtEmbeddedViewInterface getViewInterface()
++    {
++        return m_viewInterface;
++    }
++
+     // Set the visibility of the underlying QWindow. If visible is true, showNormal() is called.
+     // If false, the window is hidden.
+     void setWindowVisible(boolean visible) {
+@@ -203,10 +236,6 @@ abstract class QtView extends ViewGroup implements QtNative.AppStateDetailsListe
+         setWindowReference(0L);
+     }
+ 
+-    QtWindow getQtWindow() {
+-        return m_window;
+-    }
+-
+     @Override
+     public void onAppStateDetailsChanged(QtNative.ApplicationStateDetails details) {
+         if (!details.isStarted) {
+-- 
+2.51.2
+

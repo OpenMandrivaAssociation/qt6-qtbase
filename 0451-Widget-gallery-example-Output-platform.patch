@@ -1,0 +1,33 @@
+From ba745fddf89dcb4df19d6fa79fed2161d85d134c Mon Sep 17 00:00:00 2001
+From: Friedemann Kleint <Friedemann.Kleint@qt.io>
+Date: Fri, 17 Oct 2025 07:59:53 +0200
+Subject: [PATCH 451/553] Widget gallery example: Output platform
+
+On Linux, it can be helpful to know whether it us using
+wayland or falling back to xcb.
+
+Change-Id: I175f422b9dd35278deb82c63f73989bab46e43bb
+Reviewed-by: Axel Spoerl <axel.spoerl@qt.io>
+(cherry picked from commit 130ca2a062722aea0bf18f0ba832652ae6181365)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ examples/widgets/gallery/widgetgallery.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/examples/widgets/gallery/widgetgallery.cpp b/examples/widgets/gallery/widgetgallery.cpp
+index 64a83676c02..e2ffec50e81 100644
+--- a/examples/widgets/gallery/widgetgallery.cpp
++++ b/examples/widgets/gallery/widgetgallery.cpp
+@@ -419,7 +419,8 @@ void WidgetGallery::updateSystemInfo()
+     QString systemInfo;
+     QTextStream str(&systemInfo);
+     str << "<html><head/><body><h3>Build</h3><p>" << QLibraryInfo::build() << "</p>"
+-        << "<h3>Operating System</h3><p>" << QSysInfo::prettyProductName() << "</p>"
++        << "<h3>Operating System</h3><p>\"" << QSysInfo::prettyProductName() << "\" / "
++        << QGuiApplication::platformName() << "</p>"
+         << "<h3>Screens</h3><p>High DPI scale factor rounding policy: "
+         << highDpiScaleFactorRoundingPolicy() << "</p><ol>";
+     const auto screens = QGuiApplication::screens();
+-- 
+2.51.2
+

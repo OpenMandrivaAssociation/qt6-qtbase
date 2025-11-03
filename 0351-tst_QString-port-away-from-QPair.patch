@@ -1,0 +1,58 @@
+From 771ad4f3aaea229e280491e6cb3d39fb9daf0425 Mon Sep 17 00:00:00 2001
+From: Ahmad Samir <a.samirh78@gmail.com>
+Date: Tue, 7 Oct 2025 22:02:32 +0300
+Subject: [PATCH 351/553] tst_QString: port away from QPair
+
+Pick-to: 6.8 6.5
+Task-number: QTBUG-115841
+Change-Id: I4b67c181ca990f6f2dd2cffd42ff570ff732412d
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit 385d842385e48bfb811b7eff9d5ce67cc75a8376)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ tests/auto/corelib/text/qstring/tst_qstring.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/tests/auto/corelib/text/qstring/tst_qstring.cpp b/tests/auto/corelib/text/qstring/tst_qstring.cpp
+index 19df768691c..028c13b8a76 100644
+--- a/tests/auto/corelib/text/qstring/tst_qstring.cpp
++++ b/tests/auto/corelib/text/qstring/tst_qstring.cpp
+@@ -132,7 +132,7 @@ public:
+ };
+ 
+ template <>
+-class Arg<QPair<const QChar *, int> > : ArgBase
++class Arg<std::pair<const QChar *, int> > : ArgBase
+ {
+ public:
+     explicit Arg(const char *str) : ArgBase(str) {}
+@@ -426,7 +426,7 @@ private slots:
+     void prepend_qlatin1string_data() { prepend_data({EmptyIsNoop, Latin1Encoded}); }
+     void prepend_qutf8stringview()    { prepend_impl<QUtf8StringView, QString &(QString::*)(QUtf8StringView)>(); }
+     void prepend_qutf8stringview_data() { prepend_data(EmptyIsNoop); }
+-    void prepend_qcharstar_int()      { prepend_impl<QPair<const QChar *, int>, QString &(QString::*)(const QChar *, qsizetype)>(); }
++    void prepend_qcharstar_int()      { prepend_impl<std::pair<const QChar *, int>, QString &(QString::*)(const QChar *, qsizetype)>(); }
+     void prepend_qcharstar_int_data() { prepend_data(EmptyIsNoop); }
+     void prepend_qchar()              { prepend_impl<Reversed<QChar>, QString &(QString::*)(QChar)>(); }
+     void prepend_qchar_data()         { prepend_data(EmptyIsNoop); }
+@@ -455,7 +455,7 @@ private slots:
+     void append_qlatin1string_data() { append_data(Latin1Encoded); }
+     void append_qutf8stringview()    { append_impl<QUtf8StringView,  QString &(QString::*)(QUtf8StringView)>(); }
+     void append_qutf8stringview_data() { append_data(); }
+-    void append_qcharstar_int()      { append_impl<QPair<const QChar *, int>, QString&(QString::*)(const QChar *, qsizetype)>(); }
++    void append_qcharstar_int()      { append_impl<std::pair<const QChar *, int>, QString&(QString::*)(const QChar *, qsizetype)>(); }
+     void append_qcharstar_int_data() { append_data(EmptyIsNoop); }
+     void append_qchar()              { append_impl<QChar, QString &(QString::*)(QChar)>(); }
+     void append_qchar_data()         { append_data(EmptyIsNoop); }
+@@ -524,7 +524,7 @@ private slots:
+     void insert_qlatin1string_data() { insert_data({EmptyIsNoop, Latin1Encoded}); }
+     void insert_qutf8stringview()    { insert_impl<QUtf8StringView, QString &(QString::*)(qsizetype, QUtf8StringView)>(); }
+     void insert_qutf8stringview_data() { insert_data(EmptyIsNoop); }
+-    void insert_qcharstar_int()      { insert_impl<QPair<const QChar *, int>, QString &(QString::*)(qsizetype, const QChar*, qsizetype) >(); }
++    void insert_qcharstar_int()      { insert_impl<std::pair<const QChar *, int>, QString &(QString::*)(qsizetype, const QChar*, qsizetype) >(); }
+     void insert_qcharstar_int_data() { insert_data(EmptyIsNoop); }
+     void insert_qchar()              { insert_impl<Reversed<QChar>, QString &(QString::*)(qsizetype, QChar)>(); }
+     void insert_qchar_data()         { insert_data(EmptyIsNoop); }
+-- 
+2.51.2
+

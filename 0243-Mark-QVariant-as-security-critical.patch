@@ -1,0 +1,67 @@
+From 941944b6cda6d9580e1ae2a3e8d65b7cc9b26927 Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Mon, 29 Sep 2025 11:32:59 +0200
+Subject: [PATCH 243/553] Mark QVariant as security-critical
+
+If QVariant was just a container (open sum type, like std::any), the
+story would end there, and it could be marked as security-significant,
+the default, like QList. Both are used all over the place in Qt, but,
+crucially, QList doesn't interpret its contents. QString does, so it's
+security-critical.
+
+Unfortunately, QVariant also interprets its contents (it performs
+conversion between content types), and there's also
+load(QDataStream&), so this can't be anything else but critical.
+
+Both headers are full of implementation most of which can't be called
+trivial, so the headers are critical, too.
+
+Task-number: QTBUG-135190
+Pick-to: 6.8
+Change-Id: I12688f502b6362f2f541a5aba012c80677dbfef9
+Reviewed-by: Matthias Rauter <matthias.rauter@qt.io>
+(cherry picked from commit 6b494c507d51b2b24cb48578216cf4e200a6e7d8)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/kernel/qvariant.cpp | 1 +
+ src/corelib/kernel/qvariant.h   | 1 +
+ src/corelib/kernel/qvariant_p.h | 1 +
+ 3 files changed, 3 insertions(+)
+
+diff --git a/src/corelib/kernel/qvariant.cpp b/src/corelib/kernel/qvariant.cpp
+index ba6e3e881be..a7bf259f307 100644
+--- a/src/corelib/kernel/qvariant.cpp
++++ b/src/corelib/kernel/qvariant.cpp
+@@ -2,6 +2,7 @@
+ // Copyright (C) 2021 Intel Corporation.
+ // Copyright (C) 2015 Olivier Goffart <ogoffart@woboq.com>
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:critical reason:data-parser
+ 
+ #include "qvariant_p.h"
+ 
+diff --git a/src/corelib/kernel/qvariant.h b/src/corelib/kernel/qvariant.h
+index 8c971df79fb..b4a6bfb58a6 100644
+--- a/src/corelib/kernel/qvariant.h
++++ b/src/corelib/kernel/qvariant.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:critical reason:data-parser
+ 
+ #ifndef QVARIANT_H
+ #define QVARIANT_H
+diff --git a/src/corelib/kernel/qvariant_p.h b/src/corelib/kernel/qvariant_p.h
+index d2a73909386..3ffa2c36353 100644
+--- a/src/corelib/kernel/qvariant_p.h
++++ b/src/corelib/kernel/qvariant_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2023 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:critical reason:data-parser
+ 
+ #ifndef QVARIANT_P_H
+ #define QVARIANT_P_H
+-- 
+2.51.2
+

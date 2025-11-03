@@ -1,0 +1,70 @@
+From df7c9081765f040c2eab0e5fb2c0e05cfb8f1ffd Mon Sep 17 00:00:00 2001
+From: Tim Blechmann <tim.blechmann@qt.io>
+Date: Mon, 27 Oct 2025 12:27:49 +0800
+Subject: [PATCH 532/553] Test: QParallelAnimationGroup - increase timeout
+
+deleteChildrenWithRunningGroup has an 80ms timeout. This does not seem
+to be enough when running the tests with -repeat 2
+-recreate-app-instance.
+
+Also silencing some warnings about extra semicolons.
+
+Change-Id: Ibc42f82eaa5db9145a2843eda044e6a49a43222c
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit 33eeb091629889fec2c6332dcaf6ec1021febb82)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../tst_qparallelanimationgroup.cpp                 | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/tests/auto/corelib/animation/qparallelanimationgroup/tst_qparallelanimationgroup.cpp b/tests/auto/corelib/animation/qparallelanimationgroup/tst_qparallelanimationgroup.cpp
+index d8da8ecc03b..c2c09a234c8 100644
+--- a/tests/auto/corelib/animation/qparallelanimationgroup/tst_qparallelanimationgroup.cpp
++++ b/tests/auto/corelib/animation/qparallelanimationgroup/tst_qparallelanimationgroup.cpp
+@@ -74,13 +74,13 @@ class TestAnimation : public QVariantAnimation
+ {
+     Q_OBJECT
+ public:
+-    virtual void updateCurrentValue(const QVariant &value) override { Q_UNUSED(value)};
++    virtual void updateCurrentValue(const QVariant &value) override { Q_UNUSED(value)}
+     virtual void updateState(QAbstractAnimation::State newState,
+                              QAbstractAnimation::State oldState) override
+     {
+         Q_UNUSED(oldState);
+         Q_UNUSED(newState);
+-    };
++    }
+ };
+ 
+ class TestAnimation2 : public QVariantAnimation
+@@ -90,13 +90,13 @@ public:
+     TestAnimation2(QAbstractAnimation *animation) : QVariantAnimation(animation) {}
+     TestAnimation2(int duration, QAbstractAnimation *animation) : QVariantAnimation(animation), m_duration(duration) {}
+ 
+-    virtual void updateCurrentValue(const QVariant &value) override { Q_UNUSED(value)};
++    virtual void updateCurrentValue(const QVariant &value) override { Q_UNUSED(value)}
+     virtual void updateState(QAbstractAnimation::State newState,
+                              QAbstractAnimation::State oldState) override
+     {
+         Q_UNUSED(oldState);
+         Q_UNUSED(newState);
+-    };
++    }
+ 
+     virtual int duration() const override {
+         return m_duration;
+@@ -463,8 +463,9 @@ void tst_QParallelAnimationGroup::deleteChildrenWithRunningGroup()
+     QCOMPARE(group.state(), QAnimationGroup::Running);
+     QCOMPARE(anim1->state(), QAnimationGroup::Running);
+ 
+-    QTest::qWait(80);
+-    QVERIFY(group.currentLoopTime() > 0);
++    QTest::qWaitFor([&]{
++        return group.currentLoopTime() > 0;
++    }, 200ms);
+ 
+     delete anim1;
+     QCOMPARE(group.animationCount(), 0);
+-- 
+2.51.2
+

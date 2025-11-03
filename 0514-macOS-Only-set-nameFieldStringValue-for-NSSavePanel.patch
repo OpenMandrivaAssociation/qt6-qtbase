@@ -1,0 +1,35 @@
+From 671ef6c4ecaa101c7f07207b6bbb904b0362fc0b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tor=20Arne=20Vestb=C3=B8?= <tor.arne.vestbo@qt.io>
+Date: Wed, 22 Oct 2025 14:37:27 +0200
+Subject: [PATCH 514/553] macOS: Only set nameFieldStringValue for NSSavePanel
+
+Even though NSOpenPanel is a subclass of NSSavePanel, it emits a
+warning when the property is set:
+
+ Ignoring NSSavePanel method sent to NSOpenPanel: setNameFieldStringValue:
+
+Change-Id: I9886f861797bab92a89cdaa361c0e6d8802053ee
+Reviewed-by: Doris Verria <doris.verria@qt.io>
+(cherry picked from commit 016123daacbe64b4b80b6884ff72baf46f7e6a41)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/plugins/platforms/cocoa/qcocoafiledialoghelper.mm | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/plugins/platforms/cocoa/qcocoafiledialoghelper.mm b/src/plugins/platforms/cocoa/qcocoafiledialoghelper.mm
+index 17cd59cb34c..3e717f63501 100644
+--- a/src/plugins/platforms/cocoa/qcocoafiledialoghelper.mm
++++ b/src/plugins/platforms/cocoa/qcocoafiledialoghelper.mm
+@@ -160,7 +160,8 @@ typedef QSharedPointer<QFileDialogOptions> SharedPointerFileDialogOptions;
+     bool selectable = (m_options->acceptMode() == QFileDialogOptions::AcceptSave)
+         || [self panel:m_panel shouldEnableURL:url];
+ 
+-    m_panel.nameFieldStringValue = selectable ? info.fileName().toNSString() : @"";
++    if (!openpanel_cast(m_panel))
++        m_panel.nameFieldStringValue = selectable ? info.fileName().toNSString() : @"";
+ 
+     [self updateProperties];
+ 
+-- 
+2.51.2
+

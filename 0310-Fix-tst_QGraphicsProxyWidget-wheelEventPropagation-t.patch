@@ -1,0 +1,49 @@
+From 776fc1ddc35fd308e366757a1870b1b4211c3fd8 Mon Sep 17 00:00:00 2001
+From: Friedemann Kleint <Friedemann.Kleint@qt.io>
+Date: Wed, 8 Oct 2025 13:20:38 +0200
+Subject: [PATCH 310/553] Fix tst_QGraphicsProxyWidget::wheelEventPropagation()
+ to pass on a High DPI screen
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Scale the event coordinates.
+
+Change-Id: I022a3c52e178ce49920318d46a9e9fc26f96f7b2
+Reviewed-by: Morten Johan Sørvig <morten.sorvig@qt.io>
+(cherry picked from commit d302f023b653a3a0ab04465335100ad2b29c3de5)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../qgraphicsproxywidget/tst_qgraphicsproxywidget.cpp     | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/tests/auto/widgets/graphicsview/qgraphicsproxywidget/tst_qgraphicsproxywidget.cpp b/tests/auto/widgets/graphicsview/qgraphicsproxywidget/tst_qgraphicsproxywidget.cpp
+index 37ba5ea1c46..5295a2f8740 100644
+--- a/tests/auto/widgets/graphicsview/qgraphicsproxywidget/tst_qgraphicsproxywidget.cpp
++++ b/tests/auto/widgets/graphicsview/qgraphicsproxywidget/tst_qgraphicsproxywidget.cpp
+@@ -24,6 +24,7 @@
+ #include <QtWidgets/qstylefactory.h>
+ 
+ #include <QtGui/qevent.h>
++#include <QtGui/private/qhighdpiscaling_p.h>
+ 
+ #include <QtCore/qmimedata.h>
+ #include <QtCore/qtimer.h>
+@@ -3717,10 +3718,11 @@ void tst_QGraphicsProxyWidget::wheelEventPropagation()
+ 
+     const QPoint wheelPosition(50, 25);
+     auto wheelUp = [&view, wheelPosition](Qt::ScrollPhase phase) {
+-        const QPoint global = view.mapToGlobal(wheelPosition);
+-        const QPoint pixelDelta(0, -25);
++        auto *window = view.windowHandle();
++        const QPoint global = QHighDpi::toNativePixels(view.mapToGlobal(wheelPosition), window);
++        const QPoint pixelDelta = QHighDpi::toNativeLocalPosition(QPoint(0, -25), window);
+         const QPoint angleDelta(0, -120);
+-        QWindowSystemInterface::handleWheelEvent(view.windowHandle(), wheelPosition, global,
++        QWindowSystemInterface::handleWheelEvent(window, wheelPosition, global,
+                                                 pixelDelta, angleDelta, Qt::NoModifier,
+                                                 phase);
+         QCoreApplication::processEvents();
+-- 
+2.51.2
+

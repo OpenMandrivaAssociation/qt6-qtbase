@@ -1,0 +1,500 @@
+From 6e6639d6693423cba1c02c86d749f01570d2d64d Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Fri, 29 Aug 2025 17:25:39 +0200
+Subject: [PATCH 111/553] Make QTEST_THROW_ON_FAIL work from within
+ QtConcurrent
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+QtConcurrent rewrites any exception that doesn't inherit QException
+into a QUnhandledException, incl. QtTest's internal
+TestFailedException class (ditto for skipped). At the exit from a test
+function, QtTest therefore no longer recognizes the exceptions as its
+own, and lets them escape, or logs them as unexpected.
+
+Fix by inheriting the exceptions from QException, but QtConcurrent
+should really be fixed to use exception_ptr and not rely on
+Q(Unhandled)Exception.
+
+Add a check to tst_selftests.
+
+[ChangeLog][QtTest] Fixed a bug which prevented QTEST_THROW_ON_FAIL
+and QTEST_THROW_ON_SKIP from working with QCOMPARE(), QVERIFY(), and
+QSKIP() invoked from within QtConcurrent functions.
+
+Amends e769cf026e328ed7fff660c204ce6e55b80114e3.
+
+Pick-to: 6.9 6.8
+Fixes: QTBUG-139765
+Change-Id: I087c9fd49dbde22098e3ff173b8f843c120667b4
+Reviewed-by: Øystein Heskestad <oystein.heskestad@qt.io>
+Reviewed-by: Ivan Solovev <ivan.solovev@qt.io>
+(cherry picked from commit 5bde0225c81137dccc197006a88501d9a4e7024a)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/testlib/qtestcase.cpp                     | 21 ++++-
+ tests/auto/testlib/selftests/CMakeLists.txt   |  7 ++
+ .../expected_throwonfailandskip.junitxml      | 28 +++++++
+ .../expected_throwonfailandskip.lightxml      | 42 ++++++++++
+ .../selftests/expected_throwonfailandskip.tap | 34 ++++++++
+ .../expected_throwonfailandskip.teamcity      | 18 ++++
+ .../selftests/expected_throwonfailandskip.txt | 18 ++++
+ .../selftests/expected_throwonfailandskip.xml | 45 ++++++++++
+ .../selftests/generate_expected_output.py     |  1 +
+ .../throwonfailandskip/CMakeLists.txt         | 24 ++++++
+ .../tst_throwonfailandskip.cpp                | 83 +++++++++++++++++++
+ .../auto/testlib/selftests/tst_selftests.cpp  |  6 ++
+ 12 files changed, 325 insertions(+), 2 deletions(-)
+ create mode 100644 tests/auto/testlib/selftests/expected_throwonfailandskip.junitxml
+ create mode 100644 tests/auto/testlib/selftests/expected_throwonfailandskip.lightxml
+ create mode 100644 tests/auto/testlib/selftests/expected_throwonfailandskip.tap
+ create mode 100644 tests/auto/testlib/selftests/expected_throwonfailandskip.teamcity
+ create mode 100644 tests/auto/testlib/selftests/expected_throwonfailandskip.txt
+ create mode 100644 tests/auto/testlib/selftests/expected_throwonfailandskip.xml
+ create mode 100644 tests/auto/testlib/selftests/throwonfailandskip/CMakeLists.txt
+ create mode 100644 tests/auto/testlib/selftests/throwonfailandskip/tst_throwonfailandskip.cpp
+
+diff --git a/src/testlib/qtestcase.cpp b/src/testlib/qtestcase.cpp
+index 0dfee1b47c5..6c58f327e13 100644
+--- a/src/testlib/qtestcase.cpp
++++ b/src/testlib/qtestcase.cpp
+@@ -11,6 +11,9 @@
+ #include <QtCore/qdebug.h>
+ #include <QtCore/qdir.h>
+ #include <QtCore/qdirlisting.h>
++#if QT_CONFIG(future)
++#include <QtCore/qexception.h>
++#endif
+ #include <QtCore/qfile.h>
+ #include <QtCore/qfileinfo.h>
+ #include <QtCore/qfloat16.h>
+@@ -163,22 +166,36 @@ namespace QTestPrivate
+ 
+ namespace {
+ 
+-class TestFailedException : public std::exception // clazy:exclude=copyable-polymorphic
++#if !QT_CONFIG(future)
++using QException = std::exception;
++#endif
++
++class TestFailedException : public QException // clazy:exclude=copyable-polymorphic
+ {
+ public:
+     TestFailedException() = default;
+     ~TestFailedException() override = default;
+ 
+     const char *what() const noexcept override { return "QtTest: test failed"; }
++
++#if QT_CONFIG(future)
++    TestFailedException *clone() const override { return new TestFailedException(); }
++    void raise() const override { throw TestFailedException(); }
++#endif
+ };
+ 
+-class TestSkippedException : public std::exception // clazy:exclude=copyable-polymorphic
++class TestSkippedException : public QException // clazy:exclude=copyable-polymorphic
+ {
+ public:
+     TestSkippedException() = default;
+     ~TestSkippedException() override = default;
+ 
+     const char *what() const noexcept override { return "QtTest: test was skipped"; }
++
++#if QT_CONFIG(future)
++    TestSkippedException *clone() const override { return new TestSkippedException(); }
++    void raise() const override { throw TestSkippedException(); }
++#endif
+ };
+ 
+ } // unnamed namespace
+diff --git a/tests/auto/testlib/selftests/CMakeLists.txt b/tests/auto/testlib/selftests/CMakeLists.txt
+index 9d013e6f757..790605130d4 100644
+--- a/tests/auto/testlib/selftests/CMakeLists.txt
++++ b/tests/auto/testlib/selftests/CMakeLists.txt
+@@ -119,6 +119,13 @@ if(NOT QT_FEATURE_sanitize_address)
+     )
+ endif()
+ 
++if(FEATURE_concurrent AND FEATURE_future)
++    list(APPEND subprograms
++        # This test needs exceptions, QException, and QtConcurrent::run()
++        throwonfailandskip
++    )
++endif()
++
+ if(FEATURE_cxx20)
+   list(APPEND subprograms
+       threewaycompare
+diff --git a/tests/auto/testlib/selftests/expected_throwonfailandskip.junitxml b/tests/auto/testlib/selftests/expected_throwonfailandskip.junitxml
+new file mode 100644
+index 00000000000..69a65d1f40b
+--- /dev/null
++++ b/tests/auto/testlib/selftests/expected_throwonfailandskip.junitxml
+@@ -0,0 +1,28 @@
++<?xml version="1.0" encoding="UTF-8" ?>
++<testsuite name="tst_ThrowOnFailAndSkip" timestamp="@TEST_START_TIME@" hostname="@HOSTNAME@" tests="6" failures="2" errors="0" skipped="2" time="@TEST_DURATION@">
++  <properties>
++    <property name="QTestVersion" value="@INSERT_QT_VERSION_HERE@"/>
++    <property name="QtVersion" value="@INSERT_QT_VERSION_HERE@"/>
++    <property name="QtBuild" value=""/>
++  </properties>
++  <testcase name="initTestCase" classname="tst_ThrowOnFailAndSkip" time="@TEST_DURATION@"/>
++  <testcase name="throwOnFail" classname="tst_ThrowOnFailAndSkip" time="@TEST_DURATION@">
++    <failure type="fail" message="Compared values are not the same">
++      <![CDATA[   Actual   (i) : 17
++   Expected (42): 42]]>
++    </failure>
++  </testcase>
++  <testcase name="throwOnSkip" classname="tst_ThrowOnFailAndSkip" time="@TEST_DURATION@">
++    <skipped message="skipped"/>
++  </testcase>
++  <testcase name="throwOnFailWorksFromConcurrent" classname="tst_ThrowOnFailAndSkip" time="@TEST_DURATION@">
++    <failure type="fail" message="The computed value is expected to be different from the baseline, but is not">
++      <![CDATA[   Computed (i) : 42
++   Baseline (42): 42]]>
++    </failure>
++  </testcase>
++  <testcase name="throwOnSkipWorksFromConcurrent" classname="tst_ThrowOnFailAndSkip" time="@TEST_DURATION@">
++    <skipped message="skipped from QtConcurrent::run()"/>
++  </testcase>
++  <testcase name="cleanupTestCase" classname="tst_ThrowOnFailAndSkip" time="@TEST_DURATION@"/>
++</testsuite>
+diff --git a/tests/auto/testlib/selftests/expected_throwonfailandskip.lightxml b/tests/auto/testlib/selftests/expected_throwonfailandskip.lightxml
+new file mode 100644
+index 00000000000..39e0e23c592
+--- /dev/null
++++ b/tests/auto/testlib/selftests/expected_throwonfailandskip.lightxml
+@@ -0,0 +1,42 @@
++  <Environment>
++    <QtVersion>@INSERT_QT_VERSION_HERE@</QtVersion>
++    <QtBuild/>
++    <QTestVersion>@INSERT_QT_VERSION_HERE@</QTestVersion>
++  </Environment>
++  <TestFunction name="initTestCase">
++    <Incident type="pass" file="" line="0" />
++    <Duration msecs="0"/>
++  </TestFunction>
++  <TestFunction name="throwOnFail">
++    <Incident type="fail" file="qtbase&#x002D;submit/tests/auto/testlib/selftests/throwonfailandskip/tst_throwonfailandskip.cpp" line="0">
++      <Description><![CDATA[Compared values are not the same
++   Actual   (i) : 17
++   Expected (42): 42]]></Description>
++    </Incident>
++    <Duration msecs="0"/>
++  </TestFunction>
++  <TestFunction name="throwOnSkip">
++    <Incident type="skip" file="qtbase&#x002D;submit/tests/auto/testlib/selftests/throwonfailandskip/tst_throwonfailandskip.cpp" line="0">
++      <Description><![CDATA[skipped]]></Description>
++    </Incident>
++    <Duration msecs="0"/>
++  </TestFunction>
++  <TestFunction name="throwOnFailWorksFromConcurrent">
++    <Incident type="fail" file="qtbase&#x002D;submit/tests/auto/testlib/selftests/throwonfailandskip/tst_throwonfailandskip.cpp" line="0">
++      <Description><![CDATA[The computed value is expected to be different from the baseline, but is not
++   Computed (i) : 42
++   Baseline (42): 42]]></Description>
++    </Incident>
++    <Duration msecs="0"/>
++  </TestFunction>
++  <TestFunction name="throwOnSkipWorksFromConcurrent">
++    <Incident type="skip" file="qtbase&#x002D;submit/tests/auto/testlib/selftests/throwonfailandskip/tst_throwonfailandskip.cpp" line="0">
++      <Description><![CDATA[skipped from QtConcurrent::run()]]></Description>
++    </Incident>
++    <Duration msecs="0"/>
++  </TestFunction>
++  <TestFunction name="cleanupTestCase">
++    <Incident type="pass" file="" line="0" />
++    <Duration msecs="0"/>
++  </TestFunction>
++  <Duration msecs="0"/>
+diff --git a/tests/auto/testlib/selftests/expected_throwonfailandskip.tap b/tests/auto/testlib/selftests/expected_throwonfailandskip.tap
+new file mode 100644
+index 00000000000..f791124b995
+--- /dev/null
++++ b/tests/auto/testlib/selftests/expected_throwonfailandskip.tap
+@@ -0,0 +1,34 @@
++TAP version 13
++# tst_ThrowOnFailAndSkip
++ok 1 - initTestCase()
++not ok 2 - throwOnFail()
++  ---
++  type: QCOMPARE
++  message: Compared values are not the same
++  wanted: 42 (42)
++  found: 17 (i)
++  expected: 42 (42)
++  actual: 17 (i)
++  at: tst_ThrowOnFailAndSkip::throwOnFail() (qtbase-submit/tests/auto/testlib/selftests/throwonfailandskip/tst_throwonfailandskip.cpp:0)
++  file: qtbase-submit/tests/auto/testlib/selftests/throwonfailandskip/tst_throwonfailandskip.cpp
++  line: 0
++  ...
++ok 3 - throwOnSkip() # SKIP skipped
++not ok 4 - throwOnFailWorksFromConcurrent()
++  ---
++  type: QCOMPARE_NE
++  message: The computed value is expected to be different from the baseline, but is not
++  wanted: != 42 (42)
++  found: 42 (i)
++  expected: != 42 (42)
++  actual: 42 (i)
++  at: tst_ThrowOnFailAndSkip::throwOnFailWorksFromConcurrent() (qtbase-submit/tests/auto/testlib/selftests/throwonfailandskip/tst_throwonfailandskip.cpp:0)
++  file: qtbase-submit/tests/auto/testlib/selftests/throwonfailandskip/tst_throwonfailandskip.cpp
++  line: 0
++  ...
++ok 5 - throwOnSkipWorksFromConcurrent() # SKIP skipped from QtConcurrent::run()
++ok 6 - cleanupTestCase()
++1..6
++# tests 6
++# pass 2
++# fail 2
+diff --git a/tests/auto/testlib/selftests/expected_throwonfailandskip.teamcity b/tests/auto/testlib/selftests/expected_throwonfailandskip.teamcity
+new file mode 100644
+index 00000000000..21ed7e0d073
+--- /dev/null
++++ b/tests/auto/testlib/selftests/expected_throwonfailandskip.teamcity
+@@ -0,0 +1,18 @@
++##teamcity[testSuiteStarted name='tst_ThrowOnFailAndSkip' flowId='tst_ThrowOnFailAndSkip']
++##teamcity[testStarted name='initTestCase()' flowId='tst_ThrowOnFailAndSkip']
++##teamcity[testFinished name='initTestCase()' flowId='tst_ThrowOnFailAndSkip']
++##teamcity[testStarted name='throwOnFail()' flowId='tst_ThrowOnFailAndSkip']
++##teamcity[testFailed name='throwOnFail()' message='Failure! |[Loc: qtbase-submit/tests/auto/testlib/selftests/throwonfailandskip/tst_throwonfailandskip.cpp(0)|]' details='Compared values are not the same|n Actual (i) : 17|n Expected (42): 42' flowId='tst_ThrowOnFailAndSkip']
++##teamcity[testFinished name='throwOnFail()' flowId='tst_ThrowOnFailAndSkip']
++##teamcity[testStarted name='throwOnSkip()' flowId='tst_ThrowOnFailAndSkip']
++##teamcity[testIgnored name='throwOnSkip()' message='skipped |[Loc: qtbase-submit/tests/auto/testlib/selftests/throwonfailandskip/tst_throwonfailandskip.cpp(0)|]' flowId='tst_ThrowOnFailAndSkip']
++##teamcity[testFinished name='throwOnSkip()' flowId='tst_ThrowOnFailAndSkip']
++##teamcity[testStarted name='throwOnFailWorksFromConcurrent()' flowId='tst_ThrowOnFailAndSkip']
++##teamcity[testFailed name='throwOnFailWorksFromConcurrent()' message='Failure! |[Loc: qtbase-submit/tests/auto/testlib/selftests/throwonfailandskip/tst_throwonfailandskip.cpp(0)|]' details='The computed value is expected to be different from the baseline, but is not|n Computed (i) : 42|n Baseline (42): 42' flowId='tst_ThrowOnFailAndSkip']
++##teamcity[testFinished name='throwOnFailWorksFromConcurrent()' flowId='tst_ThrowOnFailAndSkip']
++##teamcity[testStarted name='throwOnSkipWorksFromConcurrent()' flowId='tst_ThrowOnFailAndSkip']
++##teamcity[testIgnored name='throwOnSkipWorksFromConcurrent()' message='skipped from QtConcurrent::run() |[Loc: qtbase-submit/tests/auto/testlib/selftests/throwonfailandskip/tst_throwonfailandskip.cpp(0)|]' flowId='tst_ThrowOnFailAndSkip']
++##teamcity[testFinished name='throwOnSkipWorksFromConcurrent()' flowId='tst_ThrowOnFailAndSkip']
++##teamcity[testStarted name='cleanupTestCase()' flowId='tst_ThrowOnFailAndSkip']
++##teamcity[testFinished name='cleanupTestCase()' flowId='tst_ThrowOnFailAndSkip']
++##teamcity[testSuiteFinished name='tst_ThrowOnFailAndSkip' flowId='tst_ThrowOnFailAndSkip']
+diff --git a/tests/auto/testlib/selftests/expected_throwonfailandskip.txt b/tests/auto/testlib/selftests/expected_throwonfailandskip.txt
+new file mode 100644
+index 00000000000..48bc92a2a4a
+--- /dev/null
++++ b/tests/auto/testlib/selftests/expected_throwonfailandskip.txt
+@@ -0,0 +1,18 @@
++********* Start testing of tst_ThrowOnFailAndSkip *********
++Config: Using QtTest library
++PASS   : tst_ThrowOnFailAndSkip::initTestCase()
++FAIL!  : tst_ThrowOnFailAndSkip::throwOnFail() Compared values are not the same
++   Actual   (i) : 17
++   Expected (42): 42
++   Loc: [qtbase-submit/tests/auto/testlib/selftests/throwonfailandskip/tst_throwonfailandskip.cpp(0)]
++SKIP   : tst_ThrowOnFailAndSkip::throwOnSkip() skipped
++   Loc: [qtbase-submit/tests/auto/testlib/selftests/throwonfailandskip/tst_throwonfailandskip.cpp(0)]
++FAIL!  : tst_ThrowOnFailAndSkip::throwOnFailWorksFromConcurrent() The computed value is expected to be different from the baseline, but is not
++   Computed (i) : 42
++   Baseline (42): 42
++   Loc: [qtbase-submit/tests/auto/testlib/selftests/throwonfailandskip/tst_throwonfailandskip.cpp(0)]
++SKIP   : tst_ThrowOnFailAndSkip::throwOnSkipWorksFromConcurrent() skipped from QtConcurrent::run()
++   Loc: [qtbase-submit/tests/auto/testlib/selftests/throwonfailandskip/tst_throwonfailandskip.cpp(0)]
++PASS   : tst_ThrowOnFailAndSkip::cleanupTestCase()
++Totals: 2 passed, 2 failed, 2 skipped, 0 blacklisted, 0ms
++********* Finished testing of tst_ThrowOnFailAndSkip *********
+diff --git a/tests/auto/testlib/selftests/expected_throwonfailandskip.xml b/tests/auto/testlib/selftests/expected_throwonfailandskip.xml
+new file mode 100644
+index 00000000000..e27e33faf89
+--- /dev/null
++++ b/tests/auto/testlib/selftests/expected_throwonfailandskip.xml
+@@ -0,0 +1,45 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<TestCase name="tst_ThrowOnFailAndSkip">
++  <Environment>
++    <QtVersion>@INSERT_QT_VERSION_HERE@</QtVersion>
++    <QtBuild/>
++    <QTestVersion>@INSERT_QT_VERSION_HERE@</QTestVersion>
++  </Environment>
++  <TestFunction name="initTestCase">
++    <Incident type="pass" file="" line="0" />
++    <Duration msecs="0"/>
++  </TestFunction>
++  <TestFunction name="throwOnFail">
++    <Incident type="fail" file="qtbase&#x002D;submit/tests/auto/testlib/selftests/throwonfailandskip/tst_throwonfailandskip.cpp" line="0">
++      <Description><![CDATA[Compared values are not the same
++   Actual   (i) : 17
++   Expected (42): 42]]></Description>
++    </Incident>
++    <Duration msecs="0"/>
++  </TestFunction>
++  <TestFunction name="throwOnSkip">
++    <Incident type="skip" file="qtbase&#x002D;submit/tests/auto/testlib/selftests/throwonfailandskip/tst_throwonfailandskip.cpp" line="0">
++      <Description><![CDATA[skipped]]></Description>
++    </Incident>
++    <Duration msecs="0"/>
++  </TestFunction>
++  <TestFunction name="throwOnFailWorksFromConcurrent">
++    <Incident type="fail" file="qtbase&#x002D;submit/tests/auto/testlib/selftests/throwonfailandskip/tst_throwonfailandskip.cpp" line="0">
++      <Description><![CDATA[The computed value is expected to be different from the baseline, but is not
++   Computed (i) : 42
++   Baseline (42): 42]]></Description>
++    </Incident>
++    <Duration msecs="0"/>
++  </TestFunction>
++  <TestFunction name="throwOnSkipWorksFromConcurrent">
++    <Incident type="skip" file="qtbase&#x002D;submit/tests/auto/testlib/selftests/throwonfailandskip/tst_throwonfailandskip.cpp" line="0">
++      <Description><![CDATA[skipped from QtConcurrent::run()]]></Description>
++    </Incident>
++    <Duration msecs="0"/>
++  </TestFunction>
++  <TestFunction name="cleanupTestCase">
++    <Incident type="pass" file="" line="0" />
++    <Duration msecs="0"/>
++  </TestFunction>
++  <Duration msecs="0"/>
++</TestCase>
+diff --git a/tests/auto/testlib/selftests/generate_expected_output.py b/tests/auto/testlib/selftests/generate_expected_output.py
+index 446cc6a8b86..b1d6ec86ccc 100755
+--- a/tests/auto/testlib/selftests/generate_expected_output.py
++++ b/tests/auto/testlib/selftests/generate_expected_output.py
+@@ -45,6 +45,7 @@ TESTS = ['assert', 'badxml', 'benchlibcallgrind', 'benchlibcounting',
+          'subtest',
+          'testlib',
+          'threewaycompare',
++         'throwonfailandskip',
+          'tuplediagnostics',
+          'verbose1', 'verbose2', 'verifyexceptionthrown', 'warnings', 'watchdog',
+          'junit', 'keyboard']
+diff --git a/tests/auto/testlib/selftests/throwonfailandskip/CMakeLists.txt b/tests/auto/testlib/selftests/throwonfailandskip/CMakeLists.txt
+new file mode 100644
+index 00000000000..c70466cfaf6
+--- /dev/null
++++ b/tests/auto/testlib/selftests/throwonfailandskip/CMakeLists.txt
+@@ -0,0 +1,24 @@
++# Copyright (C) 2022 The Qt Company Ltd.
++# SPDX-License-Identifier: BSD-3-Clause
++
++#####################################################################
++## exceptionthrow Binary:
++#####################################################################
++
++qt_internal_add_executable(throwonfailandskip
++    EXCEPTIONS
++    NO_INSTALL
++    OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
++    DEFINES
++        QTEST_THROW_ON_FAIL
++        QTEST_THROW_ON_SKIP
++    SOURCES
++        tst_throwonfailandskip.cpp
++    LIBRARIES
++        Qt::Test
++)
++
++## Scopes:
++#####################################################################
++
++qt_internal_apply_testlib_coverage_options(throwonfailandskip)
+diff --git a/tests/auto/testlib/selftests/throwonfailandskip/tst_throwonfailandskip.cpp b/tests/auto/testlib/selftests/throwonfailandskip/tst_throwonfailandskip.cpp
+new file mode 100644
+index 00000000000..0a061a8d50c
+--- /dev/null
++++ b/tests/auto/testlib/selftests/throwonfailandskip/tst_throwonfailandskip.cpp
+@@ -0,0 +1,83 @@
++// Copyright (C) 2025 The Qt Company Ltd.
++// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
++
++#include <QTest>
++
++#ifndef QTEST_THROW_ON_FAIL
++# error This test requires throw-on-fail mode.
++#endif
++
++#ifndef QTEST_THROW_ON_SKIP
++# error This test requires throw-on-skip mode.
++#endif
++
++QT_REQUIRE_CONFIG(future); // otherwise QException doesn't exist
++
++#ifdef QT_NO_CONCURRENT
++# error This test requires QtConcurrent::run().
++#endif
++
++#include <QtConcurrent/qtconcurrentrun.h>
++
++class tst_ThrowOnFailAndSkip: public QObject
++{
++    Q_OBJECT
++
++private Q_SLOTS:
++    void throwOnFail() const;
++    void throwOnSkip() const;
++    void throwOnFailWorksFromConcurrent() const;
++    void throwOnSkipWorksFromConcurrent() const;
++};
++
++
++void tst_ThrowOnFailAndSkip::throwOnFail() const
++{
++    int i = 17;
++    // This would not compile if QTEST_FAIL_ACTION was just a `return;`
++    i = [&] { QCOMPARE(i, 42); return 42; }();
++    // When throw-on-fail works, the following line
++    // won't be executed anymore:
++    QCOMPARE(i, 67);
++}
++
++void tst_ThrowOnFailAndSkip::throwOnSkip() const
++{
++    int i = 17;
++    // This would not compile if QTEST_SKIP_ACTION was just a `return;`
++    i = [&] { QSKIP("skipped"); return 42; }();
++    // When throw-on-skip works, the following line
++    // won't be executed anymore:
++    QCOMPARE(i, 67);
++}
++
++static int function(int i)
++{
++    // This would not compile if QTEST_FAIL_ACTION was just a `return;`
++    QCOMPARE_NE(i, 42);
++    return 17;
++}
++
++void tst_ThrowOnFailAndSkip::throwOnFailWorksFromConcurrent() const
++{
++    QCOMPARE(QtConcurrent::run(&function, 42).result(), 17);
++    // When throw-on-fail works, the following line (and the outer QCOMPARE above)
++    // won't be executed anymore:
++    QVERIFY(false);
++}
++
++void tst_ThrowOnFailAndSkip::throwOnSkipWorksFromConcurrent() const
++{
++    const auto lambda = [] {
++        QSKIP("skipped from QtConcurrent::run()");
++        return 42;
++    };
++    QCOMPARE(QtConcurrent::run(lambda).result(), 42);
++    // When throw-on-skip works, the following line (and the QCOMPARE above)
++    // won't be executed anymore:
++    QVERIFY(false);
++}
++
++QTEST_MAIN(tst_ThrowOnFailAndSkip)
++
++#include "tst_throwonfailandskip.moc"
+diff --git a/tests/auto/testlib/selftests/tst_selftests.cpp b/tests/auto/testlib/selftests/tst_selftests.cpp
+index bc3517a9e4a..dee2d46fd93 100644
+--- a/tests/auto/testlib/selftests/tst_selftests.cpp
++++ b/tests/auto/testlib/selftests/tst_selftests.cpp
+@@ -697,6 +697,12 @@ bool TestLogger::shouldIgnoreTest(const QString &test) const
+         return true;
+ #endif
+ 
++#if defined(QT_NO_EXCEPTIONS) || !QT_CONFIG(future) || defined(QT_NO_CONCURRENT)
++    // This test requires exceptions, QException, and QtConcurrent::run():
++    if (test == "throwonfailandskip")
++        return true;
++#endif
++
+     if (test == "benchlibcallgrind") {
+ #if defined(__GNUC__) && (defined(__i386) || defined(__x86_64)) && defined(Q_OS_LINUX)
+ #  ifdef __AVX512F__
+-- 
+2.51.2
+

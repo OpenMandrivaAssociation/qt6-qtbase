@@ -1,0 +1,92 @@
+From 3c397f4ce3faaa9942b09f645594edb0e7a86a03 Mon Sep 17 00:00:00 2001
+From: Thiago Macieira <thiago.macieira@intel.com>
+Date: Thu, 23 Oct 2025 08:01:54 -0700
+Subject: [PATCH 495/553] QSaveFile: remove !QT_NO_QOBJECT support
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Amends commit 670810787318df8a80b2197b49448c18a78bb7ed, which removed
+qsavefile.cpp from the bootstrap lib.
+
+Change-Id: Iac520c557c978d6f9ec3fffd3dd83a18ca6a98df
+Reviewed-by: BogDan Vatra <bogdan@kdab.com>
+Reviewed-by: Ahmad Samir <a.samirh78@gmail.com>
+Reviewed-by: Mårten Nordheim <marten.nordheim@qt.io>
+(cherry picked from commit 2e2040104931a06b0149c1caa58d57e469f1a0d0)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/io/qsavefile.cpp | 12 +-----------
+ src/corelib/io/qsavefile.h   |  4 ----
+ 2 files changed, 1 insertion(+), 15 deletions(-)
+
+diff --git a/src/corelib/io/qsavefile.cpp b/src/corelib/io/qsavefile.cpp
+index a7d101dc124..a5108710614 100644
+--- a/src/corelib/io/qsavefile.cpp
++++ b/src/corelib/io/qsavefile.cpp
+@@ -71,14 +71,6 @@ QSaveFilePrivate::~QSaveFilePrivate()
+     \sa QTextStream, QDataStream, QFileInfo, QDir, QFile, QTemporaryFile
+ */
+ 
+-#ifdef QT_NO_QOBJECT
+-QSaveFile::QSaveFile(const QString &name)
+-    : QFileDevice(*new QSaveFilePrivate)
+-{
+-    Q_D(QSaveFile);
+-    d->fileName = name;
+-}
+-#else
+ /*!
+     Constructs a new file object to represent the file with the given \a name.
+ */
+@@ -97,6 +89,7 @@ QSaveFile::QSaveFile(QObject *parent)
+     : QFileDevice(*new QSaveFilePrivate, parent)
+ {
+ }
++
+ /*!
+     Constructs a new file object with the given \a parent to represent the
+     file with the specified \a name.
+@@ -107,7 +100,6 @@ QSaveFile::QSaveFile(const QString &name, QObject *parent)
+     Q_D(QSaveFile);
+     d->fileName = name;
+ }
+-#endif
+ 
+ /*!
+     Destroys the file object, discarding the saved contents unless commit() was called.
+@@ -417,8 +409,6 @@ bool QSaveFile::directWriteFallback() const
+ 
+ QT_END_NAMESPACE
+ 
+-#ifndef QT_NO_QOBJECT
+ #include "moc_qsavefile.cpp"
+-#endif
+ 
+ #endif // QT_CONFIG(temporaryfile)
+diff --git a/src/corelib/io/qsavefile.h b/src/corelib/io/qsavefile.h
+index 5e8cffe7c38..cc35901f75c 100644
+--- a/src/corelib/io/qsavefile.h
++++ b/src/corelib/io/qsavefile.h
+@@ -23,18 +23,14 @@ class QSaveFilePrivate;
+ 
+ class Q_CORE_EXPORT QSaveFile : public QFileDevice
+ {
+-#ifndef QT_NO_QOBJECT
+     Q_OBJECT
+-#endif
+     Q_DECLARE_PRIVATE(QSaveFile)
+ 
+ public:
+ 
+     explicit QSaveFile(const QString &name);
+-#ifndef QT_NO_QOBJECT
+     explicit QSaveFile(QObject *parent = nullptr);
+     explicit QSaveFile(const QString &name, QObject *parent);
+-#endif
+     ~QSaveFile();
+ 
+     QString fileName() const override;
+-- 
+2.51.2
+

@@ -1,0 +1,84 @@
+From 65e44b8ea3852dfd97734f732803dc149cc8aac5 Mon Sep 17 00:00:00 2001
+From: Liang Qi <liang.qi@qt.io>
+Date: Thu, 25 Sep 2025 09:54:40 +0200
+Subject: [PATCH 261/553] CRA review: plugins/platforms/bsdfb/*
+
+Only platform screen is implemented, not critical.
+
+QUIP: 23
+Fixes: QTBUG-135706
+Pick-to: 6.8
+Change-Id: I35827fe662dde35c863e3533edfad1b34a6f3aef
+Reviewed-by: Volker Hilsheimer <volker.hilsheimer@qt.io>
+(cherry picked from commit bd32e2a11db43c7b625f02ebdb968e5f2f64e1d0)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/plugins/platforms/bsdfb/main.cpp              | 1 +
+ src/plugins/platforms/bsdfb/qbsdfbintegration.cpp | 1 +
+ src/plugins/platforms/bsdfb/qbsdfbintegration.h   | 1 +
+ src/plugins/platforms/bsdfb/qbsdfbscreen.cpp      | 1 +
+ src/plugins/platforms/bsdfb/qbsdfbscreen.h        | 1 +
+ 5 files changed, 5 insertions(+)
+
+diff --git a/src/plugins/platforms/bsdfb/main.cpp b/src/plugins/platforms/bsdfb/main.cpp
+index 99868567a99..aaf8ce43109 100644
+--- a/src/plugins/platforms/bsdfb/main.cpp
++++ b/src/plugins/platforms/bsdfb/main.cpp
+@@ -1,6 +1,7 @@
+ // Copyright (C) 2017 The Qt Company Ltd.
+ // Copyright (C) 2015-2016 Oleksandr Tymoshenko <gonzo@bluezbox.com>
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <qpa/qplatformintegrationplugin.h>
+ #include "qbsdfbintegration.h"
+diff --git a/src/plugins/platforms/bsdfb/qbsdfbintegration.cpp b/src/plugins/platforms/bsdfb/qbsdfbintegration.cpp
+index 4847049bec5..e4cdbf7c638 100644
+--- a/src/plugins/platforms/bsdfb/qbsdfbintegration.cpp
++++ b/src/plugins/platforms/bsdfb/qbsdfbintegration.cpp
+@@ -1,6 +1,7 @@
+ // Copyright (C) 2017 The Qt Company Ltd.
+ // Copyright (C) 2015-2016 Oleksandr Tymoshenko <gonzo@bluezbox.com>
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qbsdfbintegration.h"
+ #include "qbsdfbscreen.h"
+diff --git a/src/plugins/platforms/bsdfb/qbsdfbintegration.h b/src/plugins/platforms/bsdfb/qbsdfbintegration.h
+index 319071c7163..16f2b30fd75 100644
+--- a/src/plugins/platforms/bsdfb/qbsdfbintegration.h
++++ b/src/plugins/platforms/bsdfb/qbsdfbintegration.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2017 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QBSDFBINTEGRATION_H
+ #define QBSDFBINTEGRATION_H
+diff --git a/src/plugins/platforms/bsdfb/qbsdfbscreen.cpp b/src/plugins/platforms/bsdfb/qbsdfbscreen.cpp
+index 31f8dab0914..43c19ff2e0b 100644
+--- a/src/plugins/platforms/bsdfb/qbsdfbscreen.cpp
++++ b/src/plugins/platforms/bsdfb/qbsdfbscreen.cpp
+@@ -1,6 +1,7 @@
+ // Copyright (C) 2017 The Qt Company Ltd.
+ // Copyright (C) 2015-2016 Oleksandr Tymoshenko <gonzo@bluezbox.com>
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qbsdfbscreen.h"
+ #include <QtFbSupport/private/qfbcursor_p.h>
+diff --git a/src/plugins/platforms/bsdfb/qbsdfbscreen.h b/src/plugins/platforms/bsdfb/qbsdfbscreen.h
+index d22fb669201..2d435688b8d 100644
+--- a/src/plugins/platforms/bsdfb/qbsdfbscreen.h
++++ b/src/plugins/platforms/bsdfb/qbsdfbscreen.h
+@@ -1,6 +1,7 @@
+ // Copyright (C) 2017 The Qt Company Ltd.
+ // Copyright (C) 2015-2016 Oleksandr Tymoshenko <gonzo@bluezbox.com>
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QBSDFBSCREEN_H
+ #define QBSDFBSCREEN_H
+-- 
+2.51.2
+

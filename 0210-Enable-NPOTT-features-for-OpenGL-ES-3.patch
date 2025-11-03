@@ -1,0 +1,49 @@
+From b7f6ea850ea20be8a0a1d198fea960d7d9823a95 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Morten=20S=C3=B8rvig?= <morten.sorvig@qt.io>
+Date: Thu, 25 Sep 2025 20:17:27 +0200
+Subject: [PATCH 210/553] Enable NPOTT features for OpenGL ES >= 3
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fix "Attempted to use an unsupported filtering or wrap mode ..."
+warning on WebGL.
+
+OpenGL ES 3 requires support for non-power-of-two textures,
+but implementations may not provide the extensions.
+
+Change-Id: I613743e971238cfdd5da4267c01fdf60962c204e
+(cherry picked from commit 676e3745f5c7e91d6186cfe236a9fd18dd3def7c)
+Reviewed-by: Morten Johan Sørvig <morten.sorvig@qt.io>
+---
+ src/gui/opengl/qopenglfunctions.cpp | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/src/gui/opengl/qopenglfunctions.cpp b/src/gui/opengl/qopenglfunctions.cpp
+index 7eef9956b65..6b45d26fb4c 100644
+--- a/src/gui/opengl/qopenglfunctions.cpp
++++ b/src/gui/opengl/qopenglfunctions.cpp
+@@ -234,11 +234,17 @@ static int qt_gl_resolve_features()
+             QOpenGLFunctions::CompressedTextures |
+             QOpenGLFunctions::Multisample |
+             QOpenGLFunctions::StencilSeparate;
+-        if (extensions.match("GL_IMG_texture_npot"))
+-            features |= QOpenGLFunctions::NPOTTextures;
+-        if (extensions.match("GL_OES_texture_npot"))
++
++        if (ctx->format().majorVersion() >= 3) {
+             features |= QOpenGLFunctions::NPOTTextures |
+                 QOpenGLFunctions::NPOTTextureRepeat;
++        } else {
++            if (extensions.match("GL_IMG_texture_npot"))
++                features |= QOpenGLFunctions::NPOTTextures;
++            if (extensions.match("GL_OES_texture_npot"))
++                features |= QOpenGLFunctions::NPOTTextures |
++                    QOpenGLFunctions::NPOTTextureRepeat;
++        }
+         if (ctx->format().majorVersion() >= 3 || extensions.match("GL_EXT_texture_rg"))
+             features |= QOpenGLFunctions::TextureRGFormats;
+         if (ctx->format().majorVersion() >= 3) {
+-- 
+2.51.2
+

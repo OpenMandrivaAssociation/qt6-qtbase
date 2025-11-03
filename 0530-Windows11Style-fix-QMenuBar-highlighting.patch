@@ -1,0 +1,95 @@
+From c3e78352c0cef26f1267367f66683f457ccafd4b Mon Sep 17 00:00:00 2001
+From: Christian Ehrlicher <ch.ehrlicher@gmx.de>
+Date: Wed, 20 Aug 2025 21:41:11 +0200
+Subject: [PATCH 530/553] Windows11Style: fix QMenuBar highlighting
+
+In pressed state the text color is subtlePressedColor, only for hover we
+have to use subtleHighlightColor.
+cherry picked from commit 3e649c9a42c430c904c13a93daa1173dbadf6bd8
+
+Change-Id: I7ad7505a73df5ab8255210a237efcc0903b7b445
+Reviewed-by: Wladimir Leuschner <wladimir.leuschner@qt.io>
+---
+ .../styles/modernwindows/qwindows11style.cpp  | 46 +++++++++----------
+ 1 file changed, 22 insertions(+), 24 deletions(-)
+
+diff --git a/src/plugins/styles/modernwindows/qwindows11style.cpp b/src/plugins/styles/modernwindows/qwindows11style.cpp
+index 00dd6c5d08f..109d8c4bd8e 100644
+--- a/src/plugins/styles/modernwindows/qwindows11style.cpp
++++ b/src/plugins/styles/modernwindows/qwindows11style.cpp
+@@ -120,8 +120,8 @@ static constexpr int percentToAlpha(double percent)
+ }
+ 
+ static constexpr std::array<QColor, 33> WINUI3ColorsLight {
+-    QColor(0x00,0x00,0x00,0x09), //subtleHighlightColor
+-    QColor(0x00,0x00,0x00,0x06), //subtlePressedColor
++    QColor(0x00,0x00,0x00,percentToAlpha(3.73)), // subtleHighlightColor (fillSubtleSecondary)
++    QColor(0x00,0x00,0x00,percentToAlpha(2.41)), // subtlePressedColor (fillSubtleTertiary)
+     QColor(0x00,0x00,0x00,0x0F), //frameColorLight
+     QColor(0x00,0x00,0x00,percentToAlpha(60.63)),   //frameColorStrong
+     QColor(0x00,0x00,0x00,percentToAlpha(21.69)),   //frameColorStrongDisabled
+@@ -156,8 +156,8 @@ static constexpr std::array<QColor, 33> WINUI3ColorsLight {
+ };
+ 
+ static constexpr std::array<QColor, 33> WINUI3ColorsDark {
+-    QColor(0xFF,0xFF,0xFF,0x0F), //subtleHighlightColor
+-    QColor(0xFF,0xFF,0xFF,0x0A), //subtlePressedColor
++    QColor(0xFF,0xFF,0xFF,percentToAlpha(6.05)), // subtleHighlightColor (fillSubtleSecondary)
++    QColor(0xFF,0xFF,0xFF,percentToAlpha(4.19)), // subtlePressedColor (fillSubtleTertiary)
+     QColor(0xFF,0xFF,0xFF,0x12), //frameColorLight
+     QColor(0xFF,0xFF,0xFF,percentToAlpha(60.47)),   //frameColorStrong
+     QColor(0xFF,0xFF,0xFF,percentToAlpha(15.81)),   //frameColorStrongDisabled
+@@ -1504,32 +1504,30 @@ void QWindows11Style::drawControl(ControlElement element, const QStyleOption *op
+         break;
+     case CE_MenuBarItem:
+         if (const auto *mbi = qstyleoption_cast<const QStyleOptionMenuItem *>(option))  {
++            using namespace StyleOptionHelper;
++
+             constexpr int hPadding = 11;
+             constexpr int topPadding = 4;
+             constexpr int bottomPadding = 6;
+-            bool active = mbi->state & State_Selected;
+-            bool hasFocus = mbi->state & State_HasFocus;
+-            bool down = mbi->state & State_Sunken;
+-            bool enabled = mbi->state & State_Enabled;
+             QStyleOptionMenuItem newMbi = *mbi;
++
+             newMbi.font.setPointSize(10);
+-            if (enabled && active) {
+-                if (down)
+-                    painter->setBrushOrigin(painter->brushOrigin() + QPoint(1, 1));
+-                if (hasFocus) {
+-                    if (highContrastTheme)
+-                        painter->setPen(QPen(newMbi.palette.highlight().color(), 2));
+-                    else
+-                        painter->setPen(Qt::NoPen);
+-                    painter->setBrush(highContrastTheme ? newMbi.palette.window().color() : WINUI3Colors[colorSchemeIndex][subtleHighlightColor]);
+-                    QRect rect = mbi->rect.marginsRemoved(QMargins(5,0,5,0));
+-                    painter->drawRoundedRect(rect,secondLevelRoundingRadius,secondLevelRoundingRadius, Qt::AbsoluteSize);
++            newMbi.palette.setColor(QPalette::ButtonText, controlTextColor(&newMbi));
++            if (!isDisabled(&newMbi)) {
++                QPen pen(Qt::NoPen);
++                QBrush brush(Qt::NoBrush);
++                if (highContrastTheme) {
++                    pen = QPen(newMbi.palette.highlight().color(), 2);
++                    brush = newMbi.palette.window();
++                } else if (isPressed(&newMbi)) {
++                    brush = winUI3Color(subtlePressedColor);
++                } else if (isHover(&newMbi)) {
++                    brush = winUI3Color(subtleHighlightColor);
++                }
++                if (pen != Qt::NoPen || brush != Qt::NoBrush) {
++                    const QRect rect = mbi->rect.marginsRemoved(QMargins(5, 0, 5, 0));
++                    drawRoundedRect(painter, rect, pen, brush);
+                 }
+-            } else if (enabled && highContrastTheme) {
+-                painter->setPen(QPen(newMbi.palette.windowText().color(), 2));
+-                painter->setBrush(newMbi.palette.window().color());
+-                QRect rect = mbi->rect.marginsRemoved(QMargins(5,0,5,0));
+-                painter->drawRoundedRect(rect,secondLevelRoundingRadius,secondLevelRoundingRadius, Qt::AbsoluteSize);
+             }
+             newMbi.rect.adjust(hPadding,topPadding,-hPadding,-bottomPadding);
+             painter->setFont(newMbi.font);
+-- 
+2.51.2
+

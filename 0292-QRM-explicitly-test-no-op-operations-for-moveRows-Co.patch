@@ -1,0 +1,48 @@
+From 68a244de8a4936ca452c87368f26b7c85d30c3d4 Mon Sep 17 00:00:00 2001
+From: Volker Hilsheimer <volker.hilsheimer@qt.io>
+Date: Fri, 3 Oct 2025 13:51:50 +0200
+Subject: [PATCH 292/553] QRM: explicitly test no-op operations for
+ moveRows/Columns
+
+Verify failure when trying to move a row/column onto itself, or when
+moving zero. QAIM::beginMoveColumns asserts if we move zero columns, so
+we can't (or don't have to) test this. beginMoveRows is less aggressive.
+
+Change-Id: Ifdb0a1ac86576178f414d19657fda0255a1ac706
+Reviewed-by: Artem Dyomin <artem.dyomin@qt.io>
+(cherry picked from commit 8411d6ecfd99b12c720bf33a22bb7d7efc795734)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../corelib/itemmodels/qrangemodel/tst_qrangemodel.cpp   | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/tests/auto/corelib/itemmodels/qrangemodel/tst_qrangemodel.cpp b/tests/auto/corelib/itemmodels/qrangemodel/tst_qrangemodel.cpp
+index e69df1bce8b..292a31cc407 100644
+--- a/tests/auto/corelib/itemmodels/qrangemodel/tst_qrangemodel.cpp
++++ b/tests/auto/corelib/itemmodels/qrangemodel/tst_qrangemodel.cpp
+@@ -1060,6 +1060,11 @@ void tst_QRangeModel::moveRows()
+     const QVariant second = model->index(1, 0).data();
+     const QVariant last = model->index(expectedRowCount - 1, 0).data();
+ 
++    // various noops, should always fail
++    QVERIFY(!model->moveRows({}, 0, 1, {}, 0));
++    QVERIFY(!model->moveRows({}, 0, 1, {}, 1));
++    QVERIFY(!model->moveRows({}, 0, 0, {}, expectedRowCount));
++
+     // try to move first to last
+     QCOMPARE(model->moveRows({}, 0, 1, {}, expectedRowCount),
+              changeActions != ChangeAction::ReadOnly);
+@@ -1134,6 +1139,10 @@ void tst_QRangeModel::moveColumns()
+     const QVariant second = model->index(0, 1).data();
+     const QVariant last = model->index(0, expectedColumnCount - 1).data();
+ 
++    // various noops, should always fail
++    QVERIFY(!model->moveColumns({}, 0, 1, {}, 0));
++    QVERIFY(!model->moveColumns({}, 0, 1, {}, 1));
++
+     QCOMPARE(model->moveColumns({}, 0, 1, {}, expectedColumnCount),
+              bool(changeActions & ChangeAction::ChangeColumns));
+     if (!(changeActions & ChangeAction::ChangeColumns))
+-- 
+2.51.2
+

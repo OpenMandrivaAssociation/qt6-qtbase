@@ -1,0 +1,133 @@
+From 9d9f91d9f062522567b9c096776f6f57efdc152b Mon Sep 17 00:00:00 2001
+From: Assam Boudjelthia <assam.boudjelthia@qt.io>
+Date: Mon, 15 Sep 2025 03:16:43 +0300
+Subject: [PATCH 237/553] Android: set system bars colors when Qt color scheme
+ is requested
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When Qt requests a color scheme request the same color scheme
+for the device's status and/or navigation bars.
+
+Fixes: QTBUG-137248
+Task-number: QTBUG-51196
+Pick-to: 6.8
+Change-Id: I36c8d0b1f7a18210e900634512b842856b18c822
+Reviewed-by: Tor Arne Vestbø <tor.arne.vestbo@qt.io>
+(cherry picked from commit 1fe4cb6fa99111633a6a2f94259a007735e9ea76)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../qt/android/QtActivityDelegateBase.java    | 11 ++++++---
+ .../org/qtproject/qt/android/QtWindow.java    |  2 ++
+ .../android/qandroidplatformtheme.cpp         | 24 +++++++++++++++++++
+ .../platforms/android/qandroidplatformtheme.h |  1 +
+ 4 files changed, 35 insertions(+), 3 deletions(-)
+
+diff --git a/src/android/jar/src/org/qtproject/qt/android/QtActivityDelegateBase.java b/src/android/jar/src/org/qtproject/qt/android/QtActivityDelegateBase.java
+index fe36981a84c..4734e439a50 100644
+--- a/src/android/jar/src/org/qtproject/qt/android/QtActivityDelegateBase.java
++++ b/src/android/jar/src/org/qtproject/qt/android/QtActivityDelegateBase.java
+@@ -28,6 +28,8 @@ abstract class QtActivityDelegateBase
+     private boolean m_membersInitialized = false;
+     private boolean m_contextMenuVisible = false;
+ 
++    static native boolean canOverrideColorSchemeHint();
++
+     // Subclass must implement these
+     abstract void startNativeApplicationImpl(String appParams, String mainLib);
+ 
+@@ -110,9 +112,12 @@ abstract class QtActivityDelegateBase
+             QtDisplayManager.setNavigationBarColor(window, nav);
+         }
+ 
+-        boolean isLight = uiMode == Configuration.UI_MODE_NIGHT_NO;
+-        QtDisplayManager.setStatusBarColorHint(m_activity, isLight);
+-        QtDisplayManager.setNavigationBarColorHint(m_activity, isLight);
++        // Don't override color scheme if the app has it set explicitly.
++        if (canOverrideColorSchemeHint()) {
++            boolean isLight = uiMode == Configuration.UI_MODE_NIGHT_NO;
++            QtDisplayManager.setStatusBarColorHint(m_activity, isLight);
++            QtDisplayManager.setNavigationBarColorHint(m_activity, isLight);
++        }
+ 
+         switch (uiMode) {
+             case Configuration.UI_MODE_NIGHT_NO:
+diff --git a/src/android/jar/src/org/qtproject/qt/android/QtWindow.java b/src/android/jar/src/org/qtproject/qt/android/QtWindow.java
+index 71b490108c0..f0d304f9e7f 100644
+--- a/src/android/jar/src/org/qtproject/qt/android/QtWindow.java
++++ b/src/android/jar/src/org/qtproject/qt/android/QtWindow.java
+@@ -17,7 +17,9 @@ import android.view.Surface;
+ import android.view.View;
+ import android.view.ViewGroup;
+ import android.view.ViewTreeObserver;
++import android.view.Window;
+ import android.view.WindowInsets;
++import android.view.WindowInsetsController;
+ import android.os.Build;
+ 
+ import java.util.HashMap;
+diff --git a/src/plugins/platforms/android/qandroidplatformtheme.cpp b/src/plugins/platforms/android/qandroidplatformtheme.cpp
+index 58543cecb38..5826c83bdb2 100644
+--- a/src/plugins/platforms/android/qandroidplatformtheme.cpp
++++ b/src/plugins/platforms/android/qandroidplatformtheme.cpp
+@@ -10,6 +10,7 @@
+ #include "qandroidplatformmenuitem.h"
+ #include "qandroidplatformdialoghelpers.h"
+ #include "qandroidplatformfiledialoghelper.h"
++#include "qandroidplatformwindow.h"
+ 
+ #include <QCoreApplication>
+ #include <QDebug>
+@@ -25,6 +26,8 @@ QT_BEGIN_NAMESPACE
+ 
+ Q_LOGGING_CATEGORY(lcQpaMenus, "qt.qpa.menus")
+ 
++Q_DECLARE_JNI_CLASS(QtDisplayManager, "org/qtproject/qt/android/QtDisplayManager")
++
+ using namespace Qt::StringLiterals;
+ 
+ namespace {
+@@ -437,6 +440,27 @@ void QAndroidPlatformTheme::requestColorScheme(Qt::ColorScheme scheme)
+     QMetaObject::invokeMethod(qGuiApp, [this]{
+         updateColorScheme();
+     });
++
++    if (m_colorSchemeOverride == Qt::ColorScheme::Unknown)
++        return;
++
++    const auto iface = qGuiApp->nativeInterface<QNativeInterface::QAndroidApplication>();
++    iface->runOnAndroidMainThread([=]() {
++        bool isLight = scheme == Qt::ColorScheme::Light;
++        QtJniTypes::QtDisplayManager::callStaticMethod("setStatusBarColorHint",
++            iface->context().object<QtJniTypes::Activity>(), isLight);
++        QtJniTypes::QtDisplayManager::callStaticMethod("setNavigationBarColorHint",
++            iface->context().object<QtJniTypes::Activity>(), isLight);
++    });
++}
++
++extern "C" JNIEXPORT bool JNICALL
++Java_org_qtproject_qt_android_QtActivityDelegateBase_canOverrideColorSchemeHint(JNIEnv *, jobject)
++{
++    if (!QAndroidPlatformTheme::instance())
++        return true;
++
++    return QAndroidPlatformTheme::instance()->colorSchemeOverride() == Qt::ColorScheme::Unknown;
+ }
+ 
+ static inline int paletteType(QPlatformTheme::Palette type)
+diff --git a/src/plugins/platforms/android/qandroidplatformtheme.h b/src/plugins/platforms/android/qandroidplatformtheme.h
+index 1b4ab5664de..339919acb75 100644
+--- a/src/plugins/platforms/android/qandroidplatformtheme.h
++++ b/src/plugins/platforms/android/qandroidplatformtheme.h
+@@ -40,6 +40,7 @@ public:
+     QPlatformMenuItem *createPlatformMenuItem() const override;
+     void showPlatformMenuBar() override;
+     Qt::ColorScheme colorScheme() const override;
++    Qt::ColorScheme colorSchemeOverride() const { return m_colorSchemeOverride; };
+     void requestColorScheme(Qt::ColorScheme scheme) override;
+ 
+     const QPalette *palette(Palette type = SystemPalette) const override;
+-- 
+2.51.2
+

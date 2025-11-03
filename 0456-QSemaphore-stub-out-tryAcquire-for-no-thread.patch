@@ -1,0 +1,64 @@
+From 7f9173d8b044d09f4073cfc82a4c35ac6220881d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Morten=20S=C3=B8rvig?= <morten.sorvig@qt.io>
+Date: Fri, 17 Oct 2025 10:00:39 +0200
+Subject: [PATCH 456/553] QSemaphore: stub out tryAcquire() for no-thread
+
+Ammends 7075ac5bf6bf51a7538bf5c6592e2ff97f5c7cbe.
+
+Fixes: QTBUG-141130
+Change-Id: I699bb61832cded1b2f05d0138478e3d8c703f8f2
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit 2d49156af55f3e0e4f2aefd428a0fef7bac119e5)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/thread/qsemaphore.cpp | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
+
+diff --git a/src/corelib/thread/qsemaphore.cpp b/src/corelib/thread/qsemaphore.cpp
+index 0de30d3b9f9..a308c4419e2 100644
+--- a/src/corelib/thread/qsemaphore.cpp
++++ b/src/corelib/thread/qsemaphore.cpp
+@@ -12,6 +12,9 @@
+ #include "qwaitcondition_p.h"
+ 
+ #include <chrono>
++#if !QT_CONFIG(thread)
++#include <limits>
++#endif
+ 
+ QT_BEGIN_NAMESPACE
+ 
+@@ -684,7 +687,7 @@ bool QSemaphore::tryAcquire(int n, QDeadlineTimer timer)
+ // the calling thread (which is the only thread in the no-thread
+ // configuraton)
+ 
+-QSemaphore::QSemaphore(int n)
++QSemaphore::QSemaphore(int)
+ {
+ 
+ }
+@@ -704,6 +707,21 @@ void QSemaphore::release(int)
+ 
+ }
+ 
++int QSemaphore::available() const
++{
++    return std::numeric_limits<int>::max();
++}
++
++bool QSemaphore::tryAcquire(int)
++{
++    return true;
++}
++
++bool QSemaphore::tryAcquire(int, QDeadlineTimer)
++{
++    return true;
++}
++
+ #endif
+ 
+ QT_END_NAMESPACE
+-- 
+2.51.2
+

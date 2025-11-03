@@ -1,0 +1,49 @@
+From 40443e92d25f6cf33b37c9d2b643a9bf7f73915e Mon Sep 17 00:00:00 2001
+From: Alexey Edelev <alexey.edelev@qt.io>
+Date: Wed, 28 May 2025 10:40:44 +0200
+Subject: [PATCH 109/553] Move the  'Do not compress Qt binary resources file'
+ comment
+
+Move the comment closer to the line that actually disables compression.
+
+Pick-to: 6.8 6.9 6.10.0
+Change-Id: Ib65d5ddffa9b3e3cf97a2ce0e04219c651017653
+Reviewed-by: Assam Boudjelthia <assam.boudjelthia@qt.io>
+(cherry picked from commit 205f45832775cd08cf20316387ea580060616bcd)
+Reviewed-by: Alexandru Croitor <alexandru.croitor@qt.io>
+---
+ src/android/templates/build.gradle                              | 2 +-
+ .../platform/android_legacy_packaging/testdata/build.gradle     | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/android/templates/build.gradle b/src/android/templates/build.gradle
+index 6595cb5358f..b6c4797fde7 100644
+--- a/src/android/templates/build.gradle
++++ b/src/android/templates/build.gradle
+@@ -70,8 +70,8 @@ android {
+         abortOnError = false
+     }
+ 
+-    // Do not compress Qt binary resources file
+     aaptOptions {
++        // Do not compress Qt binary resources file
+         noCompress 'rcc'
+     }
+ 
+diff --git a/tests/auto/corelib/platform/android_legacy_packaging/testdata/build.gradle b/tests/auto/corelib/platform/android_legacy_packaging/testdata/build.gradle
+index cbdd833e2ae..1d796d9b6b9 100644
+--- a/tests/auto/corelib/platform/android_legacy_packaging/testdata/build.gradle
++++ b/tests/auto/corelib/platform/android_legacy_packaging/testdata/build.gradle
+@@ -70,8 +70,8 @@ android {
+         abortOnError = false
+     }
+ 
+-    // Do not compress Qt binary resources file
+     aaptOptions {
++        // Do not compress Qt binary resources file
+         noCompress 'rcc'
+     }
+ 
+-- 
+2.51.2
+

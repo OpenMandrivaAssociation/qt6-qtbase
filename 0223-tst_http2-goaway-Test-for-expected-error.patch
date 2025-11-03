@@ -1,0 +1,34 @@
+From c389f5201fd53ff44478ce40e5d3e56ab1cca6e5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?M=C3=A5rten=20Nordheim?= <marten.nordheim@qt.io>
+Date: Tue, 2 Sep 2025 16:04:22 +0200
+Subject: [PATCH 223/553] tst_http2::goaway: Test for expected error
+
+Comments in the test imply this was always intended, but it wasn't
+currently done.
+
+Pick-to: 6.9 6.8
+Task-number: QTBUG-139692
+Change-Id: I044ff004c604d6688f40829062d98127733e00ba
+Reviewed-by: Edward Welbourne <edward.welbourne@qt.io>
+(cherry picked from commit af5582c5bd7b96b77397e7dedd32e64ef5b56dca)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ tests/auto/network/access/http2/tst_http2.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/tests/auto/network/access/http2/tst_http2.cpp b/tests/auto/network/access/http2/tst_http2.cpp
+index d255629441b..385855e9130 100644
+--- a/tests/auto/network/access/http2/tst_http2.cpp
++++ b/tests/auto/network/access/http2/tst_http2.cpp
+@@ -646,6 +646,8 @@ void tst_Http2::goaway()
+ 
+     // No request processed, no 'replyFinished' slot calls:
+     QCOMPARE(nRequests, 0);
++    for (const auto &reply : replies)
++        QCOMPARE(reply->error(), QNetworkReply::InternalServerError);
+     // Our server did not bother to send anything except a single GOAWAY frame:
+     QVERIFY(!prefaceOK);
+     QVERIFY(!serverGotSettingsACK);
+-- 
+2.51.2
+

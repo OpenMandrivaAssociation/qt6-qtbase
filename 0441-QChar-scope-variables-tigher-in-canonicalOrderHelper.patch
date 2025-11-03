@@ -1,0 +1,90 @@
+From df558282ade3393bccc3d50c0824591b366e6417 Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Thu, 16 Oct 2025 13:11:00 +0200
+Subject: [PATCH 441/553] QChar: scope variables tigher in
+ canonicalOrderHelper()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The old code defined four variables outside a complex loop (with a
+nested goto). These can all be defined at their point of
+initialization, though, improving readability of the function (a tiny
+bit...), because the tighter scope makes it obvious that the loop
+isn't carrying state in these variables from one iteration to the
+next.
+
+The construction is safe, because, in C++, a backwards goto will
+destroy all variables declared after the label¹, iow: u2 and c2 are
+re-created by each jump though `advance`.
+
+Found while trying to fix char32_t → char16_t narrowing highlighted by
+Clang 21's -Wcharacter-conversion.
+
+Fix function has many other problems (most prominently, said goto),
+but they're out of scope of this immediate patch series, though they
+should eventually be fixed. This is security-critical code; we ought
+not have to deal with assembler-esque C++ code in such components.
+
+Amends f4d02ecdbf54987a0bada20fe8f8537e90c051d8.
+
+As a drive-by, change the c variables from char16_t back to ushort,
+because they don't represent characters, but character combining
+classes, partially reverting 7b04e0012b40203970f27869db2ab3e838ffe359.
+
+¹ https://en.cppreference.com/w/cpp/language/goto.html#Explanation
+
+Pick-to: 6.8 6.5
+Change-Id: If06356483bc77a16812d2790bd98f793bc74faa2
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+Reviewed-by: Ahmad Samir <a.samirh78@gmail.com>
+(cherry picked from commit 168a2e3efc348e3cba91a638fc25c1d15a725d78)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/text/qchar.cpp | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
+
+diff --git a/src/corelib/text/qchar.cpp b/src/corelib/text/qchar.cpp
+index d3011c34538..167ba9e84d0 100644
+--- a/src/corelib/text/qchar.cpp
++++ b/src/corelib/text/qchar.cpp
+@@ -1996,13 +1996,10 @@ static void canonicalOrderHelper(QString *str, QChar::UnicodeVersion version, qs
+     QString &s = *str;
+     const qsizetype l = s.size()-1;
+ 
+-    char32_t u1, u2;
+-    char16_t c1, c2;
+-
+     qsizetype pos = from;
+     while (pos < l) {
+         qsizetype p2 = pos+1;
+-        u1 = s.at(pos).unicode();
++        char32_t u1 = s.at(pos).unicode();
+         if (QChar::isHighSurrogate(u1)) {
+             const char16_t low = s.at(p2).unicode();
+             if (QChar::isLowSurrogate(low)) {
+@@ -2012,10 +2009,10 @@ static void canonicalOrderHelper(QString *str, QChar::UnicodeVersion version, qs
+                 ++p2;
+             }
+         }
+-        c1 = 0;
++        ushort c1 = 0;
+ 
+     advance:
+-        u2 = s.at(p2).unicode();
++        char32_t u2 = s.at(p2).unicode();
+         if (QChar::isHighSurrogate(u2) && p2 < l) {
+             const char16_t low = s.at(p2+1).unicode();
+             if (QChar::isLowSurrogate(low)) {
+@@ -2024,7 +2021,7 @@ static void canonicalOrderHelper(QString *str, QChar::UnicodeVersion version, qs
+             }
+         }
+ 
+-        c2 = 0;
++        ushort c2 = 0;
+         {
+             const QUnicodeTables::Properties *p = qGetProp(u2);
+             if (p->unicodeVersion <= version)
+-- 
+2.51.2
+

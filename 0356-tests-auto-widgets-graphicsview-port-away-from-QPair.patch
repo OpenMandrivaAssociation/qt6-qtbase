@@ -1,0 +1,81 @@
+From bc49b2dc530d61cbe4cf3cee595e770e4439636d Mon Sep 17 00:00:00 2001
+From: Ahmad Samir <a.samirh78@gmail.com>
+Date: Wed, 8 Oct 2025 01:04:32 +0300
+Subject: [PATCH 356/553] tests/auto/widgets/graphicsview/*: port away from
+ QPair
+
+Pick-to: 6.8 6.5
+Task-number: QTBUG-115841
+Change-Id: Iad6c8eb05c03790f8e7718506cc29fe1ae0b0650
+Reviewed-by: Ivan Solovev <ivan.solovev@qt.io>
+(cherry picked from commit 01fd2f8c6e24a895561bc32229c09c6768b3aa7a)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../qgraphicsgridlayout/tst_qgraphicsgridlayout.cpp  |  4 ++--
+ .../tst_qgraphicsitemanimation.cpp                   | 12 ++++++------
+ .../qgraphicswidget/tst_qgraphicswidget.cpp          |  4 +---
+ 3 files changed, 9 insertions(+), 11 deletions(-)
+
+diff --git a/tests/auto/widgets/graphicsview/qgraphicsgridlayout/tst_qgraphicsgridlayout.cpp b/tests/auto/widgets/graphicsview/qgraphicsgridlayout/tst_qgraphicsgridlayout.cpp
+index b70335acb6f..c98bc0a3c97 100644
+--- a/tests/auto/widgets/graphicsview/qgraphicsgridlayout/tst_qgraphicsgridlayout.cpp
++++ b/tests/auto/widgets/graphicsview/qgraphicsgridlayout/tst_qgraphicsgridlayout.cpp
+@@ -136,7 +136,7 @@ public:
+ struct ItemDesc
+ {
+     ItemDesc(int row, int col)
+-    : m_pos(qMakePair(row, col))
++    : m_pos({row, col})
+     {
+     }
+ 
+@@ -249,7 +249,7 @@ struct ItemDesc
+     }
+ 
+ //private:
+-    QPair<int,int> m_pos; // row,col
++    std::pair<int,int> m_pos; // row,col
+     int m_rowSpan = 1;
+     int m_colSpan = 1;
+     QSizePolicy m_sizePolicy{QSizePolicy::Preferred, QSizePolicy::Preferred};
+diff --git a/tests/auto/widgets/graphicsview/qgraphicsitemanimation/tst_qgraphicsitemanimation.cpp b/tests/auto/widgets/graphicsview/qgraphicsitemanimation/tst_qgraphicsitemanimation.cpp
+index 9cf74c23fe1..5bbfa880c39 100644
+--- a/tests/auto/widgets/graphicsview/qgraphicsitemanimation/tst_qgraphicsitemanimation.cpp
++++ b/tests/auto/widgets/graphicsview/qgraphicsitemanimation/tst_qgraphicsitemanimation.cpp
+@@ -89,12 +89,12 @@ void tst_QGraphicsItemAnimation::checkReturnedLists()
+     animation.setScaleAt(0.3, 2.5, 1.8);
+     animation.setShearAt(0.3, 5, 5);
+ 
+-    QCOMPARE(animation.posList().at(0), (QPair<qreal, QPointF>(0.5, QPointF(5, -5))));
+-    QCOMPARE(animation.posList().at(1), (QPair<qreal, QPointF>(1.0, QPointF(10, -10))));
+-    QCOMPARE(animation.rotationList().at(0), (QPair<qreal, qreal>(0.3, 2.3)));
+-    QCOMPARE(animation.translationList().at(0), (QPair<qreal, QPointF>(0.3, QPointF(15, 15))));
+-    QCOMPARE(animation.scaleList().at(0), (QPair<qreal, QPointF>(0.3, QPointF(2.5, 1.8))));
+-    QCOMPARE(animation.shearList().at(0), (QPair<qreal, QPointF>(0.3, QPointF(5, 5))));
++    QCOMPARE(animation.posList().at(0), (std::pair<qreal, QPointF>(0.5, QPointF(5, -5))));
++    QCOMPARE(animation.posList().at(1), (std::pair<qreal, QPointF>(1.0, QPointF(10, -10))));
++    QCOMPARE(animation.rotationList().at(0), (std::pair<qreal, qreal>(0.3, 2.3)));
++    QCOMPARE(animation.translationList().at(0), (std::pair<qreal, QPointF>(0.3, QPointF(15, 15))));
++    QCOMPARE(animation.scaleList().at(0), (std::pair<qreal, QPointF>(0.3, QPointF(2.5, 1.8))));
++    QCOMPARE(animation.shearList().at(0), (std::pair<qreal, QPointF>(0.3, QPointF(5, 5))));
+ 
+     QCOMPARE(animation.posList().size(), 2);
+     QCOMPARE(animation.rotationList().size(), 1);
+diff --git a/tests/auto/widgets/graphicsview/qgraphicswidget/tst_qgraphicswidget.cpp b/tests/auto/widgets/graphicsview/qgraphicswidget/tst_qgraphicswidget.cpp
+index 2a71e28f2f3..b01afb5da2c 100644
+--- a/tests/auto/widgets/graphicsview/qgraphicswidget/tst_qgraphicswidget.cpp
++++ b/tests/auto/widgets/graphicsview/qgraphicswidget/tst_qgraphicswidget.cpp
+@@ -1859,9 +1859,7 @@ enum WhichSize {
+     None,
+ };
+ 
+-typedef QPair<int, QVariant> Inst;
+-
+-Q_DECLARE_METATYPE(Inst)
++using Inst = std::pair<int, QVariant>;
+ 
+ void tst_QGraphicsWidget::setSizes_data()
+ {
+-- 
+2.51.2
+

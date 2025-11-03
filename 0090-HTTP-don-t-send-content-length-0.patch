@@ -1,0 +1,241 @@
+From e134d01fc7b2c6eab88cf826543f5c6ed2fe6c78 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?M=C3=A5rten=20Nordheim?= <marten.nordheim@qt.io>
+Date: Fri, 1 Aug 2025 16:38:56 +0200
+Subject: [PATCH 090/553] HTTP: don't send content-length: 0
+
+If a request is made with a valid QIODevice that happens to be empty
+then we end up setting the Content-Length header to 0.
+
+This is discouraged according to the RFC9110, specifically for methods
+that do not usually expect a body.
+
+Pick-to: 6.9 6.8
+Fixes: QTBUG-138848
+Change-Id: I618220008ed9f739fed96e5fd7630a0afd5cdaaf
+Reviewed-by: Edward Welbourne <edward.welbourne@qt.io>
+(cherry picked from commit bb40f641f2f80ff5a01bf49d50470d6868cbf701)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/network/access/qnetworkaccessmanager.cpp  |  2 +-
+ src/network/access/qnetworkreplyhttpimpl.cpp  | 51 ++++++++++
+ src/network/access/qnetworkreplyhttpimpl_p.h  |  1 +
+ .../tst_qnetworkreply_local.cpp               | 95 +++++++++++++++++++
+ 4 files changed, 148 insertions(+), 1 deletion(-)
+
+diff --git a/src/network/access/qnetworkaccessmanager.cpp b/src/network/access/qnetworkaccessmanager.cpp
+index 40416bf0fb0..1b06af697c6 100644
+--- a/src/network/access/qnetworkaccessmanager.cpp
++++ b/src/network/access/qnetworkaccessmanager.cpp
+@@ -1261,7 +1261,7 @@ QNetworkReply *QNetworkAccessManager::createRequest(QNetworkAccessManager::Opera
+     auto h = request.headers();
+ #ifndef Q_OS_WASM // Content-length header is not allowed to be set by user in wasm
+     if (!h.contains(QHttpHeaders::WellKnownHeader::ContentLength) &&
+-        outgoingData && !outgoingData->isSequential()) {
++        outgoingData && !outgoingData->isSequential() && outgoingData->size()) {
+         // request has no Content-Length
+         // but the data that is outgoing is random-access
+         h.append(QHttpHeaders::WellKnownHeader::ContentLength,
+diff --git a/src/network/access/qnetworkreplyhttpimpl.cpp b/src/network/access/qnetworkreplyhttpimpl.cpp
+index f3ddb75b127..5e22162b805 100644
+--- a/src/network/access/qnetworkreplyhttpimpl.cpp
++++ b/src/network/access/qnetworkreplyhttpimpl.cpp
+@@ -626,6 +626,53 @@ QHttpNetworkRequest::Priority QNetworkReplyHttpImplPrivate::convert(QNetworkRequ
+     Q_UNREACHABLE_RETURN(QHttpNetworkRequest::NormalPriority);
+ }
+ 
++void QNetworkReplyHttpImplPrivate::maybeDropUploadDevice(const QNetworkRequest &newHttpRequest)
++{
++    // Check for 0-length upload device. Following RFC9110, we are discouraged
++    // from sending "content-length: 0" for methods where a content-length would
++    // not normally be expected. E.g. get, connect, head, delete
++    // https://www.rfc-editor.org/rfc/rfc9110.html#section-8.6-5
++    auto contentLength0Allowed = [&]{
++        switch (operation) {
++        case QNetworkAccessManager::CustomOperation: {
++            const QByteArray customVerb = newHttpRequest.attribute(QNetworkRequest::CustomVerbAttribute)
++                                                .toByteArray();
++            if (customVerb.compare("get", Qt::CaseInsensitive) != 0
++                && customVerb.compare("head", Qt::CaseInsensitive) != 0
++                && customVerb.compare("connect", Qt::CaseInsensitive) != 0
++                && customVerb.compare("delete", Qt::CaseInsensitive) != 0) {
++                return true; // Trust user => content-length 0 is presumably okay!
++            }
++            // else:
++            [[fallthrough]];
++        }
++        case QNetworkAccessManager::HeadOperation:
++        case QNetworkAccessManager::GetOperation:
++        case QNetworkAccessManager::DeleteOperation:
++            // no content-length 0
++            return false;
++        case QNetworkAccessManager::PutOperation:
++        case QNetworkAccessManager::PostOperation:
++        case QNetworkAccessManager::UnknownOperation:
++            // yes content-length 0
++            return true;
++        }
++        Q_UNREACHABLE_RETURN(false);
++    };
++
++    const auto hasEmptyOutgoingPayload = [&]() {
++        if (!outgoingData)
++            return false;
++        if (outgoingDataBuffer)
++            return outgoingDataBuffer->isEmpty();
++        return outgoingData->size() == 0;
++    };
++    if (Q_UNLIKELY(hasEmptyOutgoingPayload()) && !contentLength0Allowed()) {
++        outgoingData = nullptr;
++        outgoingDataBuffer.reset();
++    }
++}
++
+ void QNetworkReplyHttpImplPrivate::postRequest(const QNetworkRequest &newHttpRequest)
+ {
+     Q_Q(QNetworkReplyHttpImpl);
+@@ -698,6 +745,10 @@ void QNetworkReplyHttpImplPrivate::postRequest(const QNetworkRequest &newHttpReq
+ 
+     httpRequest.setRedirectPolicy(redirectPolicy);
+ 
++    // If, for some reason, it turns out we won't use the upload device we drop
++    // it in the following call:
++    maybeDropUploadDevice(newHttpRequest);
++
+     httpRequest.setPriority(convert(newHttpRequest.priority()));
+     loadingFromCache = false;
+ 
+diff --git a/src/network/access/qnetworkreplyhttpimpl_p.h b/src/network/access/qnetworkreplyhttpimpl_p.h
+index 13f1d2f1354..233bc6b39b4 100644
+--- a/src/network/access/qnetworkreplyhttpimpl_p.h
++++ b/src/network/access/qnetworkreplyhttpimpl_p.h
+@@ -163,6 +163,7 @@ public:
+     QString reasonPhrase;
+ 
+     // upload
++    void maybeDropUploadDevice(const QNetworkRequest &newHttpRequest);
+     QNonContiguousByteDevice* createUploadByteDevice();
+     std::shared_ptr<QNonContiguousByteDevice> uploadByteDevice;
+     qint64 uploadByteDevicePosition;
+diff --git a/tests/auto/network/access/qnetworkreply_local/tst_qnetworkreply_local.cpp b/tests/auto/network/access/qnetworkreply_local/tst_qnetworkreply_local.cpp
+index 58b45a7b13f..fe2dc6954d9 100644
+--- a/tests/auto/network/access/qnetworkreply_local/tst_qnetworkreply_local.cpp
++++ b/tests/auto/network/access/qnetworkreply_local/tst_qnetworkreply_local.cpp
+@@ -8,6 +8,8 @@
+ #include <QtNetwork/qnetworkreply.h>
+ #include <QtNetwork/qnetworkaccessmanager.h>
+ 
++#include <QtCore/qbuffer.h>
++
+ #include "minihttpserver.h"
+ 
+ using namespace Qt::StringLiterals;
+@@ -24,6 +26,8 @@ private slots:
+ 
+     void get();
+     void post();
++    void emptyDeviceUpload_data();
++    void emptyDeviceUpload();
+ 
+ #if QT_CONFIG(localserver)
+     void fullServerName_data();
+@@ -114,6 +118,97 @@ void tst_QNetworkReply_local::post()
+     QCOMPARE(firstRequest.receivedData.last(payload.size() + 4), "\r\n\r\n" + payload);
+ }
+ 
++enum Method {
++    Get,
++    Put,
++    Post,
++    Custom,
++};
++void tst_QNetworkReply_local::emptyDeviceUpload_data()
++{
++    QTest::addColumn<Method>("method");
++    QTest::addColumn<QString>("customVerb");
++    QTest::addColumn<bool>("contentLengthExpected");
++    QTest::addColumn<bool>("sequential");
++    for (auto sequential : { false, true }) {
++        const char *suffix = sequential ? "sequential" : "non-sequential";
++        QTest::addRow("get-%s", suffix) << Get << "" << false << sequential;
++        QTest::addRow("put-%s", suffix) << Put << "" << true << sequential;
++        QTest::addRow("post-%s", suffix) << Post << "" << true << sequential;
++        QTest::addRow("custom-get-%s", suffix) << Custom << "get" << false << sequential;
++        QTest::addRow("custom-post-%s", suffix) << Custom << "post" << true << sequential;
++        QTest::addRow("custom-connect-%s", suffix) << Custom << "cOnNeCt" << false << sequential;
++    }
++}
++
++class EmptySequentialDevice : public QIODevice {
++public:
++    EmptySequentialDevice() = default;
++    bool isSequential() const override { return true; }
++
++protected:
++    qint64 readData(char *buf, qint64 len) override
++    {
++        Q_UNUSED(buf);
++        Q_UNUSED(len);
++        return -1;
++    }
++    qint64 writeData(const char *buf, qint64 len) override
++    {
++        Q_UNUSED(buf);
++        Q_UNUSED(len);
++        return -1;
++    }
++};
++
++void tst_QNetworkReply_local::emptyDeviceUpload()
++{
++    QFETCH(const Method, method);
++    QFETCH(const QString, customVerb);
++    QFETCH(const bool, contentLengthExpected);
++    QFETCH(const bool, sequential);
++    std::unique_ptr<MiniHttpServerV2> server = getServerForCurrentScheme();
++    const QUrl url = getUrlForCurrentScheme(server.get());
++
++    QNetworkAccessManager manager;
++
++    QBuffer emptyDevice;
++    emptyDevice.open(QIODevice::ReadOnly);
++
++    EmptySequentialDevice emptySequentialDevice;
++    emptySequentialDevice.open(QIODevice::ReadOnly);
++
++    QIODevice *device = sequential ? static_cast<QIODevice *>(&emptySequentialDevice)
++                                   : static_cast<QIODevice *>(&emptyDevice);
++    auto reply = [&]() -> std::unique_ptr<QNetworkReply> {
++        using unique_ptr = std::unique_ptr<QNetworkReply>;
++        switch (method) {
++        case Get:
++            return unique_ptr{ manager.get(QNetworkRequest(url), device) };
++        case Put:
++            return unique_ptr{ manager.put(QNetworkRequest(url), device) };
++        case Post:
++            return unique_ptr{ manager.post(QNetworkRequest(url), device) };
++        case Custom:
++            return unique_ptr{ manager.sendCustomRequest(QNetworkRequest(url), customVerb.toUtf8(),
++                                                         device) };
++        }
++        Q_UNREACHABLE_RETURN({});
++    }();
++
++    QTRY_VERIFY(reply->isFinished());
++
++    auto printErrorOnFail = qScopeGuard([reply = reply.get()]() {
++        qWarning() << "Error in the reply:" << reply->errorString();
++    });
++    QCOMPARE(reply->readAll(), QByteArray("Hello World!"));
++    QCOMPARE(reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt(), 200);
++    const QList<MiniHttpServerV2::State> peerStates = server->peerStates();
++    QCOMPARE(peerStates.size(), 1);
++    QCOMPARE(peerStates[0].foundContentLength, contentLengthExpected);
++    printErrorOnFail.dismiss();
++}
++
+ #if QT_CONFIG(localserver)
+ void tst_QNetworkReply_local::fullServerName_data()
+ {
+-- 
+2.51.2
+

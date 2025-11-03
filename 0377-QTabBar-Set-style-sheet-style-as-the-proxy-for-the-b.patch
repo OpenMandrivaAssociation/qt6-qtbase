@@ -1,0 +1,120 @@
+From 3fb4fef152dfa9614532b176e25add9cfe65a638 Mon Sep 17 00:00:00 2001
+From: Santhosh Kumar <santhosh.kumar.selvaraj@qt.io>
+Date: Thu, 9 Oct 2025 12:22:08 +0200
+Subject: [PATCH 377/553] QTabBar: Set style-sheet style as the proxy for the
+ base style
+
+The geometry of the scroll-left (SE_TabBarScrollLeftButton) and scroll-
+right (SE_TabBarScrollRightButton) buttons can be styled either through
+the base style or the style-sheet style, but not both, like position
+set by the base style and width of the button set through style-sheet.
+
+This patch fixes this issue by temporarily setting QStyleSheetStyle as
+the proxy of the base style. This solution has been adapted from the
+patch: f414c490d38c10ab086a0ad3d32ab9bd20a2a2b6.
+
+Amends 9a3bdbf40af7e4915ed343c8e9917a0f3f54e0ae.
+
+Fixes: QTBUG-139588
+Pick-to: 6.8
+Change-Id: If86e4ace3efd64f46def0ae338cbb547dcc33412
+Reviewed-by: Volker Hilsheimer <volker.hilsheimer@qt.io>
+(cherry picked from commit 1926efac355a129c3a7fa2e8c527ee2e8854878e)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/widgets/styles/qstylesheetstyle.cpp       |  6 ++-
+ .../qstylesheetstyle/tst_qstylesheetstyle.cpp | 47 +++++++++++++++++++
+ 2 files changed, 51 insertions(+), 2 deletions(-)
+
+diff --git a/src/widgets/styles/qstylesheetstyle.cpp b/src/widgets/styles/qstylesheetstyle.cpp
+index 54facf60bdd..572bce37eb1 100644
+--- a/src/widgets/styles/qstylesheetstyle.cpp
++++ b/src/widgets/styles/qstylesheetstyle.cpp
+@@ -6304,8 +6304,10 @@ QRect QStyleSheetStyle::subElementRect(SubElement se, const QStyleOption *opt, c
+ 
+     case SE_TabBarScrollLeftButton:
+     case SE_TabBarScrollRightButton:
+-        if (hasStyleRule(w, PseudoElement_TabBarScroller))
+-            return ParentStyle::subElementRect(se, opt, w);
++        if (hasStyleRule(w, PseudoElement_TabBarScroller)) {
++            QStyleSheetProxySaver proxySaver(this);
++            return baseStyle()->subElementRect(se, opt, w);
++        }
+         break;
+ 
+     case SE_TabBarTearIndicator: {
+diff --git a/tests/auto/widgets/styles/qstylesheetstyle/tst_qstylesheetstyle.cpp b/tests/auto/widgets/styles/qstylesheetstyle/tst_qstylesheetstyle.cpp
+index 2ccf7ccdc27..f477030e725 100644
+--- a/tests/auto/widgets/styles/qstylesheetstyle/tst_qstylesheetstyle.cpp
++++ b/tests/auto/widgets/styles/qstylesheetstyle/tst_qstylesheetstyle.cpp
+@@ -27,6 +27,7 @@
+ #include <QtWidgets/QToolTip>
+ #include <QtWidgets/QTreeView>
+ #include <QtWidgets/QVBoxLayout>
++#include <QtWidgets/QProxyStyle>
+ 
+ #include <QtGui/QPainter>
+ #include <QtGui/QScreen>
+@@ -94,6 +95,7 @@ private slots:
+     void task206238_twice();
+     void transparent();
+     void proxyStyle();
++    void useProxyandStyleSheetStyleInTabBar();
+     void dialogButtonBox();
+     void emptyStyleSheet();
+     void toolTip_data();
+@@ -1593,6 +1595,51 @@ void tst_QStyleSheetStyle::proxyStyle()
+     delete newProxy;
+ }
+ 
++void tst_QStyleSheetStyle::useProxyandStyleSheetStyleInTabBar()
++{
++#ifdef Q_OS_MACOS
++    // Since macOS style doesn't support tabbar scroll buttons, skip this case
++    QSKIP("TabBar doesn't support scroll button in macOS");
++#endif
++
++    class CustomProxy : public QProxyStyle
++    {
++        public:
++            QRect subElementRect(SubElement subElement,
++                                 const QStyleOption *option,
++                                 const QWidget *widget) const override  {
++                auto r = QProxyStyle::subElementRect(subElement, option, widget);
++                if (subElement == SE_TabBarScrollLeftButton)
++                    r.moveLeft(0);
++                return r;
++            }
++    };
++
++    qApp->setStyleSheet("QTabBar::scroller { width: 50px; }");
++
++    QTabBar tabBar;
++    tabBar.setMaximumWidth(150);
++    tabBar.setStyle(new CustomProxy);
++    int totalWidth = 0;
++    for (int tabIndex = 0; tabIndex < 10; ++tabIndex) {
++        tabBar.addTab("Tab " + QString::number(tabIndex));
++        totalWidth += tabBar.tabRect(tabIndex).width();
++    }
++    if (totalWidth < 200)
++        tabBar.resize(totalWidth / 2, 30);
++    tabBar.show();
++    QVERIFY(QTest::qWaitForWindowActive(&tabBar));
++
++    QToolButton *scrollLeftButton = qobject_cast<QToolButton *>(tabBar.children().at(0));
++    QVERIFY(scrollLeftButton);
++    QCOMPARE(scrollLeftButton->pos(), QPoint(0, 0));
++    QCOMPARE(scrollLeftButton->width(), 25);
++
++    QToolButton *scrollRightButton = qobject_cast<QToolButton *>(tabBar.children().at(1));
++    QVERIFY(scrollRightButton);
++    QCOMPARE(scrollRightButton->width(), 25);
++}
++
+ void tst_QStyleSheetStyle::dialogButtonBox()
+ {
+     QDialogButtonBox box;
+-- 
+2.51.2
+

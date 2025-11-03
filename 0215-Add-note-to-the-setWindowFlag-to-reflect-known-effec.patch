@@ -1,0 +1,36 @@
+From ab747ac67f91007cbca5ee9d61cd6ece198e7188 Mon Sep 17 00:00:00 2001
+From: Morteza Jamshidi <morteza.jamshidi@qt.io>
+Date: Mon, 22 Sep 2025 13:01:15 +0200
+Subject: [PATCH 215/553] Add note to the setWindowFlag to reflect known effect
+
+After calling setWindowFlag, widget becomes hidden. This is mentioned in
+the windowFlags property but not for the setWindowFlag, so I added that.
+
+Fixes: QTBUG-138459
+Change-Id: I280698a212fa7d4bccdc69088c68bbe457599cfd
+Pick-to: 6.8 6.5
+Reviewed-by: Giuseppe D'Angelo <giuseppe.dangelo@kdab.com>
+(cherry picked from commit a6d96d4eac8c14cecd5bb89949791d38bf730c30)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/widgets/kernel/qwidget.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/widgets/kernel/qwidget.cpp b/src/widgets/kernel/qwidget.cpp
+index ba166b51f83..2835884ea7e 100644
+--- a/src/widgets/kernel/qwidget.cpp
++++ b/src/widgets/kernel/qwidget.cpp
+@@ -10597,6 +10597,10 @@ void QWidget::setWindowFlags(Qt::WindowFlags flags)
+     Sets the window flag \a flag on this widget if \a on is true;
+     otherwise clears the flag.
+ 
++    \note This function calls setParent() when changing the flags for
++    a window, causing the widget to be hidden. You must call show() to make
++    the widget visible again.
++
+     \sa setWindowFlags(), windowFlags(), windowType()
+ */
+ void QWidget::setWindowFlag(Qt::WindowType flag, bool on)
+-- 
+2.51.2
+

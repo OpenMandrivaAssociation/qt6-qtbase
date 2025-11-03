@@ -1,0 +1,34 @@
+From e258ce7750b41ab7f637d949b297a72d15b37164 Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Thu, 2 Oct 2025 14:07:49 +0200
+Subject: [PATCH 417/553] [docs] Discourage using namespace Qt;
+
+It brings all the nested namespaces inside the Qt namespace into scope,
+which may have unwanted side effects. This is analogous to IWYU, but for
+`using namespace` directives.
+
+Pick-to: 6.8 6.5
+Change-Id: I054a701458ca55915e5663e055b754c07b4007d4
+Reviewed-by: Ahmad Samir <a.samirh78@gmail.com>
+(cherry picked from commit b8fd582352a3bd77160d42516acde7da51525271)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/text/qtliterals.qdoc | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/corelib/text/qtliterals.qdoc b/src/corelib/text/qtliterals.qdoc
+index 06ce31848f7..8be03a02236 100644
+--- a/src/corelib/text/qtliterals.qdoc
++++ b/src/corelib/text/qtliterals.qdoc
+@@ -44,4 +44,8 @@
+     // in the Qt namespace
+     using namespace Qt;
+     \endcode
++
++    The latter is discouraged, because it doesn't allow you to pick which literal
++    operators you want in case Qt adds conflicting operators in different
++    namespaces within Qt::Literals.
+ */
+-- 
+2.51.2
+

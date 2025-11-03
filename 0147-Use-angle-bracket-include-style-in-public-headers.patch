@@ -1,0 +1,66 @@
+From 90d9cad2a6669f51cc953ccba3a55895dc1e23b3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tor=20Arne=20Vestb=C3=B8?= <tor.arne.vestbo@qt.io>
+Date: Thu, 18 Sep 2025 12:07:52 +0200
+Subject: [PATCH 147/553] Use angle bracket include style in public headers
+
+As a drive-by, reorder and regroup changed includes to separate
+includes from different modules from each other.
+
+Pick-to: 6.9 6.8 6.5
+Change-Id: I3bcca2a75ada7b6d99ef763e0ce8cfbd0750f004
+Reviewed-by: Marc Mutz <marc.mutz@qt.io>
+(cherry picked from commit 9c528e8ae06b4724f8f541746c92cf4b6e6adb9b)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/dbus/qdbusmetatype.h                  | 3 ++-
+ src/gui/kernel/qplatformsystemtrayicon.h  | 3 ++-
+ src/widgets/itemviews/qdatawidgetmapper.h | 3 ++-
+ 3 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/src/dbus/qdbusmetatype.h b/src/dbus/qdbusmetatype.h
+index 66b6b1b0456..a48e70eaace 100644
+--- a/src/dbus/qdbusmetatype.h
++++ b/src/dbus/qdbusmetatype.h
+@@ -6,9 +6,10 @@
+ #define QDBUSMETATYPE_H
+ 
+ #include <QtDBus/qtdbusglobal.h>
+-#include "QtCore/qmetatype.h"
+ #include <QtDBus/qdbusargument.h>
+ 
++#include <QtCore/qmetatype.h>
++
+ #ifndef QT_NO_DBUS
+ 
+ QT_BEGIN_NAMESPACE
+diff --git a/src/gui/kernel/qplatformsystemtrayicon.h b/src/gui/kernel/qplatformsystemtrayicon.h
+index 76a7ef03d90..be57e9e1489 100644
+--- a/src/gui/kernel/qplatformsystemtrayicon.h
++++ b/src/gui/kernel/qplatformsystemtrayicon.h
+@@ -7,7 +7,8 @@
+ 
+ #include <QtGui/qtguiglobal.h>
+ #include <qpa/qplatformscreen.h>
+-#include "QtCore/qobject.h"
++
++#include <QtCore/qobject.h>
+ 
+ #ifndef QT_NO_SYSTEMTRAYICON
+ 
+diff --git a/src/widgets/itemviews/qdatawidgetmapper.h b/src/widgets/itemviews/qdatawidgetmapper.h
+index 2ed1b8bccb6..6b202106fe3 100644
+--- a/src/widgets/itemviews/qdatawidgetmapper.h
++++ b/src/widgets/itemviews/qdatawidgetmapper.h
+@@ -6,7 +6,8 @@
+ #define QDATAWIDGETMAPPER_H
+ 
+ #include <QtWidgets/qtwidgetsglobal.h>
+-#include "QtCore/qobject.h"
++
++#include <QtCore/qobject.h>
+ 
+ QT_REQUIRE_CONFIG(datawidgetmapper);
+ 
+-- 
+2.51.2
+

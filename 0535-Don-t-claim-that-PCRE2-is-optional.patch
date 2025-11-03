@@ -1,0 +1,73 @@
+From b7e7661a70d2aa4a6a72ec5d149c36d339e1ef93 Mon Sep 17 00:00:00 2001
+From: Joerg Bornemann <joerg.bornemann@qt.io>
+Date: Tue, 21 Oct 2025 11:16:09 +0200
+Subject: [PATCH 535/553] Don't claim that PCRE2 is optional
+
+Using PCRE2 isn't optional anymore since Qt6.
+Fix QtUsage text in PCRE2's attribution file.
+Don't mention the options to turn off the pcre2 feature in configure's
+help text nor configure-cmake-mapping.md.
+
+[ChangeLog][Third-Party Code] Don't claim that using PCRE2 is optional.
+
+Pick-to: 6.8
+Change-Id: I53ea08a4cf7311fac9da2a514553f5e65a9bbc91
+Reviewed-by: Alexey Edelev <alexey.edelev@qt.io>
+(cherry picked from commit 5e37cd4a5cf8a1af8e1fcba3ea61d82f67be3b60)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ cmake/configure-cmake-mapping.md       | 1 -
+ config_help.txt                        | 2 +-
+ src/3rdparty/pcre2/qt_attribution.json | 4 ++--
+ 3 files changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/cmake/configure-cmake-mapping.md b/cmake/configure-cmake-mapping.md
+index 95b1215ddce..fadc03c831b 100644
+--- a/cmake/configure-cmake-mapping.md
++++ b/cmake/configure-cmake-mapping.md
+@@ -128,7 +128,6 @@ The following table describes the mapping of configure options to CMake argument
+ | -glib                                 | -DFEATURE_glib=ON                                 |                                                                 |
+ | -inotify                              | -DFEATURE_inotify=ON                              |                                                                 |
+ | -icu                                  | -DFEATURE_icu=ON                                  |                                                                 |
+-| -pcre                                 | -DFEATURE_pcre2=ON                                |                                                                 |
+ | -pcre [system/qt]                     | -DFEATURE_system_pcre2=ON/OFF                     |                                                                 |
+ | -pps                                  | n/a                                               | QNX feature. Not available for 6.0.                             |
+ | -zlib [system/qt]                     | -DFEATURE_system_zlib=ON/OFF                      |                                                                 |
+diff --git a/config_help.txt b/config_help.txt
+index 52ab7590fd9..cd41288e82f 100644
+--- a/config_help.txt
++++ b/config_help.txt
+@@ -273,7 +273,7 @@ Core options:
+   -inotify ............. Enable inotify support
+   -icu ................. Enable ICU support [auto]
+   -jemalloc ............ Enable jemalloc support and cooperation [no]
+-  -pcre ................ Select used libpcre2 [system/qt/no]
++  -pcre ................ Select used libpcre2 [system/qt]
+   -zlib ................ Select used zlib [system/qt]
+ 
+   Logging backends:
+diff --git a/src/3rdparty/pcre2/qt_attribution.json b/src/3rdparty/pcre2/qt_attribution.json
+index 20099f48e6d..ef29ad7d951 100644
+--- a/src/3rdparty/pcre2/qt_attribution.json
++++ b/src/3rdparty/pcre2/qt_attribution.json
+@@ -3,7 +3,7 @@
+     "Id": "pcre2",
+     "Name": "PCRE2",
+     "QDocModule": "qtcore",
+-    "QtUsage": "Optionally used in Qt Core (QRegularExpression). Configure with -system-pcre or -no-pcre to avoid.",
++    "QtUsage": "Used in Qt Core (QRegularExpression).",
+     "SecurityCritical": true,
+ 
+     "Description": "The PCRE library is a set of functions that implement regular expression pattern matching using the same syntax and semantics as Perl 5.",
+@@ -23,7 +23,7 @@
+     "Id": "pcre2-sljit",
+     "Name": "PCRE2 - Stack-less Just-In-Time Compiler",
+     "QDocModule": "qtcore",
+-    "QtUsage": "Optionally used in Qt Core (QRegularExpression). Configure with -system-pcre or -no-pcre to avoid.",
++    "QtUsage": "Used in Qt Core (QRegularExpression).",
+ 
+     "Path": "deps/sljit",
+     "Description": "The PCRE library is a set of functions that implement regular expression pattern matching using the same syntax and semantics as Perl 5.",
+-- 
+2.51.2
+

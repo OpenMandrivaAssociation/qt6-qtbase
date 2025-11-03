@@ -1,0 +1,33 @@
+From 32fa5323e1601f4dcc548a831af363ff48383b24 Mon Sep 17 00:00:00 2001
+From: Wladimir Leuschner <wladimir.leuschner@qt.io>
+Date: Wed, 15 Oct 2025 13:28:02 +0200
+Subject: [PATCH 425/553] QMenu: Do not close menu when seperator was clicked
+
+Check before closing the menu, if the respective action is a seperator.
+In case it is a seperator do not close the menu.
+
+Fixes: QTBUG-141135
+Change-Id: I74127f2eaa2973be1f2355bd1aa21e9f9a67f234
+Reviewed-by: Axel Spoerl <axel.spoerl@qt.io>
+(cherry picked from commit 879eb2c08094a70683488d56520efd3a4cf1b086)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/widgets/widgets/qmenu.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/widgets/widgets/qmenu.cpp b/src/widgets/widgets/qmenu.cpp
+index 60f30a17b6e..aa10a2dae5e 100644
+--- a/src/widgets/widgets/qmenu.cpp
++++ b/src/widgets/widgets/qmenu.cpp
+@@ -2945,7 +2945,7 @@ void QMenu::mouseReleaseEvent(QMouseEvent *e)
+ #endif
+                 d->activateAction(action, QAction::Trigger);
+         }
+-    } else if (!action || action->isEnabled()) {
++    } else if ((!action || action->isEnabled()) && !action->isSeparator()) {
+         d->hideUpToMenuBar();
+     }
+ }
+-- 
+2.51.2
+

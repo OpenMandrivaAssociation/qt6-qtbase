@@ -1,0 +1,73 @@
+From 0196d03fb8a67e2379f729907d42a51831a67e84 Mon Sep 17 00:00:00 2001
+From: Edward Welbourne <edward.welbourne@qt.io>
+Date: Wed, 10 Sep 2025 15:22:53 +0200
+Subject: [PATCH 061/553] Move CharBuff back into QLocaleData
+
+This reverts commit 69d3e96e02d4726d79aaf2d82acd30a903aa5a74, and
+adjusted users that have since been added.
+
+Its name doesn't start with Q so it shouldn't be in the public
+namespace, even if it is in a private header.
+
+The reason for the move out of QLocaleData disappeared with the
+recent commit 1cdb5178b9db59f3aa5c0af8f30ad25bc6620021, which moved
+ParsingResult into QLocaleData for the same reason.
+
+Pick-to: 6.9 6.8
+Change-Id: Icd3eac41ef7654024224dd1d55a5922f7f598a36
+Reviewed-by: Marc Mutz <marc.mutz@qt.io>
+(cherry picked from commit a865a146bead3526dc8df5badf35aa2b55bcd614)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/text/qlocale_p.h | 5 ++---
+ src/gui/util/qvalidator.cpp  | 4 ++--
+ 2 files changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/src/corelib/text/qlocale_p.h b/src/corelib/text/qlocale_p.h
+index 89489324d05..1ade70050a7 100644
+--- a/src/corelib/text/qlocale_p.h
++++ b/src/corelib/text/qlocale_p.h
+@@ -243,9 +243,6 @@ struct QLocaleId
+ };
+ Q_DECLARE_TYPEINFO(QLocaleId, Q_PRIMITIVE_TYPE);
+ 
+-
+-using CharBuff = QVarLengthArray<char, 256>;
+-
+ struct QLocaleData
+ {
+ public:
+@@ -289,6 +286,8 @@ public:
+         bool isValid() const { return least > 0 && higher > first && first > 0; }
+     };
+ 
++    using CharBuff = QVarLengthArray<char, 256>;
++
+     struct ParsingResult
+     {
+         enum State { // A duplicate of QValidator::State
+diff --git a/src/gui/util/qvalidator.cpp b/src/gui/util/qvalidator.cpp
+index 9aaaf4e6e1a..884b0ccfc6d 100644
+--- a/src/gui/util/qvalidator.cpp
++++ b/src/gui/util/qvalidator.cpp
+@@ -372,7 +372,7 @@ std::optional<QValidator::State> initialResultCheck(T min, T max,
+     if (result.state == ParsingResult::Invalid)
+         return QValidator::Invalid;
+ 
+-    const CharBuff &buff = result.buff;
++    const QLocaleData::CharBuff &buff = result.buff;
+     if (buff.isEmpty())
+         return QValidator::Intermediate;
+ 
+@@ -397,7 +397,7 @@ QValidator::State QIntValidator::validate(QString & input, int&) const
+     if (opt)
+         return *opt;
+ 
+-    const CharBuff &buff = result.buff;
++    const QLocaleData::CharBuff &buff = result.buff;
+     QSimpleParsedNumber r = QLocaleData::bytearrayToLongLong(buff, 10);
+     if (!r.ok())
+         return Invalid;
+-- 
+2.51.2
+

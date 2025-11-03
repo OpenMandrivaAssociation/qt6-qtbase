@@ -1,0 +1,170 @@
+From c05aaac7ed7ca14810567147c382ff5e0839dab7 Mon Sep 17 00:00:00 2001
+From: Liang Qi <liang.qi@qt.io>
+Date: Wed, 24 Sep 2025 06:54:29 +0200
+Subject: [PATCH 198/553] CRA review: gui/platform/unix/dbusmenu/*
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The files that we maintain by hand are marked as significant.
+
+D-Bus is security critical, but the Qt DBus Menu implementation is
+merely a user, and does not do any parsing or communication on its own.
+
+QUIP: 23
+Task-number: QTBUG-134573
+Pick-to: 6.8
+Change-Id: I2404638024884c0daa53fa9da6252b89d596f3ee
+Reviewed-by: Tor Arne Vestbø <tor.arne.vestbo@qt.io>
+(cherry picked from commit 090bd477bcadccc9020b7ea393c0570272ca8e62)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/gui/platform/unix/dbusmenu/qdbusmenuadaptor.cpp        | 1 +
+ src/gui/platform/unix/dbusmenu/qdbusmenuadaptor_p.h        | 1 +
+ src/gui/platform/unix/dbusmenu/qdbusmenubar.cpp            | 1 +
+ src/gui/platform/unix/dbusmenu/qdbusmenubar_p.h            | 1 +
+ src/gui/platform/unix/dbusmenu/qdbusmenuconnection.cpp     | 1 +
+ src/gui/platform/unix/dbusmenu/qdbusmenuconnection_p.h     | 1 +
+ src/gui/platform/unix/dbusmenu/qdbusmenuregistrarproxy.cpp | 1 +
+ src/gui/platform/unix/dbusmenu/qdbusmenuregistrarproxy_p.h | 1 +
+ src/gui/platform/unix/dbusmenu/qdbusmenutypes.cpp          | 1 +
+ src/gui/platform/unix/dbusmenu/qdbusmenutypes_p.h          | 1 +
+ src/gui/platform/unix/dbusmenu/qdbusplatformmenu.cpp       | 1 +
+ src/gui/platform/unix/dbusmenu/qdbusplatformmenu_p.h       | 1 +
+ 12 files changed, 12 insertions(+)
+
+diff --git a/src/gui/platform/unix/dbusmenu/qdbusmenuadaptor.cpp b/src/gui/platform/unix/dbusmenu/qdbusmenuadaptor.cpp
+index a3b7b6db005..0a50f6c2839 100644
+--- a/src/gui/platform/unix/dbusmenu/qdbusmenuadaptor.cpp
++++ b/src/gui/platform/unix/dbusmenu/qdbusmenuadaptor.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ /*
+     This file was originally created by qdbusxml2cpp version 0.8
+diff --git a/src/gui/platform/unix/dbusmenu/qdbusmenuadaptor_p.h b/src/gui/platform/unix/dbusmenu/qdbusmenuadaptor_p.h
+index b6f538f6b34..7507f559ba3 100644
+--- a/src/gui/platform/unix/dbusmenu/qdbusmenuadaptor_p.h
++++ b/src/gui/platform/unix/dbusmenu/qdbusmenuadaptor_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ /*
+     This file was originally created by qdbusxml2cpp version 0.8
+diff --git a/src/gui/platform/unix/dbusmenu/qdbusmenubar.cpp b/src/gui/platform/unix/dbusmenu/qdbusmenubar.cpp
+index 153dedf54ac..3019d8eba2b 100644
+--- a/src/gui/platform/unix/dbusmenu/qdbusmenubar.cpp
++++ b/src/gui/platform/unix/dbusmenu/qdbusmenubar.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 Dmitry Shachnev <mitya57@gmail.com>
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qdbusmenubar_p.h"
+ #include "qdbusmenuregistrarproxy_p.h"
+diff --git a/src/gui/platform/unix/dbusmenu/qdbusmenubar_p.h b/src/gui/platform/unix/dbusmenu/qdbusmenubar_p.h
+index 24c63802aa1..24126e11a5a 100644
+--- a/src/gui/platform/unix/dbusmenu/qdbusmenubar_p.h
++++ b/src/gui/platform/unix/dbusmenu/qdbusmenubar_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 Dmitry Shachnev <mitya57@gmail.com>
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QDBUSMENUBAR_P_H
+ #define QDBUSMENUBAR_P_H
+diff --git a/src/gui/platform/unix/dbusmenu/qdbusmenuconnection.cpp b/src/gui/platform/unix/dbusmenu/qdbusmenuconnection.cpp
+index e5506e9718f..5949d7a8ba0 100644
+--- a/src/gui/platform/unix/dbusmenu/qdbusmenuconnection.cpp
++++ b/src/gui/platform/unix/dbusmenu/qdbusmenuconnection.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QtGui/qtgui-config.h>
+ 
+diff --git a/src/gui/platform/unix/dbusmenu/qdbusmenuconnection_p.h b/src/gui/platform/unix/dbusmenu/qdbusmenuconnection_p.h
+index 37033e2fa3e..f5b4542b020 100644
+--- a/src/gui/platform/unix/dbusmenu/qdbusmenuconnection_p.h
++++ b/src/gui/platform/unix/dbusmenu/qdbusmenuconnection_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QDBUSMENUCONNECTION_H
+ #define QDBUSMENUCONNECTION_H
+diff --git a/src/gui/platform/unix/dbusmenu/qdbusmenuregistrarproxy.cpp b/src/gui/platform/unix/dbusmenu/qdbusmenuregistrarproxy.cpp
+index 089bf5de47a..0ae738f099e 100644
+--- a/src/gui/platform/unix/dbusmenu/qdbusmenuregistrarproxy.cpp
++++ b/src/gui/platform/unix/dbusmenu/qdbusmenuregistrarproxy.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 Dmitry Shachnev <mitya57@gmail.com>
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ /*
+  * This file was originally created by qdbusxml2cpp version 0.8
+diff --git a/src/gui/platform/unix/dbusmenu/qdbusmenuregistrarproxy_p.h b/src/gui/platform/unix/dbusmenu/qdbusmenuregistrarproxy_p.h
+index 8041f3af0ac..664d5869999 100644
+--- a/src/gui/platform/unix/dbusmenu/qdbusmenuregistrarproxy_p.h
++++ b/src/gui/platform/unix/dbusmenu/qdbusmenuregistrarproxy_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 Dmitry Shachnev <mitya57@gmail.com>
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ /*
+  * This file was originally created by qdbusxml2cpp version 0.8
+diff --git a/src/gui/platform/unix/dbusmenu/qdbusmenutypes.cpp b/src/gui/platform/unix/dbusmenu/qdbusmenutypes.cpp
+index b7fd0358839..db5b30ee253 100644
+--- a/src/gui/platform/unix/dbusmenu/qdbusmenutypes.cpp
++++ b/src/gui/platform/unix/dbusmenu/qdbusmenutypes.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qdbusmenutypes_p.h"
+ 
+diff --git a/src/gui/platform/unix/dbusmenu/qdbusmenutypes_p.h b/src/gui/platform/unix/dbusmenu/qdbusmenutypes_p.h
+index 4775c0094d7..196f661f766 100644
+--- a/src/gui/platform/unix/dbusmenu/qdbusmenutypes_p.h
++++ b/src/gui/platform/unix/dbusmenu/qdbusmenutypes_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QDBUSMENUTYPES_H
+ #define QDBUSMENUTYPES_H
+diff --git a/src/gui/platform/unix/dbusmenu/qdbusplatformmenu.cpp b/src/gui/platform/unix/dbusmenu/qdbusplatformmenu.cpp
+index f25fb0831b4..fe050461260 100644
+--- a/src/gui/platform/unix/dbusmenu/qdbusplatformmenu.cpp
++++ b/src/gui/platform/unix/dbusmenu/qdbusplatformmenu.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qdbusplatformmenu_p.h"
+ 
+diff --git a/src/gui/platform/unix/dbusmenu/qdbusplatformmenu_p.h b/src/gui/platform/unix/dbusmenu/qdbusplatformmenu_p.h
+index cb672fee488..765823b5b47 100644
+--- a/src/gui/platform/unix/dbusmenu/qdbusplatformmenu_p.h
++++ b/src/gui/platform/unix/dbusmenu/qdbusplatformmenu_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QDBUSPLATFORMMENU_H
+ #define QDBUSPLATFORMMENU_H
+-- 
+2.51.2
+

@@ -1,0 +1,111 @@
+From ac1f571717976bf10fe35ccac68b61b5707fe2b5 Mon Sep 17 00:00:00 2001
+From: Alexandru Croitor <alexandru.croitor@qt.io>
+Date: Thu, 28 Aug 2025 19:14:48 +0200
+Subject: [PATCH 117/553] CMake: Fix sbom project end target finalization to be
+ a loop
+
+Finalizing an SBOM for a target inside _qt_internal_sbom_end_project
+can cause another target's SBOM to be deferred. It would never be
+added to the SBOM, because by that time we already
+call _qt_internal_sbom_end_project_generate().
+
+Make sure to process the sbom finalization in a loop, until no new
+targets need to be finalized.
+
+Remove IMMEDIATE_FINALIZATION from qtbase's Platform targets, because
+they will now be properly finalized including attribution dependencies.
+
+Pick-to: 6.9 6.8
+Task-number: QTBUG-134894
+Change-Id: Id10a7131eed146cdc2c7074b36762f796b927a71
+Reviewed-by: Joerg Bornemann <joerg.bornemann@qt.io>
+(cherry picked from commit 2a1665dbad4f9befc87cbb2bc1ca46eccb7c88b0)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ cmake/QtPlatformTargetHelpers.cmake |  1 -
+ cmake/QtPublicSbomHelpers.cmake     | 42 ++++++++++++++++++++++++-----
+ cmake/QtTargetHelpers.cmake         |  1 -
+ 3 files changed, 36 insertions(+), 8 deletions(-)
+
+diff --git a/cmake/QtPlatformTargetHelpers.cmake b/cmake/QtPlatformTargetHelpers.cmake
+index 33b49960984..dba39721b69 100644
+--- a/cmake/QtPlatformTargetHelpers.cmake
++++ b/cmake/QtPlatformTargetHelpers.cmake
+@@ -70,7 +70,6 @@ function(qt_internal_setup_public_platform_target)
+         ATTRIBUTION_FILE_DIR_PATHS
+             "${PROJECT_SOURCE_DIR}/cmake/3rdparty/extra-cmake-modules"
+             "${PROJECT_SOURCE_DIR}/cmake/3rdparty/kwin"
+-        IMMEDIATE_FINALIZATION
+     )
+ endfunction()
+ 
+diff --git a/cmake/QtPublicSbomHelpers.cmake b/cmake/QtPublicSbomHelpers.cmake
+index 73276e5a8c7..a49601afcb7 100644
+--- a/cmake/QtPublicSbomHelpers.cmake
++++ b/cmake/QtPublicSbomHelpers.cmake
+@@ -428,14 +428,44 @@ function(_qt_internal_sbom_end_project)
+     # This can happen when _qt_internal_sbom_end_project is called within the same
+     # subdirectory scope as where the targets are meant to be finalized, but that would be too late
+     # and the targets wouldn't be added to the sbom.
+-    # This would mostly happen in user projects, and not Qt repos, because in Qt repos we afaik
+-    # never create targets in the root cmakelists (aside from the qtbase Platform targets).
+-    get_cmake_property(targets _qt_internal_sbom_targets_waiting_for_finalization)
+-    if(targets)
+-        foreach(target IN LISTS targets)
++    # This can happen in user projects, but also it happens for qtbase with the Platform targets.
++    # Check the list of targets to finalize in a loop, because finalizing a target can schedule
++    # finalization of a different attribution target.
++    set(targets_to_finalize "")
++    get_cmake_property(new_targets _qt_internal_sbom_targets_waiting_for_finalization)
++    if(new_targets)
++        list(APPEND targets_to_finalize ${new_targets})
++    endif()
++
++    set(finalization_iterations 0)
++    while(targets_to_finalize)
++        # Make sure we don't accidentally create a never-ending loop.
++        math(EXPR finalization_iterations "${finalization_iterations} + 1")
++        if(finalization_iterations GREATER 500)
++            message(WARNING
++                "SBOM warning: Too many iterations while handling finalization of SBOM targets. "
++                "Possible circular dependency. "
++                "Please report to https://bugreports.qt.io with details "
++                "about the project and a trace log. "
++                "Targets left to finalize: '${targets_to_finalize}'"
++            )
++            break()
++        endif()
++
++        # Clear the list.
++        set_property(GLOBAL PROPERTY _qt_internal_sbom_targets_waiting_for_finalization "")
++
++        foreach(target IN LISTS targets_to_finalize)
+             _qt_internal_finalize_sbom("${target}")
+         endforeach()
+-    endif()
++
++        # Retrieve any new targets.
++        set(targets_to_finalize "")
++        get_cmake_property(new_targets _qt_internal_sbom_targets_waiting_for_finalization)
++        if(new_targets)
++            list(APPEND targets_to_finalize ${new_targets})
++        endif()
++    endwhile()
+ 
+     _qt_internal_sbom_end_project_generate()
+ 
+diff --git a/cmake/QtTargetHelpers.cmake b/cmake/QtTargetHelpers.cmake
+index 6f977dc7f3a..485091e780e 100644
+--- a/cmake/QtTargetHelpers.cmake
++++ b/cmake/QtTargetHelpers.cmake
+@@ -1835,7 +1835,6 @@ function(qt_internal_add_platform_internal_target target)
+ 
+     qt_internal_add_sbom("${target}"
+         TYPE QT_MODULE
+-        IMMEDIATE_FINALIZATION
+     )
+ endfunction()
+ 
+-- 
+2.51.2
+

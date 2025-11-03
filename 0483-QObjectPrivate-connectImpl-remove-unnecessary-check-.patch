@@ -1,0 +1,34 @@
+From 063b968b0003e9bd3b8833ecb714766cbe33e788 Mon Sep 17 00:00:00 2001
+From: Thiago Macieira <thiago.macieira@intel.com>
+Date: Fri, 29 Aug 2025 09:31:51 -0700
+Subject: [PATCH 483/553] QObjectPrivate::connectImpl: remove unnecessary check
+ we've already done
+
+We checked above that if the UniqueConnection bit is set, slot is not
+null.
+
+Pick-to: 6.8
+Change-Id: I1a323f917be73c0653cefffd852e46ca8b0fa22f
+Reviewed-by: Ahmad Samir <a.samirh78@gmail.com>
+(cherry picked from commit 22657b73183c3997be2751fd41d608e226615a40)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/kernel/qobject.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/corelib/kernel/qobject.cpp b/src/corelib/kernel/qobject.cpp
+index 3e560bf5b0d..eae9f01edef 100644
+--- a/src/corelib/kernel/qobject.cpp
++++ b/src/corelib/kernel/qobject.cpp
+@@ -5386,7 +5386,7 @@ QMetaObject::Connection QObjectPrivate::connectImpl(const QObject *sender, int s
+     QOrderedMutexLocker locker(signalSlotLock(sender),
+                                signalSlotLock(receiver));
+ 
+-    if (type & Qt::UniqueConnection && slot) {
++    if (type & Qt::UniqueConnection) {
+         QObjectPrivate::ConnectionData *connections = QObjectPrivate::get(s)->connections.loadRelaxed();
+         if (connections && connections->signalVectorCount() > signal_index) {
+             const QObjectPrivate::Connection *c2 = connections->signalVector.loadRelaxed()->at(signal_index).first.loadRelaxed();
+-- 
+2.51.2
+

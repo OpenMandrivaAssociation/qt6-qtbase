@@ -1,0 +1,83 @@
+From 531c49d307f81f5926627b718b831c65673a48d4 Mon Sep 17 00:00:00 2001
+From: Alexandru Croitor <alexandru.croitor@qt.io>
+Date: Wed, 17 Sep 2025 18:59:35 +0200
+Subject: [PATCH 186/553] CMake: Opt in for NEW CMP0156 on WebAssembly
+
+Otherwise duplicate symbol errors occur when -sMAIN_MODULE is passed
+to the executable and a static library is linked multiple times into
+the executable, which is common in Qt builds, due to how qt plugin
+propagation causes link cycles.
+
+Note that having CMP0156 set to NEW relies on CMake having proper
+support for de-duplication of libraries when targeting Emscripten /
+WebAssembly, which is only being considered to be added in CMake
+4.2+, which as of now is not released yet.
+
+For earlier CMake versions, for CMP0156 to apply properly, a project
+can workaround it by setting
+
+set(CMAKE_CXX_PLATFORM_LINKER_ID LLD)
+set(CMAKE_CXX_LINK_LIBRARIES_PROCESSING ORDER=REVERSE DEDUPLICATION=ALL)
+
+in the project manually, even though that is not supported by CMake
+itself, and relies on CMake internals that might change between
+versions.
+
+Pick-to: 6.9 6.8
+Task-number: QTBUG-140211
+Change-Id: Iece0f6893bbd0528e83c5cdbeddd29a51ff35991
+Reviewed-by: Joerg Bornemann <joerg.bornemann@qt.io>
+(cherry picked from commit d6d832d0d28ac29807a04f6634a20e12649b440d)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ cmake/QtPublicCMakeVersionHelpers.cmake | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/cmake/QtPublicCMakeVersionHelpers.cmake b/cmake/QtPublicCMakeVersionHelpers.cmake
+index 17ab9b450fe..292d97c84e7 100644
+--- a/cmake/QtPublicCMakeVersionHelpers.cmake
++++ b/cmake/QtPublicCMakeVersionHelpers.cmake
+@@ -155,14 +155,20 @@ function(__qt_internal_set_cmp0156)
+     if(APPLE)
+         set(default_policy_value NEW)
+         set(unsupported_policy_value OLD)
+-        set(platform_string "Apple")
++    elseif(EMSCRIPTEN OR WASM)
++        # It's a similar story for Emscripten WebAssembly. If a project passes -sMAIN_MODULE=1,
++        # this will cause duplicate symbol errors when qt's static libraries are mentioned
++        # more than once on the link line, unless we let CMake deduplicate them. This only works
++        # for CMake 4.2+, which lets CMake know that the emscripten linker can resolve all symbols
++        # even if the library is not repeated.
++        set(default_policy_value NEW)
++        set(unsupported_policy_value OLD)
+     else()
+         # For non-Apple linkers, we keep the previous behavior of not deduplicating libraries,
+         # because we haven't done the necessary testing to identify on which platforms
+         # it is safe to deduplicate.
+         set(default_policy_value OLD)
+         set(unsupported_policy_value NEW)
+-        set(platform_string "non-Apple")
+     endif()
+ 
+     # Force set the default policy value for the given platform, even if the policy value is
+@@ -171,7 +177,7 @@ function(__qt_internal_set_cmp0156)
+     get_cmake_property(debug_message_shown _qt_internal_cmp0156_debug_message_shown)
+     if(NOT debug_message_shown)
+         message(DEBUG "Force setting the CMP0156 policy to '${default_policy_value}' "
+-            "for ${platform_string} platforms.")
++            "for platform '${CMAKE_SYSTEM_NAME}'.")
+         set_property(GLOBAL PROPERTY _qt_internal_cmp0156_debug_message_shown TRUE)
+     endif()
+ 
+@@ -183,7 +189,7 @@ function(__qt_internal_set_cmp0156)
+     if("${policy_value}" STREQUAL "${unsupported_policy_value}" AND NOT QT_BUILDING_QT)
+         message(WARNING
+             "CMP0156 is set to '${policy_value}'. Qt forces the '${default_policy_value}'"
+-            " behavior of this policy for ${platform_string} platforms by default."
++            " behavior of this policy for the '${CMAKE_SYSTEM_NAME}' platform by default."
+             " Set QT_FORCE_CMP0156_TO_VALUE=${unsupported_policy_value} to force"
+             " the '${unsupported_policy_value}' behavior for Qt commands that create"
+             " library or executable targets.")
+-- 
+2.51.2
+

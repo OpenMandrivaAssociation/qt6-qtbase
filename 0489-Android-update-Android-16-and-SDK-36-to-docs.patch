@@ -1,0 +1,41 @@
+From 8a014dae4861b6104a44f097068d9254dc2d731b Mon Sep 17 00:00:00 2001
+From: Rami Potinkara <rami.potinkara@qt.io>
+Date: Tue, 2 Sep 2025 10:32:48 +0300
+Subject: [PATCH 489/553] Android: update Android 16 and SDK 36 to docs
+
+This patch updates the macros for Android
+maxApiVer, AndroidMaxVer, AndroidPlatformVer,
+AndroidBuildToolsVer variables to reflect
+Android 16 and SDK 36.
+
+Task-number: QTBUG-138673
+Change-Id: Ib0ef647e38b577f4740c9d1e3d1fc2b6c8a596cb
+Reviewed-by: Rami Potinkara <rami.potinkara@qt.io>
+Reviewed-by: Nicholas Bennett <nicholas.bennett@qt.io>
+---
+ doc/global/macros.qdocconf | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/doc/global/macros.qdocconf b/doc/global/macros.qdocconf
+index ae08c76ad93..f414b3fed18 100644
+--- a/doc/global/macros.qdocconf
++++ b/doc/global/macros.qdocconf
+@@ -91,11 +91,11 @@ macro.NdkFullVer          = "27.2.12479018"
+ macro.NdkCompilerVer      = "Clang 17.0.2"
+ macro.JdkVer              = "17"
+ macro.AndroidMinApiVer    = "28"
+-macro.AndroidMaxApiVer    = "35"
++macro.AndroidMaxApiVer    = "36"
+ macro.AndroidMinVer       = "9"
+-macro.AndroidMaxVer       = "15"
+-macro.AndroidPlatformVer  = "35"
+-macro.AndroidBuildToolsVer = "35.0.1"
++macro.AndroidMaxVer       = "16"
++macro.AndroidPlatformVer  = "36"
++macro.AndroidBuildToolsVer = "36.0.0"
+ macro.GradleVer           = "8.14.3"
+ macro.AGPVer              = "8.10.1"
+ macro.AAOSVer             = "10 to 13"
+-- 
+2.51.2
+

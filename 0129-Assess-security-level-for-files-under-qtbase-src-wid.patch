@@ -1,0 +1,345 @@
+From 9761888f50f3cc4b3af8c05628f40e20d73a282a Mon Sep 17 00:00:00 2001
+From: Piotr Wiercinski <piotr.wiercinski@qt.io>
+Date: Wed, 17 Sep 2025 10:17:48 +0200
+Subject: [PATCH 129/553] Assess security level for files under
+ qtbase/src/widgets/dialogs
+
+Assign the default level to all files but qfiledialog.cpp which parses
+input in restoreState().
+
+Fixes: QTBUG-135735
+Pick-to: 6.9 6.8
+Change-Id: I27e1f18e26e070130018ccf6fa47ccf78b635dc8
+Reviewed-by: Volker Hilsheimer <volker.hilsheimer@qt.io>
+(cherry picked from commit 70d572aba304ed369b3463453ff3a30ad5b5c030)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/widgets/dialogs/qcolordialog.cpp    | 1 +
+ src/widgets/dialogs/qcolordialog.h      | 1 +
+ src/widgets/dialogs/qdialog.cpp         | 1 +
+ src/widgets/dialogs/qdialog.h           | 1 +
+ src/widgets/dialogs/qdialog_p.h         | 1 +
+ src/widgets/dialogs/qerrormessage.cpp   | 1 +
+ src/widgets/dialogs/qerrormessage.h     | 1 +
+ src/widgets/dialogs/qfiledialog.cpp     | 1 +
+ src/widgets/dialogs/qfiledialog.h       | 1 +
+ src/widgets/dialogs/qfiledialog_p.h     | 1 +
+ src/widgets/dialogs/qfilesystemmodel.h  | 1 +
+ src/widgets/dialogs/qfontdialog.cpp     | 1 +
+ src/widgets/dialogs/qfontdialog.h       | 1 +
+ src/widgets/dialogs/qfontdialog_p.h     | 1 +
+ src/widgets/dialogs/qfscompleter_p.h    | 1 +
+ src/widgets/dialogs/qinputdialog.cpp    | 1 +
+ src/widgets/dialogs/qinputdialog.h      | 1 +
+ src/widgets/dialogs/qmessagebox.cpp     | 1 +
+ src/widgets/dialogs/qmessagebox.h       | 1 +
+ src/widgets/dialogs/qprogressdialog.cpp | 1 +
+ src/widgets/dialogs/qprogressdialog.h   | 1 +
+ src/widgets/dialogs/qsidebar.cpp        | 1 +
+ src/widgets/dialogs/qsidebar_p.h        | 1 +
+ src/widgets/dialogs/qwizard.cpp         | 1 +
+ src/widgets/dialogs/qwizard.h           | 1 +
+ src/widgets/dialogs/qwizard_win.cpp     | 1 +
+ src/widgets/dialogs/qwizard_win_p.h     | 1 +
+ 27 files changed, 27 insertions(+)
+
+diff --git a/src/widgets/dialogs/qcolordialog.cpp b/src/widgets/dialogs/qcolordialog.cpp
+index bb9202f8dec..b4ca17b9f64 100644
+--- a/src/widgets/dialogs/qcolordialog.cpp
++++ b/src/widgets/dialogs/qcolordialog.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qcolordialog.h"
+ 
+diff --git a/src/widgets/dialogs/qcolordialog.h b/src/widgets/dialogs/qcolordialog.h
+index 824efa8f8c2..adef4c3abca 100644
+--- a/src/widgets/dialogs/qcolordialog.h
++++ b/src/widgets/dialogs/qcolordialog.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QCOLORDIALOG_H
+ #define QCOLORDIALOG_H
+diff --git a/src/widgets/dialogs/qdialog.cpp b/src/widgets/dialogs/qdialog.cpp
+index 90df7bf5453..b324c5b8520 100644
+--- a/src/widgets/dialogs/qdialog.cpp
++++ b/src/widgets/dialogs/qdialog.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QtWidgets/qtwidgetsglobal.h>
+ #if QT_CONFIG(colordialog)
+diff --git a/src/widgets/dialogs/qdialog.h b/src/widgets/dialogs/qdialog.h
+index 22360bc3580..cca029fc355 100644
+--- a/src/widgets/dialogs/qdialog.h
++++ b/src/widgets/dialogs/qdialog.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QDIALOG_H
+ #define QDIALOG_H
+diff --git a/src/widgets/dialogs/qdialog_p.h b/src/widgets/dialogs/qdialog_p.h
+index 63750540654..41aac8a6d84 100644
+--- a/src/widgets/dialogs/qdialog_p.h
++++ b/src/widgets/dialogs/qdialog_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QDIALOG_P_H
+ #define QDIALOG_P_H
+diff --git a/src/widgets/dialogs/qerrormessage.cpp b/src/widgets/dialogs/qerrormessage.cpp
+index 6dda2cc09d8..1ca521eaf24 100644
+--- a/src/widgets/dialogs/qerrormessage.cpp
++++ b/src/widgets/dialogs/qerrormessage.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qerrormessage.h"
+ 
+diff --git a/src/widgets/dialogs/qerrormessage.h b/src/widgets/dialogs/qerrormessage.h
+index 55f0ac058ed..9c11e818371 100644
+--- a/src/widgets/dialogs/qerrormessage.h
++++ b/src/widgets/dialogs/qerrormessage.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QERRORMESSAGE_H
+ #define QERRORMESSAGE_H
+diff --git a/src/widgets/dialogs/qfiledialog.cpp b/src/widgets/dialogs/qfiledialog.cpp
+index fee57003943..4b3be13e667 100644
+--- a/src/widgets/dialogs/qfiledialog.cpp
++++ b/src/widgets/dialogs/qfiledialog.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:critical reason:data-parser
+ 
+ #define QT_NO_URL_CAST_FROM_STRING
+ 
+diff --git a/src/widgets/dialogs/qfiledialog.h b/src/widgets/dialogs/qfiledialog.h
+index d59392753a3..7a1cbd37bb3 100644
+--- a/src/widgets/dialogs/qfiledialog.h
++++ b/src/widgets/dialogs/qfiledialog.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QFILEDIALOG_H
+ #define QFILEDIALOG_H
+diff --git a/src/widgets/dialogs/qfiledialog_p.h b/src/widgets/dialogs/qfiledialog_p.h
+index 19e5894b5ee..15044cfd291 100644
+--- a/src/widgets/dialogs/qfiledialog_p.h
++++ b/src/widgets/dialogs/qfiledialog_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QFILEDIALOG_P_H
+ #define QFILEDIALOG_P_H
+diff --git a/src/widgets/dialogs/qfilesystemmodel.h b/src/widgets/dialogs/qfilesystemmodel.h
+index 9bf7f259459..c102721221f 100644
+--- a/src/widgets/dialogs/qfilesystemmodel.h
++++ b/src/widgets/dialogs/qfilesystemmodel.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QtGui/QFileSystemModel>
+ 
+diff --git a/src/widgets/dialogs/qfontdialog.cpp b/src/widgets/dialogs/qfontdialog.cpp
+index 24b91a873dd..870b0c40faf 100644
+--- a/src/widgets/dialogs/qfontdialog.cpp
++++ b/src/widgets/dialogs/qfontdialog.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qwindowdefs.h"
+ #include "qfontdialog.h"
+diff --git a/src/widgets/dialogs/qfontdialog.h b/src/widgets/dialogs/qfontdialog.h
+index b2900d6a6be..63f07528589 100644
+--- a/src/widgets/dialogs/qfontdialog.h
++++ b/src/widgets/dialogs/qfontdialog.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QFONTDIALOG_H
+ #define QFONTDIALOG_H
+diff --git a/src/widgets/dialogs/qfontdialog_p.h b/src/widgets/dialogs/qfontdialog_p.h
+index 89b795f35ea..9287afccf78 100644
+--- a/src/widgets/dialogs/qfontdialog_p.h
++++ b/src/widgets/dialogs/qfontdialog_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QFONTDIALOG_P_H
+ #define QFONTDIALOG_P_H
+diff --git a/src/widgets/dialogs/qfscompleter_p.h b/src/widgets/dialogs/qfscompleter_p.h
+index 3981e8a3af9..2c6c50389b3 100644
+--- a/src/widgets/dialogs/qfscompleter_p.h
++++ b/src/widgets/dialogs/qfscompleter_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QFSCOMPLETOR_P_H
+ #define QFSCOMPLETOR_P_H
+diff --git a/src/widgets/dialogs/qinputdialog.cpp b/src/widgets/dialogs/qinputdialog.cpp
+index 2a6413c2478..215ba9f47c6 100644
+--- a/src/widgets/dialogs/qinputdialog.cpp
++++ b/src/widgets/dialogs/qinputdialog.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qinputdialog.h"
+ 
+diff --git a/src/widgets/dialogs/qinputdialog.h b/src/widgets/dialogs/qinputdialog.h
+index bbf757e6e6e..594af64c88b 100644
+--- a/src/widgets/dialogs/qinputdialog.h
++++ b/src/widgets/dialogs/qinputdialog.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QINPUTDIALOG_H
+ #define QINPUTDIALOG_H
+diff --git a/src/widgets/dialogs/qmessagebox.cpp b/src/widgets/dialogs/qmessagebox.cpp
+index f9d58e4d906..c188aed4202 100644
+--- a/src/widgets/dialogs/qmessagebox.cpp
++++ b/src/widgets/dialogs/qmessagebox.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2021 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QtWidgets/qmessagebox.h>
+ 
+diff --git a/src/widgets/dialogs/qmessagebox.h b/src/widgets/dialogs/qmessagebox.h
+index 751674466c1..bc2b2590eff 100644
+--- a/src/widgets/dialogs/qmessagebox.h
++++ b/src/widgets/dialogs/qmessagebox.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QMESSAGEBOX_H
+ #define QMESSAGEBOX_H
+diff --git a/src/widgets/dialogs/qprogressdialog.cpp b/src/widgets/dialogs/qprogressdialog.cpp
+index 0fc49b287aa..738d63889e2 100644
+--- a/src/widgets/dialogs/qprogressdialog.cpp
++++ b/src/widgets/dialogs/qprogressdialog.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qprogressdialog.h"
+ 
+diff --git a/src/widgets/dialogs/qprogressdialog.h b/src/widgets/dialogs/qprogressdialog.h
+index 132dffa4801..95fd6ef67f1 100644
+--- a/src/widgets/dialogs/qprogressdialog.h
++++ b/src/widgets/dialogs/qprogressdialog.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPROGRESSDIALOG_H
+ #define QPROGRESSDIALOG_H
+diff --git a/src/widgets/dialogs/qsidebar.cpp b/src/widgets/dialogs/qsidebar.cpp
+index 17670ab6e3c..c8498bc56bf 100644
+--- a/src/widgets/dialogs/qsidebar.cpp
++++ b/src/widgets/dialogs/qsidebar.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qsidebar_p.h"
+ 
+diff --git a/src/widgets/dialogs/qsidebar_p.h b/src/widgets/dialogs/qsidebar_p.h
+index ed17a2ff311..83359dc346f 100644
+--- a/src/widgets/dialogs/qsidebar_p.h
++++ b/src/widgets/dialogs/qsidebar_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QSIDEBAR_H
+ #define QSIDEBAR_H
+diff --git a/src/widgets/dialogs/qwizard.cpp b/src/widgets/dialogs/qwizard.cpp
+index 1fa9794aab3..b4ce09f6aae 100644
+--- a/src/widgets/dialogs/qwizard.cpp
++++ b/src/widgets/dialogs/qwizard.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qwizard.h"
+ #include <QtWidgets/private/qtwidgetsglobal_p.h>
+diff --git a/src/widgets/dialogs/qwizard.h b/src/widgets/dialogs/qwizard.h
+index 0ec973b0d2c..db67bfa53bd 100644
+--- a/src/widgets/dialogs/qwizard.h
++++ b/src/widgets/dialogs/qwizard.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QWIZARD_H
+ #define QWIZARD_H
+diff --git a/src/widgets/dialogs/qwizard_win.cpp b/src/widgets/dialogs/qwizard_win.cpp
+index 64447f9728f..934f36424bc 100644
+--- a/src/widgets/dialogs/qwizard_win.cpp
++++ b/src/widgets/dialogs/qwizard_win.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QtWidgets/private/qtwidgetsglobal_p.h>
+ 
+diff --git a/src/widgets/dialogs/qwizard_win_p.h b/src/widgets/dialogs/qwizard_win_p.h
+index ce0f7b85b33..e6b5ecdad24 100644
+--- a/src/widgets/dialogs/qwizard_win_p.h
++++ b/src/widgets/dialogs/qwizard_win_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QWIZARD_WIN_P_H
+ #define QWIZARD_WIN_P_H
+-- 
+2.51.2
+

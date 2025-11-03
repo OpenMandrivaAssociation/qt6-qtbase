@@ -1,0 +1,45 @@
+From 206bd055e1c387c695c69de3a173ad833a5b023c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Lefebvre?= <frederic.lefebvre@qt.io>
+Date: Fri, 29 Aug 2025 10:11:39 +0200
+Subject: [PATCH 499/553] Remove redundant calls in tst_QFocusEvent to
+ requestActivate
+
+tst_QFocusEvent::checkReason_ActiveWindow include two calls to
+requestActivate() after a window is shown. These calls are redundant as
+show() already activates the windows.
+
+Remove the unnecessary requestActivate() calls to simplify the code.
+
+Task-number: QTBUG-139705
+Pick-to: 6.9 6.8 6.5
+Change-Id: I978bec6cae5a297afc0a200af55d11caa7c74815
+Reviewed-by: Axel Spoerl <axel.spoerl@qt.io>
+(cherry picked from commit 5d433b7811c9ef8423ca7f3fa7b32a8a0925c1ab)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ tests/auto/other/qfocusevent/tst_qfocusevent.cpp | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/tests/auto/other/qfocusevent/tst_qfocusevent.cpp b/tests/auto/other/qfocusevent/tst_qfocusevent.cpp
+index c1b72d4d623..b4cfb0f4f79 100644
+--- a/tests/auto/other/qfocusevent/tst_qfocusevent.cpp
++++ b/tests/auto/other/qfocusevent/tst_qfocusevent.cpp
+@@ -364,7 +364,6 @@ void tst_QFocusEvent::checkReason_ActiveWindow()
+ 
+     Window window;
+     window.show();
+-    window.requestActivate();
+     QVERIFY(QTest::qWaitForWindowActive(&window));
+ 
+     if (windowActivationReasonFail)
+@@ -374,7 +373,6 @@ void tst_QFocusEvent::checkReason_ActiveWindow()
+ 
+     Window window2;
+     window2.show();
+-    window2.requestActivate();
+     QVERIFY(QTest::qWaitForWindowActive(&window2));
+ 
+     if (windowActivationReasonFail)
+-- 
+2.51.2
+

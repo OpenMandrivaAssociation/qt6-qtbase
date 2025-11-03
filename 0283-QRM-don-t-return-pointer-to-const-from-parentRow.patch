@@ -1,0 +1,86 @@
+From 3b721e2b99309fa6d0de140cf9df9da519fb40b3 Mon Sep 17 00:00:00 2001
+From: Volker Hilsheimer <volker.hilsheimer@qt.io>
+Date: Sun, 5 Oct 2025 00:08:45 +0200
+Subject: [PATCH 283/553] QRM: don't return pointer-to-const from parentRow
+
+We want to be able to get the parent from one row and make it the parent
+of another row, and returning a `const row *` from parentRow makes that
+impossible without a hacky const-cast.
+
+Returning a pointer to const is not necessary. The inner state of the
+parent row has no impact on the observable state of the child from which
+it is returned.
+
+Change-Id: I1487cf2a2ed5122dd0e3530af6e055ed56e34fb7
+Reviewed-by: Artem Dyomin <artem.dyomin@qt.io>
+(cherry picked from commit 72cee72eb0913d049e352a7b45920e6012df1aa6)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/itemmodels/qrangemodel.cpp               | 5 ++---
+ tests/auto/corelib/itemmodels/qrangemodel/data.h     | 6 +++---
+ tests/manual/corelib/itemmodels/qrangemodel/main.cpp | 2 +-
+ 3 files changed, 6 insertions(+), 7 deletions(-)
+
+diff --git a/src/corelib/itemmodels/qrangemodel.cpp b/src/corelib/itemmodels/qrangemodel.cpp
+index c93cb68df6d..dabd98ac1a6 100644
+--- a/src/corelib/itemmodels/qrangemodel.cpp
++++ b/src/corelib/itemmodels/qrangemodel.cpp
+@@ -337,9 +337,8 @@ QRangeModel::QRangeModel(QRangeModelImplBase *impl, QObject *parent)
+ 
+     The tree traversal protocol can then be implemented as member functions of
+     the row data type. A const \c{parentRow()} function has to return a pointer
+-    to a const row item; and the \c{childRows()} function has to return a
+-    reference to a const \c{std::optional} that can hold the optional child
+-    range.
++    to a row item; and the \c{childRows()} function has to return a reference
++    to a const \c{std::optional} that can hold the optional child range.
+ 
+     These two functions are sufficient for the model to navigate the tree as a
+     read-only data structure. To allow the user to edit data in a view, and the
+diff --git a/tests/auto/corelib/itemmodels/qrangemodel/data.h b/tests/auto/corelib/itemmodels/qrangemodel/data.h
+index 8065d9f68c7..31a85bfb32c 100644
+--- a/tests/auto/corelib/itemmodels/qrangemodel/data.h
++++ b/tests/auto/corelib/itemmodels/qrangemodel/data.h
+@@ -222,7 +222,7 @@ public:
+         return res;
+     }
+ 
+-    const tree_row *parentRow() const { return m_parent; }
++    tree_row *parentRow() const { return m_parent; }
+     void setParentRow(tree_row *parent) { m_parent = parent; }
+     const std::optional<value_tree> &childRows() const { return m_children; }
+     std::optional<value_tree> &childRows() { return m_children; }
+@@ -249,7 +249,7 @@ public:
+     struct ProtocolWithChildrenVector {
+         tree_row newRow() const { return tree_row{}; }
+         void deleteRow(tree_row&& ) { }
+-        const tree_row *parentRow(const tree_row &row) const { return row.m_parent; }
++        tree_row *parentRow(const tree_row &row) const { return row.m_parent; }
+         void setParentRow(tree_row &row, tree_row *parent) { row.m_parent = parent; }
+ 
+         const value_tree &childRows(const tree_row &row) const
+@@ -280,7 +280,7 @@ public:
+     struct ProtocolPointerImpl {
+         tree_row *newRow() const { return new tree_row; }
+         void deleteRow(tree_row *row) { delete row; }
+-        const tree_row *parentRow(const tree_row &row) const { return row.m_parent; }
++        tree_row *parentRow(const tree_row &row) const { return row.m_parent; }
+         void setParentRow(tree_row &row, tree_row *parent) { row.m_parent = parent; }
+ 
+         const std::optional<pointer_tree> &childRows(const tree_row &row) const
+diff --git a/tests/manual/corelib/itemmodels/qrangemodel/main.cpp b/tests/manual/corelib/itemmodels/qrangemodel/main.cpp
+index d420c824067..5b797d98bf7 100644
+--- a/tests/manual/corelib/itemmodels/qrangemodel/main.cpp
++++ b/tests/manual/corelib/itemmodels/qrangemodel/main.cpp
+@@ -131,7 +131,7 @@ public:
+     }
+ 
+     // tree traversal protocol implementation
+-    const TreeRow *parentRow() const { return m_parent; }
++    TreeRow *parentRow() const { return m_parent; }
+     void setParentRow(TreeRow *parent) { m_parent = parent; }
+     const std::optional<Tree> &childRows() const { return m_children; }
+     std::optional<Tree> &childRows() { return m_children; }
+-- 
+2.51.2
+

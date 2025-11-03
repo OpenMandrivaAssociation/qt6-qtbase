@@ -1,0 +1,33 @@
+From caebe23cafe71540e204eaa1f3b93f75444b9ae8 Mon Sep 17 00:00:00 2001
+From: Friedemann Kleint <Friedemann.Kleint@qt.io>
+Date: Thu, 23 Oct 2025 09:08:51 +0200
+Subject: [PATCH 474/553] QAbstractItemView: Fix using declaration of update()
+
+It is a QWidget method. PySide's shiboken6 code generator is a bit
+picky about the using declarations.
+
+Fixes: PYSIDE-3219
+Change-Id: Iafb2c2d8c0d66a38f6b48eef9a09f94f4fc25141
+Reviewed-by: Richard Moe Gustavsen <richard.gustavsen@qt.io>
+(cherry picked from commit edf36814152bfd7f050e5cd45049985799ab7ce6)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/widgets/itemviews/qabstractitemview.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/widgets/itemviews/qabstractitemview.h b/src/widgets/itemviews/qabstractitemview.h
+index 63adac8d6f2..1c3889558e0 100644
+--- a/src/widgets/itemviews/qabstractitemview.h
++++ b/src/widgets/itemviews/qabstractitemview.h
+@@ -204,7 +204,7 @@ public:
+ 
+     virtual QVariant inputMethodQuery(Qt::InputMethodQuery query) const override;
+ 
+-    using QAbstractScrollArea::update;
++    using QWidget::update;
+ 
+ public Q_SLOTS:
+     virtual void reset();
+-- 
+2.51.2
+

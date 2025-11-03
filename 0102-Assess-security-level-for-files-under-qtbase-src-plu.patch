@@ -1,0 +1,212 @@
+From 2cc8a2cdec03cf30b0f5736ecccafba805b31172 Mon Sep 17 00:00:00 2001
+From: Piotr Wiercinski <piotr.wiercinski@qt.io>
+Date: Mon, 15 Sep 2025 16:49:34 +0200
+Subject: [PATCH 102/553] Assess security level for files under
+ qtbase/src/plugins/platformthemes
+
+Assign the default level to all files in the directory.
+
+Fixes: QTBUG-135726
+Pick-to: 6.9 6.8
+Change-Id: I3a585710e61f29d99a460f6335e541203b721ce2
+Reviewed-by: Oliver Eftevaag <oliver.eftevaag@qt.io>
+(cherry picked from commit 8033a313ff28ce2a8e69bd2f6e2d946d291acf5e)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/plugins/platformthemes/gtk3/main.cpp                         | 1 +
+ src/plugins/platformthemes/gtk3/qgtk3dialoghelpers.cpp           | 1 +
+ src/plugins/platformthemes/gtk3/qgtk3dialoghelpers.h             | 1 +
+ src/plugins/platformthemes/gtk3/qgtk3interface.cpp               | 1 +
+ src/plugins/platformthemes/gtk3/qgtk3interface_p.h               | 1 +
+ src/plugins/platformthemes/gtk3/qgtk3json.cpp                    | 1 +
+ src/plugins/platformthemes/gtk3/qgtk3json_p.h                    | 1 +
+ src/plugins/platformthemes/gtk3/qgtk3storage.cpp                 | 1 +
+ src/plugins/platformthemes/gtk3/qgtk3storage_p.h                 | 1 +
+ src/plugins/platformthemes/gtk3/qgtk3theme.cpp                   | 1 +
+ src/plugins/platformthemes/gtk3/qgtk3theme.h                     | 1 +
+ src/plugins/platformthemes/xdgdesktopportal/main.cpp             | 1 +
+ .../xdgdesktopportal/qxdgdesktopportalfiledialog.cpp             | 1 +
+ .../xdgdesktopportal/qxdgdesktopportalfiledialog_p.h             | 1 +
+ .../platformthemes/xdgdesktopportal/qxdgdesktopportaltheme.cpp   | 1 +
+ .../platformthemes/xdgdesktopportal/qxdgdesktopportaltheme.h     | 1 +
+ 16 files changed, 16 insertions(+)
+
+diff --git a/src/plugins/platformthemes/gtk3/main.cpp b/src/plugins/platformthemes/gtk3/main.cpp
+index 569c2d87440..64986c1b610 100644
+--- a/src/plugins/platformthemes/gtk3/main.cpp
++++ b/src/plugins/platformthemes/gtk3/main.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <qpa/qplatformthemeplugin.h>
+ #include "qgtk3theme.h"
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3dialoghelpers.cpp b/src/plugins/platformthemes/gtk3/qgtk3dialoghelpers.cpp
+index ebc1de2c3a2..e01a54db299 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3dialoghelpers.cpp
++++ b/src/plugins/platformthemes/gtk3/qgtk3dialoghelpers.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #undef QT_NO_FOREACH // this file contains unported legacy Q_FOREACH uses
+ 
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3dialoghelpers.h b/src/plugins/platformthemes/gtk3/qgtk3dialoghelpers.h
+index 89f48d8b014..60cb9e10238 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3dialoghelpers.h
++++ b/src/plugins/platformthemes/gtk3/qgtk3dialoghelpers.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QGTK3DIALOGHELPERS_H
+ #define QGTK3DIALOGHELPERS_H
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3interface.cpp b/src/plugins/platformthemes/gtk3/qgtk3interface.cpp
+index a35e211fbf7..3fe894c53c9 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3interface.cpp
++++ b/src/plugins/platformthemes/gtk3/qgtk3interface.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2022 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ //
+ //  W A R N I N G
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3interface_p.h b/src/plugins/platformthemes/gtk3/qgtk3interface_p.h
+index adeb703ec56..ea1255fd8be 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3interface_p.h
++++ b/src/plugins/platformthemes/gtk3/qgtk3interface_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2022 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QGTK3INTERFACE_H
+ #define QGTK3INTERFACE_H
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3json.cpp b/src/plugins/platformthemes/gtk3/qgtk3json.cpp
+index 535b3b2dc84..0ee6f16eb8a 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3json.cpp
++++ b/src/plugins/platformthemes/gtk3/qgtk3json.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2022 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ //
+ //  W A R N I N G
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3json_p.h b/src/plugins/platformthemes/gtk3/qgtk3json_p.h
+index 0e1855e890d..da3fab5db60 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3json_p.h
++++ b/src/plugins/platformthemes/gtk3/qgtk3json_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2022 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ #ifndef QGTK3JSON_P_H
+ #define QGTK3JSON_P_H
+ 
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
+index ae4502183da..51259fab3b4 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
++++ b/src/plugins/platformthemes/gtk3/qgtk3storage.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2022 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ //
+ //  W A R N I N G
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3storage_p.h b/src/plugins/platformthemes/gtk3/qgtk3storage_p.h
+index d0668a97216..11a5a5a7f64 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3storage_p.h
++++ b/src/plugins/platformthemes/gtk3/qgtk3storage_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2022 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QGTK3STORAGE_P_H
+ #define QGTK3STORAGE_P_H
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3theme.cpp b/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
+index c720fc41dbd..27cc421f0b0 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
++++ b/src/plugins/platformthemes/gtk3/qgtk3theme.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qgtk3theme.h"
+ #include "qgtk3dialoghelpers.h"
+diff --git a/src/plugins/platformthemes/gtk3/qgtk3theme.h b/src/plugins/platformthemes/gtk3/qgtk3theme.h
+index ce7dc9c9dc8..3a9e16f3a34 100644
+--- a/src/plugins/platformthemes/gtk3/qgtk3theme.h
++++ b/src/plugins/platformthemes/gtk3/qgtk3theme.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QGTK3THEME_H
+ #define QGTK3THEME_H
+diff --git a/src/plugins/platformthemes/xdgdesktopportal/main.cpp b/src/plugins/platformthemes/xdgdesktopportal/main.cpp
+index 3ebba0425b3..1e8b74930b8 100644
+--- a/src/plugins/platformthemes/xdgdesktopportal/main.cpp
++++ b/src/plugins/platformthemes/xdgdesktopportal/main.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2017-2018 Red Hat, Inc
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <qpa/qplatformthemeplugin.h>
+ #include "qxdgdesktopportaltheme.h"
+diff --git a/src/plugins/platformthemes/xdgdesktopportal/qxdgdesktopportalfiledialog.cpp b/src/plugins/platformthemes/xdgdesktopportal/qxdgdesktopportalfiledialog.cpp
+index cea1ca903fa..2fe8dafa98d 100644
+--- a/src/plugins/platformthemes/xdgdesktopportal/qxdgdesktopportalfiledialog.cpp
++++ b/src/plugins/platformthemes/xdgdesktopportal/qxdgdesktopportalfiledialog.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2017-2018 Red Hat, Inc
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxdgdesktopportalfiledialog_p.h"
+ 
+diff --git a/src/plugins/platformthemes/xdgdesktopportal/qxdgdesktopportalfiledialog_p.h b/src/plugins/platformthemes/xdgdesktopportal/qxdgdesktopportalfiledialog_p.h
+index f309307cd6b..6951d6b3902 100644
+--- a/src/plugins/platformthemes/xdgdesktopportal/qxdgdesktopportalfiledialog_p.h
++++ b/src/plugins/platformthemes/xdgdesktopportal/qxdgdesktopportalfiledialog_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2017-2018 Red Hat, Inc
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ #ifndef QXDGDESKTOPPORTALFILEDIALOG_P_H
+ #define QXDGDESKTOPPORTALFILEDIALOG_P_H
+ 
+diff --git a/src/plugins/platformthemes/xdgdesktopportal/qxdgdesktopportaltheme.cpp b/src/plugins/platformthemes/xdgdesktopportal/qxdgdesktopportaltheme.cpp
+index 5fa04aa8ec9..e4c9b52fef4 100644
+--- a/src/plugins/platformthemes/xdgdesktopportal/qxdgdesktopportaltheme.cpp
++++ b/src/plugins/platformthemes/xdgdesktopportal/qxdgdesktopportaltheme.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2017 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxdgdesktopportaltheme.h"
+ #include "qxdgdesktopportalfiledialog_p.h"
+diff --git a/src/plugins/platformthemes/xdgdesktopportal/qxdgdesktopportaltheme.h b/src/plugins/platformthemes/xdgdesktopportal/qxdgdesktopportaltheme.h
+index ca2f83fddb9..94dbb9efc35 100644
+--- a/src/plugins/platformthemes/xdgdesktopportal/qxdgdesktopportaltheme.h
++++ b/src/plugins/platformthemes/xdgdesktopportal/qxdgdesktopportaltheme.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2017 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QXDGDESKTOPPORTALTHEME_H
+ #define QXDGDESKTOPPORTALTHEME_H
+-- 
+2.51.2
+

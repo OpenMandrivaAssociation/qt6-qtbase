@@ -1,0 +1,55 @@
+From 899204f7725ef454fd2b731a3931717d4865eb75 Mon Sep 17 00:00:00 2001
+From: Tim Blechmann <tim.blechmann@qt.io>
+Date: Thu, 23 Oct 2025 12:33:39 +0800
+Subject: [PATCH 486/553] test: function_ref - fix repeated test invocation
+
+When calling the unit test with -repeat, we need to re-initialize the
+counters
+
+Change-Id: Ic841ec9e499df391a288d8ec24240c8475f5f14a
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit ed489b8d1b9c450929c9acf12defcf3a4efb424b)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../corelib/global/qxp/function_ref/tst_qxp_function_ref.cpp  | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/tests/auto/corelib/global/qxp/function_ref/tst_qxp_function_ref.cpp b/tests/auto/corelib/global/qxp/function_ref/tst_qxp_function_ref.cpp
+index ee50a311efa..185887e5d87 100644
+--- a/tests/auto/corelib/global/qxp/function_ref/tst_qxp_function_ref.cpp
++++ b/tests/auto/corelib/global/qxp/function_ref/tst_qxp_function_ref.cpp
+@@ -54,6 +54,7 @@ void tst_qxp_function_ref::basics()
+ 
+     {
+         Q_CONSTINIT static int invoked = 0;
++        invoked = 0;
+         auto lambda = [](int i) noexcept { ++invoked; return i; };
+         const qxp::function_ref<int(int)> f = lambda;
+         QCOMPARE(invoked, 0);
+@@ -85,6 +86,7 @@ void tst_qxp_function_ref::basics()
+     }
+     {
+         Q_CONSTINIT static int invoked = 0;
++        invoked = 0;
+         auto lambda = [] { ++invoked; return 42; };
+         const qxp::function_ref<int()> f = lambda;
+         QCOMPARE(invoked, 0);
+@@ -106,6 +108,7 @@ void tst_qxp_function_ref::basics()
+     }
+     {
+         Q_CONSTINIT static int invoked = 0;
++        invoked = 0;
+         auto lambda = [] { ++invoked; };
+         const qxp::function_ref<void()> f = lambda;
+         QCOMPARE(invoked, 0);
+@@ -157,6 +160,7 @@ void tst_qxp_function_ref::constOverloads()
+ void tst_qxp_function_ref::constExpr()
+ {
+     Q_CONSTINIT static int invoked = 0;
++    invoked = 0;
+     {
+         Q_CONSTINIT static auto lambda = [] (int i) { ++invoked; return i; };
+         // the function object constructor is constexpr, so this should be constinit:
+-- 
+2.51.2
+

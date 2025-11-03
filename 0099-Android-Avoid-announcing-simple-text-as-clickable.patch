@@ -1,0 +1,45 @@
+From 90c7b3680d89a63c532aa502748bc3adae799490 Mon Sep 17 00:00:00 2001
+From: Lars Schmertmann <Lars.Schmertmann@governikus.de>
+Date: Mon, 15 Sep 2025 16:06:43 +0200
+Subject: [PATCH 099/553] Android: Avoid announcing simple text as clickable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The definition of Accessible.onPressAction is enough to let
+Android announce an element as clickable. But this is a
+problem when components are designied in a way like this:
+  Accessible.role: clickable ? Accessible.Button : Accessible.StaticText
+  Accessible.onPressAction: clickable ? doit() : nothing()
+So we avoid to set clickable for StaticText and Heading.
+Windows, macOS and iOS already have the right behavior and do
+not care about pressAction or toggleAction on simple text.
+
+Pick-to: 6.9 6.8
+Change-Id: I7bf9ffae112b92dd4a90f51f014a348dfe1b63f3
+Reviewed-by: Tor Arne Vestbø <tor.arne.vestbo@qt.io>
+(cherry picked from commit ac7b5815db7f08b24fbd598e22c13652cae3bb2f)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/plugins/platforms/android/androidjniaccessibility.cpp | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/plugins/platforms/android/androidjniaccessibility.cpp b/src/plugins/platforms/android/androidjniaccessibility.cpp
+index b8e8088e38c..a1edf49da12 100644
+--- a/src/plugins/platforms/android/androidjniaccessibility.cpp
++++ b/src/plugins/platforms/android/androidjniaccessibility.cpp
+@@ -699,8 +699,9 @@ namespace QtAndroidAccessibility
+         env->CallVoidMethod(node, m_setClassNameMethodID, jrole);
+ 
+         const bool hasClickableAction =
+-                info.actions.contains(QAccessibleActionInterface::pressAction()) ||
+-                info.actions.contains(QAccessibleActionInterface::toggleAction());
++                (info.actions.contains(QAccessibleActionInterface::pressAction())
++                 || info.actions.contains(QAccessibleActionInterface::toggleAction()))
++                && !(info.role == QAccessible::StaticText || info.role == QAccessible::Heading);
+         const bool hasIncreaseAction =
+                 info.actions.contains(QAccessibleActionInterface::increaseAction());
+         const bool hasDecreaseAction =
+-- 
+2.51.2
+

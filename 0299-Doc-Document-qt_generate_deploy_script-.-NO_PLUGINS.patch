@@ -1,0 +1,33 @@
+From 8ee1de6cfefa4e62ba23d9da29797c473a5c2f5a Mon Sep 17 00:00:00 2001
+From: Joerg Bornemann <joerg.bornemann@qt.io>
+Date: Mon, 29 Sep 2025 14:08:00 +0200
+Subject: [PATCH 299/553] Doc: Document qt_generate_deploy_script(...
+ NO_PLUGINS)
+
+The NO_PLUGINS option was not documented.
+This amends commit f2ac985d2fce25c073dbaeb0d2f4c836ef30cbc6.
+
+Change-Id: I2c9ce2bd1d5fcdc814ba979a759e8a339900668b
+Reviewed-by: Alexandru Croitor <alexandru.croitor@qt.io>
+(cherry picked from commit f262d477cf33eb9ffab332cbd08857f68be0e1a2)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/doc/src/cmake/qt_generate_deploy_app_script.qdoc | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/corelib/doc/src/cmake/qt_generate_deploy_app_script.qdoc b/src/corelib/doc/src/cmake/qt_generate_deploy_app_script.qdoc
+index 4606871db6b..53eae9f9418 100644
+--- a/src/corelib/doc/src/cmake/qt_generate_deploy_app_script.qdoc
++++ b/src/corelib/doc/src/cmake/qt_generate_deploy_app_script.qdoc
+@@ -102,6 +102,8 @@ The options \c EXCLUDE_PLUGINS, \c EXCLUDE_PLUGIN_TYPES, \c INCLUDE_PLUGINS, and
+ \l{qt6_deploy_runtime_dependencies}{qt_deploy_runtime_dependencies()} for their
+ documentation.
+ 
++You can turn off plugin deployment altogether with the \c NO_PLUGINS option.
++
+ \sa {qt6_standard_project_setup}{qt_standard_project_setup()},
+     {qt6_generate_deploy_script}{qt_generate_deploy_script()},
+     {qt6_generate_deploy_qml_app_script}{qt_generate_deploy_qml_app_script()}
+-- 
+2.51.2
+

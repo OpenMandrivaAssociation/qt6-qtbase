@@ -1,0 +1,82 @@
+From 0ae648250f8a22a8cfdfa1e531236bb76920a7ec Mon Sep 17 00:00:00 2001
+From: Dheerendra Purohit <dheerendra@pthinks.com>
+Date: Tue, 12 Aug 2025 12:03:31 +0530
+Subject: [PATCH 390/553] QAbstractItemView: Fix isPersistentEditorOpen for
+ non-persistent editors
+
+isPersistentEditorOpen() returned true if an editor widget existed for
+the given index, even when it was not opened as a persistent editor.
+
+Update the implementation to check both that the editor widget exists
+and that it is listed in the persistent editor set.
+
+Pick-to: 6.9
+Fixes: QTBUG-72333
+Change-Id: I380fb51a4e357b5497fb1462e4dcd40c7ead4e13
+Reviewed-by: David Faure <david.faure@kdab.com>
+(cherry picked from commit c8b7db36a021d53f6a0b76fc31e45421f66c8439)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/widgets/itemviews/qabstractitemview.cpp   |  3 ++-
+ .../tst_qabstractitemview.cpp                 | 25 +++++++++++++++++++
+ 2 files changed, 27 insertions(+), 1 deletion(-)
+
+diff --git a/src/widgets/itemviews/qabstractitemview.cpp b/src/widgets/itemviews/qabstractitemview.cpp
+index e4159ad2cf0..51aea4079a1 100644
+--- a/src/widgets/itemviews/qabstractitemview.cpp
++++ b/src/widgets/itemviews/qabstractitemview.cpp
+@@ -3298,7 +3298,8 @@ void QAbstractItemView::closePersistentEditor(const QModelIndex &index)
+ bool QAbstractItemView::isPersistentEditorOpen(const QModelIndex &index) const
+ {
+     Q_D(const QAbstractItemView);
+-    return d->editorForIndex(index).widget;
++    QWidget *editor = d->editorForIndex(index).widget;
++    return editor && d->persistent.contains(editor);
+ }
+ 
+ /*!
+diff --git a/tests/auto/widgets/itemviews/qabstractitemview/tst_qabstractitemview.cpp b/tests/auto/widgets/itemviews/qabstractitemview/tst_qabstractitemview.cpp
+index 805fa046a07..3e5c65cf0be 100644
+--- a/tests/auto/widgets/itemviews/qabstractitemview/tst_qabstractitemview.cpp
++++ b/tests/auto/widgets/itemviews/qabstractitemview/tst_qabstractitemview.cpp
+@@ -156,6 +156,7 @@ private slots:
+     void removeIndexWhileEditing();
+     void focusNextOnHide();
+     void shiftSelectionAfterModelSetCurrentIndex();
++    void QTBUG72333_isPersistentEditorOpen();
+ 
+ private:
+     static QAbstractItemView *viewFromString(const QByteArray &viewType, QWidget *parent = nullptr)
+@@ -3604,5 +3605,29 @@ void tst_QAbstractItemView::shiftSelectionAfterModelSetCurrentIndex()
+     QCOMPARE(selection.first().bottom(), 2);
+ }
+ 
++void tst_QAbstractItemView::QTBUG72333_isPersistentEditorOpen()
++{
++    QStandardItemModel model(1, 1);
++    model.setData(model.index(0, 0), QStringLiteral("Test"));
++
++    QTableView view;
++    view.setModel(&model);
++    view.show();
++
++    const QModelIndex index = model.index(0, 0);
++
++    view.edit(index);
++    QVERIFY(view.state() == QAbstractItemView::EditingState);
++    QVERIFY(!view.isPersistentEditorOpen(index));
++
++    view.closeEditor(view.indexWidget(index), QAbstractItemDelegate::RevertModelCache);
++
++    view.openPersistentEditor(index);
++    QVERIFY(view.isPersistentEditorOpen(index));
++
++    view.closePersistentEditor(index);
++    QVERIFY(!view.isPersistentEditorOpen(index));
++}
++
+ QTEST_MAIN(tst_QAbstractItemView)
+ #include "tst_qabstractitemview.moc"
+-- 
+2.51.2
+

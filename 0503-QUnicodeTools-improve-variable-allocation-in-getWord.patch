@@ -1,0 +1,67 @@
+From e65c10a91e20aa6a0ceb1a7cbb0dfd439ca7ef6f Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Tue, 21 Oct 2025 17:53:06 +0200
+Subject: [PATCH 503/553] QUnicodeTools: improve variable allocation in
+ getWordBreaks()
+
+Make 'pos' and 'prop' const, indicating that they're not modified by
+the lengthy loop body, and don't re-use 'ucs4' and 'prop' from the
+outer loop, make the inner loop have their own versions. This shadows
+the outer loop ones, but -Wshadow is not in effect in implementation
+files. I found it more important to avoid churn than to rename the
+variables to avoid the shadowing. Shadowing is well-defined in C++.
+
+These are in preparation of porting the function to QStringIterator.
+
+Pick-to: 6.8 6.5
+Change-Id: I2b0c135276ccef403802dba8b780dcbf8c0ed519
+Reviewed-by: Ahmad Samir <a.samirh78@gmail.com>
+(cherry picked from commit e472c86f69ad5a5bba6f375c8c0987483a04413f)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/text/qunicodetools.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/corelib/text/qunicodetools.cpp b/src/corelib/text/qunicodetools.cpp
+index 2d0b65fcc76..b339bb78a43 100644
+--- a/src/corelib/text/qunicodetools.cpp
++++ b/src/corelib/text/qunicodetools.cpp
+@@ -248,7 +248,7 @@ static void getWordBreaks(const char16_t *string, qsizetype len, QCharAttributes
+     auto real_cls = cls; // Unaffected by WB4
+ 
+     for (qsizetype i = 0; i != len; ++i) {
+-        qsizetype pos = i;
++        const qsizetype pos = i;
+         char32_t ucs4 = string[i];
+         if (QChar::isHighSurrogate(ucs4) && i + 1 != len) {
+             ushort low = string[i + 1];
+@@ -258,7 +258,7 @@ static void getWordBreaks(const char16_t *string, qsizetype len, QCharAttributes
+             }
+         }
+ 
+-        const QUnicodeTables::Properties *prop = QUnicodeTables::properties(ucs4);
++        const auto prop = QUnicodeTables::properties(ucs4);
+         QUnicodeTables::WordBreakClass ncls = (QUnicodeTables::WordBreakClass) prop->wordBreakClass;
+         if (qt_initcharattributes_default_algorithm_only) {
+             // as of Unicode 5.1, some punctuation marks were mapped to MidLetter and MidNumLet
+@@ -300,7 +300,7 @@ static void getWordBreaks(const char16_t *string, qsizetype len, QCharAttributes
+         case WB::Lookup:
+         case WB::LookupW:
+             for (qsizetype lookahead = i + 1; lookahead < len; ++lookahead) {
+-                ucs4 = string[lookahead];
++                char32_t ucs4 = string[lookahead];
+                 if (QChar::isHighSurrogate(ucs4) && lookahead + 1 != len) {
+                     ushort low = string[lookahead + 1];
+                     if (QChar::isLowSurrogate(low)) {
+@@ -309,7 +309,7 @@ static void getWordBreaks(const char16_t *string, qsizetype len, QCharAttributes
+                     }
+                 }
+ 
+-                prop = QUnicodeTables::properties(ucs4);
++                const auto prop = QUnicodeTables::properties(ucs4);
+                 QUnicodeTables::WordBreakClass tcls = (QUnicodeTables::WordBreakClass) prop->wordBreakClass;
+ 
+                 if (Q_UNLIKELY(tcls == QUnicodeTables::WordBreak_Extend || tcls == QUnicodeTables::WordBreak_ZWJ || tcls == QUnicodeTables::WordBreak_Format)) {
+-- 
+2.51.2
+

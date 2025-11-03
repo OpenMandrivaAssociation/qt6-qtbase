@@ -1,0 +1,59 @@
+From 752669a869a50ec847994776f488db394b022e22 Mon Sep 17 00:00:00 2001
+From: Allan Sandfeld Jensen <allan.jensen@qt.io>
+Date: Fri, 10 Oct 2025 11:30:24 +0200
+Subject: [PATCH 367/553] Fix RGB32 to RGBxFP writeback, and fix blend fallback
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Either of those to fixes, fixes alpha blending to opaque FP image
+formats, when the raster_fp feature is disabled
+
+Pick-to: 6.8 6.5
+Change-Id: I8807acc7ee41022cc013f9b7f739f615b10d3287
+Reviewed-by: Tor Arne Vestbø <tor.arne.vestbo@qt.io>
+(cherry picked from commit 79e45125af94cb0fede5ff22ae189b7725a08fb8)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/gui/painting/qdrawhelper.cpp  | 2 +-
+ src/gui/painting/qpixellayout.cpp | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/gui/painting/qdrawhelper.cpp b/src/gui/painting/qdrawhelper.cpp
+index 9563a14789e..5cb5b9eb92f 100644
+--- a/src/gui/painting/qdrawhelper.cpp
++++ b/src/gui/painting/qdrawhelper.cpp
+@@ -4147,7 +4147,7 @@ static void blend_color_generic_fp(int count, const QT_FT_Span *spans, void *use
+     };
+     QT_THREAD_PARALLEL_FILLS(function);
+ #else
+-    blend_color_generic(count, spans, userData);
++    blend_color_generic_rgb64(count, spans, userData);
+ #endif
+ }
+ 
+diff --git a/src/gui/painting/qpixellayout.cpp b/src/gui/painting/qpixellayout.cpp
+index cfb58221070..e524f95a900 100644
+--- a/src/gui/painting/qpixellayout.cpp
++++ b/src/gui/painting/qpixellayout.cpp
+@@ -1758,7 +1758,7 @@ static void QT_FASTCALL storeRGB16FFromRGB32(uchar *dest, const uint *src, int i
+ {
+     QRgbaFloat16 *d = reinterpret_cast<QRgbaFloat16 *>(dest) + index;
+     for (int i = 0; i < count; ++i)
+-        d[i] = QRgbaFloat16::fromArgb32(src[i]);
++        d[i] = QRgbaFloat16::fromArgb32(src[i] | 0xff000000);
+ }
+ 
+ static const uint *QT_FASTCALL fetchRGBA16FToARGB32PM(uint *buffer, const uchar *src, int index, int count,
+@@ -1814,7 +1814,7 @@ static void QT_FASTCALL storeRGB32FFromRGB32(uchar *dest, const uint *src, int i
+ {
+     QRgbaFloat32 *d = reinterpret_cast<QRgbaFloat32 *>(dest) + index;
+     for (int i = 0; i < count; ++i)
+-        d[i] = QRgbaFloat32::fromArgb32(src[i]);
++        d[i] = QRgbaFloat32::fromArgb32(src[i] | 0xff000000);
+ }
+ 
+ static const uint *QT_FASTCALL fetchRGBA32FToARGB32PM(uint *buffer, const uchar *src, int index, int count,
+-- 
+2.51.2
+

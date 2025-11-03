@@ -1,0 +1,37 @@
+From d8f877475a1b5fee8614f8888373b097ca4deb44 Mon Sep 17 00:00:00 2001
+From: Alexandru Croitor <alexandru.croitor@qt.io>
+Date: Wed, 10 Sep 2025 11:54:54 +0200
+Subject: [PATCH 125/553] CMake: Fix non_git_version check
+
+There was a typo where the code checked for not_git_version instead.
+
+Amends ecf1e021de519df02b1e13fcc0472bd00f8603fd
+
+Pick-to: 6.9 6.8
+Task-number: QTBUG-134894
+Change-Id: I299ffff0a2ddb628d87c9af2e75b3b3bc1af2a79
+Reviewed-by: Joerg Bornemann <joerg.bornemann@qt.io>
+(cherry picked from commit bbf675240d3f8fed24efc1d3193163ae3bcafca8)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ cmake/QtPublicSbomHelpers.cmake | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/cmake/QtPublicSbomHelpers.cmake b/cmake/QtPublicSbomHelpers.cmake
+index 848b0443c67..744e079b053 100644
+--- a/cmake/QtPublicSbomHelpers.cmake
++++ b/cmake/QtPublicSbomHelpers.cmake
+@@ -161,8 +161,8 @@ function(_qt_internal_sbom_begin_project)
+     endif()
+ 
+     set(compute_project_file_name_args "")
+-    if(not_git_version)
+-        list(APPEND compute_project_file_name_args VERSION_SUFFIX "${not_git_version}")
++    if(non_git_version)
++        list(APPEND compute_project_file_name_args VERSION_SUFFIX "${non_git_version}")
+     endif()
+ 
+     _qt_internal_sbom_compute_project_file_name(repo_project_file_name
+-- 
+2.51.2
+

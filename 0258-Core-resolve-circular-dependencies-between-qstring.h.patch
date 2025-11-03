@@ -1,0 +1,149 @@
+From 41c6f5191c27f558611e2922f6f1d35d4535aa4a Mon Sep 17 00:00:00 2001
+From: Tim Blechmann <tim.blechmann@qt.io>
+Date: Wed, 1 Oct 2025 10:01:30 +0800
+Subject: [PATCH 258/553] Core: resolve circular dependencies between qstring.h
+ / qstringliteral.h
+
+The `QStringLiteral` called the QString constructor, but
+qstringliteral.h does not pull in qstring.h. This prevents compilation
+when application code does not include qstring.h.
+Furthermore qstring.h included qstringliteral.h and downstream code
+depends that QStringLiteral is provided by qstring.h.
+
+This patch moves all functionality into qstring.h and leaves
+qstringliteral.h empty.
+
+Pick-to: 6.8
+Change-Id: Ie9f97398746c2b3a9fa02ce90ec3a27ba1a5acf4
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit 6107f6a3a6a500c8be99040bf259efa885f3baa4)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/text/qstring.h                    | 22 ++++++++++++++-
+ src/corelib/text/qstringliteral.h             | 27 ++-----------------
+ .../auto/corelib/text/qstring/CMakeLists.txt  |  1 +
+ .../qstring/tst_qstringliteral_compile.cpp    |  6 +++++
+ 4 files changed, 30 insertions(+), 26 deletions(-)
+ create mode 100644 tests/auto/corelib/text/qstring/tst_qstringliteral_compile.cpp
+
+diff --git a/src/corelib/text/qstring.h b/src/corelib/text/qstring.h
+index e4f06835bd1..143bfb9f0a3 100644
+--- a/src/corelib/text/qstring.h
++++ b/src/corelib/text/qstring.h
+@@ -17,9 +17,9 @@
+ #include <QtCore/qbytearray.h>
+ #include <QtCore/qbytearrayview.h>
+ #include <QtCore/qarraydata.h>
++#include <QtCore/qarraydatapointer.h>
+ #include <QtCore/qlatin1stringview.h>
+ #include <QtCore/qnamespace.h>
+-#include <QtCore/qstringliteral.h>
+ #include <QtCore/qstringalgorithms.h>
+ #include <QtCore/qanystringview.h>
+ #include <QtCore/qstringtokenizer.h>
+@@ -134,6 +134,7 @@ constexpr QChar QAnyStringView::back() const
+     return visit([] (auto that) { return QAnyStringView::toQChar(that.back()); });
+ }
+ 
++using QStringPrivate = QArrayDataPointer<char16_t>;
+ 
+ class Q_CORE_EXPORT QString
+ {
+@@ -1765,6 +1766,25 @@ inline QString operator""_qs(const char16_t *str, size_t size) noexcept
+ #endif // QT_DEPRECATED_SINCE(6, 8)
+ } // QtLiterals
+ 
++// all our supported compilers support Unicode string literals,
++// even if their Q_COMPILER_UNICODE_STRING has been revoked due
++// to lacking stdlib support. But QStringLiteral only needs the
++// core language feature, so just use u"" here unconditionally:
++
++#define QT_UNICODE_LITERAL(str) u"" str
++
++namespace QtPrivate {
++template <qsizetype N>
++Q_ALWAYS_INLINE static QStringPrivate qMakeStringPrivate(const char16_t (&literal)[N])
++{
++    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
++    auto str = const_cast<char16_t *>(literal);
++    return { nullptr, str, N - 1 };
++}
++} // namespace QtPrivate
++
++#define QStringLiteral(str) (QString(QtPrivate::qMakeStringPrivate(QT_UNICODE_LITERAL(str)))) /**/
++
+ QT_END_NAMESPACE
+ 
+ #include <QtCore/qstringbuilder.h>
+diff --git a/src/corelib/text/qstringliteral.h b/src/corelib/text/qstringliteral.h
+index 432b5067da0..2443d343f21 100644
+--- a/src/corelib/text/qstringliteral.h
++++ b/src/corelib/text/qstringliteral.h
+@@ -6,8 +6,7 @@
+ #ifndef QSTRINGLITERAL_H
+ #define QSTRINGLITERAL_H
+ 
+-#include <QtCore/qarraydata.h>
+-#include <QtCore/qarraydatapointer.h>
++#include <QtCore/qstring.h>
+ 
+ #if 0
+ #pragma qt_class(QStringLiteral)
+@@ -15,29 +14,7 @@
+ 
+ QT_BEGIN_NAMESPACE
+ 
+-// all our supported compilers support Unicode string literals,
+-// even if their Q_COMPILER_UNICODE_STRING has been revoked due
+-// to lacking stdlib support. But QStringLiteral only needs the
+-// core language feature, so just use u"" here unconditionally:
+-
+-#define QT_UNICODE_LITERAL(str) u"" str
+-
+-using QStringPrivate = QArrayDataPointer<char16_t>;
+-
+-namespace QtPrivate {
+-template <qsizetype N>
+-Q_ALWAYS_INLINE static QStringPrivate qMakeStringPrivate(const char16_t (&literal)[N])
+-{
+-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+-    auto str = const_cast<char16_t *>(literal);
+-    return { nullptr, str, N - 1 };
+-}
+-}
+-
+-#define QStringLiteral(str) \
+-    (QString(QtPrivate::qMakeStringPrivate(QT_UNICODE_LITERAL(str)))) \
+-    /**/
+-
++// QStringLiteral moved to QtCore/QString
+ 
+ QT_END_NAMESPACE
+ 
+diff --git a/tests/auto/corelib/text/qstring/CMakeLists.txt b/tests/auto/corelib/text/qstring/CMakeLists.txt
+index 80917554d23..938a7706fef 100644
+--- a/tests/auto/corelib/text/qstring/CMakeLists.txt
++++ b/tests/auto/corelib/text/qstring/CMakeLists.txt
+@@ -24,6 +24,7 @@ foreach(test tst_qstring tst_qstring_restricted_ascii tst_qstring_no_cast_from_a
+         NO_BATCH
+         SOURCES
+             tst_qstring.cpp
++            tst_qstringliteral_compile.cpp
+             ${tst_qstring_extra_sources}
+         LIBRARIES
+             Qt::CorePrivate
+diff --git a/tests/auto/corelib/text/qstring/tst_qstringliteral_compile.cpp b/tests/auto/corelib/text/qstring/tst_qstringliteral_compile.cpp
+new file mode 100644
+index 00000000000..e3721a42500
+--- /dev/null
++++ b/tests/auto/corelib/text/qstring/tst_qstringliteral_compile.cpp
+@@ -0,0 +1,6 @@
++// Copyright (C) 2025 The Qt Company Ltd.
++// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
++
++#include <QtCore/qstringliteral.h>
++
++auto x = QStringLiteral("test");
+-- 
+2.51.2
+

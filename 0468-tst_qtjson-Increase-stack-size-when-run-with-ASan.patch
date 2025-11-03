@@ -1,0 +1,71 @@
+From 1e06dee254fc7b1f0ab75043ff11c45e7b3d8b6b Mon Sep 17 00:00:00 2001
+From: Thiago Macieira <thiago.macieira@intel.com>
+Date: Thu, 2 Oct 2025 09:24:03 -0700
+Subject: [PATCH 468/553] tst_qtjson: Increase stack size when run with ASan
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Amends 1756a84756807a9849aa507e77845dfdf31b8020, which added the
+"nesting" test. That has 1024 nested arrays, which should we should stop
+parsing on. Under normal circumstances, we do that just fine. But with
+ASan, the size of each stack frame is pretty large and we end up
+overflowing the 1 MB stack on Windows.
+
+So increase to 8 MB, matching Unix platforms.
+
+Fixes: QTBUG-140452
+Pick-to: 6.8
+Change-Id: I28de3084bba4b9216b5ffffdcbd69278ae663b5b
+Reviewed-by: Piotr Wierciński <piotr.wiercinski@qt.io>
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+Reviewed-by: Volker Hilsheimer <volker.hilsheimer@qt.io>
+(cherry picked from commit 9c77130f5617232b2aab85a8a76ec346015d708d)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../corelib/serialization/json/tst_qtjson.cpp | 22 ++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
+
+diff --git a/tests/auto/corelib/serialization/json/tst_qtjson.cpp b/tests/auto/corelib/serialization/json/tst_qtjson.cpp
+index 2e0d8dd7be2..dbaf6873af2 100644
+--- a/tests/auto/corelib/serialization/json/tst_qtjson.cpp
++++ b/tests/auto/corelib/serialization/json/tst_qtjson.cpp
+@@ -3595,7 +3595,7 @@ void tst_QtJson::bom()
+     QCOMPARE(error.error, QJsonParseError::NoError);
+ }
+ 
+-void tst_QtJson::nesting()
++static void nesting_test()
+ {
+     // check that we abort parsing too deeply nested json documents.
+     // this is to make sure we don't crash because the parser exhausts the
+@@ -3654,6 +3654,26 @@ void tst_QtJson::nesting()
+ 
+ }
+ 
++void tst_QtJson::nesting()
++{
++#if defined(Q_OS_QNX) || defined(Q_OS_VXWORKS) || defined(Q_OS_WASM)
++    // This test misbehaving probably indicates a stack overflow due to the
++    // recursive parser in qjsonparser.cpp. The recursion prevention limit may
++    // be too high for this platform. Someone should investigate.
++    QSKIP("Test freezes or crashes - probably a stack overflow");
++#endif
++
++    QThread *thr = QThread::create(nesting_test);
++#if defined(__SANITIZE_ADDRESS__) || __has_feature(address_sanitizer) || \
++    defined(__SANITIZE_THREAD__) || __has_feature(thread_sanitizer)
++    // force a larger stack size - 8 MB seems sufficient
++    thr->setStackSize(8192 * 1024);
++#endif
++    thr->start();
++    thr->wait();
++    delete thr;
++}
++
+ void tst_QtJson::longStrings()
+ {
+     // test around 15 and 16 bit boundaries, as these are limits
+-- 
+2.51.2
+

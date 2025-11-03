@@ -1,0 +1,34 @@
+From 5bbe2ef0204e8a90c989bca62924de231143e337 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tor=20Arne=20Vestb=C3=B8?= <tor.arne.vestbo@qt.io>
+Date: Tue, 14 Oct 2025 12:24:13 +0200
+Subject: [PATCH 392/553] macOS: Make macos-26-arm64-tests significant/blocking
+
+This change in qtbase will trickle into submodules, until reaching
+qt5, where we'll then make the config fully significant, by removing
+the COIN_CTEST_IGNORE_EXIT_CODE setting.
+
+Change-Id: I1b3d7fc08f3f839a979f63e62e9451eb96c019dd
+Reviewed-by: Toni Saario <toni.saario@qt.io>
+Reviewed-by: Tero Heikkinen <tero.heikkinen@qt.io>
+(cherry picked from commit 2e9e6a8f2e2e4f6f55287ed419e962d7d0bf07d4)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ coin/instructions/cmake_regular_test_instructions.yaml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/coin/instructions/cmake_regular_test_instructions.yaml b/coin/instructions/cmake_regular_test_instructions.yaml
+index 91593df6b4f..60fbd2e8e20 100644
+--- a/coin/instructions/cmake_regular_test_instructions.yaml
++++ b/coin/instructions/cmake_regular_test_instructions.yaml
+@@ -33,7 +33,7 @@ instructions:
+           conditions:
+             - condition: property
+               property: id
+-              contains_value: "macos-15"
++              equals_value: "macos-26-arm64-tests"
+         - condition: runtime
+           env_var: COIN_CTEST_FORCE_IGNORE_EXIT_CODE
+           equals_value: null
+-- 
+2.51.2
+

@@ -1,0 +1,70 @@
+From c32bd60b12345028577220a45dd3d872ad4f67a3 Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Thu, 16 Oct 2025 11:17:20 +0200
+Subject: [PATCH 439/553] QChar: remove confusing foldCase(ch, ch&) overload
+
+For years, I've been confused by the various foldCase() overloads,
+until Clang 21 -Wcharacter-conversion now forced me down the rabbit
+hole.
+
+Turns out that there's just one user of the ch,ch& overload and it's
+readily ported to the ch*,ch* overload, so do that and remove the
+now-unused overload.
+
+Amends the start of the public history.
+
+Pick-to: 6.8 6.5
+Change-Id: I8ddd22b08423540f58c1a5fe0ef36c93c8b337f1
+Reviewed-by: Ahmad Samir <a.samirh78@gmail.com>
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit 3eab7aca75fc44677e6b3f0e050b8f3ea174d0bd)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/text/qchar.cpp   | 9 ---------
+ src/corelib/text/qstring.cpp | 4 +---
+ 2 files changed, 1 insertion(+), 12 deletions(-)
+
+diff --git a/src/corelib/text/qchar.cpp b/src/corelib/text/qchar.cpp
+index f2bc22c421a..4b89f67d276 100644
+--- a/src/corelib/text/qchar.cpp
++++ b/src/corelib/text/qchar.cpp
+@@ -1688,15 +1688,6 @@ static inline char32_t foldCase(const char16_t *cur, const char16_t *start)
+     return convertCase_helper(ucs4, QUnicodeTables::CaseFold);
+ }
+ 
+-static inline char32_t foldCase(char16_t ch, char16_t &last) noexcept
+-{
+-    char32_t ucs4 = ch;
+-    if (QChar::isLowSurrogate(ch) && QChar::isHighSurrogate(last))
+-        ucs4 = QChar::surrogateToUcs4(last, ch);
+-    last = ch;
+-    return convertCase_helper(ucs4, QUnicodeTables::CaseFold);
+-}
+-
+ static inline char16_t foldCase(char16_t ch) noexcept
+ {
+     return convertCase_helper(ch, QUnicodeTables::CaseFold);
+diff --git a/src/corelib/text/qstring.cpp b/src/corelib/text/qstring.cpp
+index 615cf3e6752..46c01bf232a 100644
+--- a/src/corelib/text/qstring.cpp
++++ b/src/corelib/text/qstring.cpp
+@@ -1197,15 +1197,13 @@ Q_NEVER_INLINE static int ucstricmp(qsizetype alen, const char16_t *a, qsizetype
+     if (a == b)
+         return qt_lencmp(alen, blen);
+ 
+-    char16_t alast = 0;
+-    char16_t blast = 0;
+     qsizetype l = qMin(alen, blen);
+     qsizetype i;
+     for (i = 0; i < l; ++i) {
+ //         qDebug() << Qt::hex << alast << blast;
+ //         qDebug() << Qt::hex << "*a=" << *a << "alast=" << alast << "folded=" << foldCase (*a, alast);
+ //         qDebug() << Qt::hex << "*b=" << *b << "blast=" << blast << "folded=" << foldCase (*b, blast);
+-        int diff = foldCase(a[i], alast) - foldCase(b[i], blast);
++        int diff = foldCase(a + i, a) - foldCase(b + i, b);
+         if ((diff))
+             return diff;
+     }
+-- 
+2.51.2
+

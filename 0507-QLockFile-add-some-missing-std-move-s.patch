@@ -1,0 +1,44 @@
+From dfb8abf0e9e72fec855e98958d18874c0d636d12 Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Thu, 23 Oct 2025 07:00:04 +0200
+Subject: [PATCH 507/553] QLockFile: add some missing std::move()s
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Coverity complained that two QByteArrays were copied into the
+LockFileInfo struct when a move was possible.
+
+It's correct. Add the moves.
+
+Amends 772863355a0cf57a49e93608790dfd17c8fd82da.
+
+Pick-to: 6.8 6.5
+Coverity-Id: 896868
+Coverity-Id: 896870
+Change-Id: I146a588e4b2ef5bb6053274479ad96bcbdf75c11
+Reviewed-by: Mårten Nordheim <marten.nordheim@qt.io>
+(cherry picked from commit eefea5bf9d8141fb920a9612cc6d274890d9ebd8)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/io/qlockfile.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/corelib/io/qlockfile.cpp b/src/corelib/io/qlockfile.cpp
+index 908db7b9d38..f5e08438cbf 100644
+--- a/src/corelib/io/qlockfile.cpp
++++ b/src/corelib/io/qlockfile.cpp
+@@ -423,8 +423,8 @@ static bool getLockInfo_helper(const QString &fileName, LockFileInfo *info)
+     bool ok;
+     info->appname = QString::fromUtf8(appNameLine);
+     info->hostname = QString::fromUtf8(hostNameLine);
+-    info->hostid = hostId;
+-    info->bootid = bootId;
++    info->hostid = std::move(hostId);
++    info->bootid = std::move(bootId);
+     info->pid = pidLine.toLongLong(&ok);
+     return ok && info->pid > 0;
+ }
+-- 
+2.51.2
+

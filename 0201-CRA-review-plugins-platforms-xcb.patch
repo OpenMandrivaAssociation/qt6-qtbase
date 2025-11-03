@@ -1,0 +1,1067 @@
+From 89e27f10ff84a78ae7504fa2c58033e8bcd65a22 Mon Sep 17 00:00:00 2001
+From: Liang Qi <liang.qi@qt.io>
+Date: Wed, 24 Sep 2025 08:15:24 +0200
+Subject: [PATCH 201/553] CRA review: plugins/platforms/xcb/*
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+We trust the OS, so none of this code is security critical.
+
+QUIP: 23
+Fixes: QTBUG-134565
+Pick-to: 6.8
+Change-Id: Ia88b99937b7bf496c703e28d095b8e8b028e2a5a
+Reviewed-by: Tor Arne Vestbø <tor.arne.vestbo@qt.io>
+(cherry picked from commit 02de77535f2a94cbeb7e0ea01895ba4e556e165c)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../platforms/xcb/gl_integrations/xcb_egl/qxcbeglcontext.h      | 1 +
+ .../platforms/xcb/gl_integrations/xcb_egl/qxcbeglinclude.h      | 1 +
+ .../xcb/gl_integrations/xcb_egl/qxcbeglintegration.cpp          | 1 +
+ .../platforms/xcb/gl_integrations/xcb_egl/qxcbeglintegration.h  | 1 +
+ .../platforms/xcb/gl_integrations/xcb_egl/qxcbeglmain.cpp       | 1 +
+ .../gl_integrations/xcb_egl/qxcbeglnativeinterfacehandler.cpp   | 1 +
+ .../xcb/gl_integrations/xcb_egl/qxcbeglnativeinterfacehandler.h | 1 +
+ .../platforms/xcb/gl_integrations/xcb_egl/qxcbeglwindow.cpp     | 1 +
+ .../platforms/xcb/gl_integrations/xcb_egl/qxcbeglwindow.h       | 1 +
+ .../platforms/xcb/gl_integrations/xcb_glx/qglxintegration.cpp   | 1 +
+ .../platforms/xcb/gl_integrations/xcb_glx/qglxintegration.h     | 1 +
+ .../xcb/gl_integrations/xcb_glx/qxcbglxintegration.cpp          | 1 +
+ .../platforms/xcb/gl_integrations/xcb_glx/qxcbglxintegration.h  | 1 +
+ .../platforms/xcb/gl_integrations/xcb_glx/qxcbglxmain.cpp       | 1 +
+ .../gl_integrations/xcb_glx/qxcbglxnativeinterfacehandler.cpp   | 1 +
+ .../xcb/gl_integrations/xcb_glx/qxcbglxnativeinterfacehandler.h | 1 +
+ .../platforms/xcb/gl_integrations/xcb_glx/qxcbglxwindow.cpp     | 1 +
+ .../platforms/xcb/gl_integrations/xcb_glx/qxcbglxwindow.h       | 1 +
+ src/plugins/platforms/xcb/nativepainting/qbackingstore_x11.cpp  | 1 +
+ src/plugins/platforms/xcb/nativepainting/qbackingstore_x11_p.h  | 1 +
+ src/plugins/platforms/xcb/nativepainting/qcolormap_x11.cpp      | 1 +
+ src/plugins/platforms/xcb/nativepainting/qcolormap_x11_p.h      | 1 +
+ src/plugins/platforms/xcb/nativepainting/qpaintengine_x11.cpp   | 1 +
+ src/plugins/platforms/xcb/nativepainting/qpaintengine_x11_p.h   | 1 +
+ src/plugins/platforms/xcb/nativepainting/qpixmap_x11.cpp        | 1 +
+ src/plugins/platforms/xcb/nativepainting/qpixmap_x11_p.h        | 1 +
+ src/plugins/platforms/xcb/nativepainting/qpolygonclipper_p.h    | 1 +
+ src/plugins/platforms/xcb/nativepainting/qt_x11_p.h             | 1 +
+ src/plugins/platforms/xcb/nativepainting/qtessellator.cpp       | 1 +
+ src/plugins/platforms/xcb/nativepainting/qtessellator_p.h       | 1 +
+ src/plugins/platforms/xcb/nativepainting/qxcbnativepainting.cpp | 1 +
+ src/plugins/platforms/xcb/nativepainting/qxcbnativepainting.h   | 1 +
+ src/plugins/platforms/xcb/qt_xlib_wrapper.c                     | 2 ++
+ src/plugins/platforms/xcb/qt_xlib_wrapper.h                     | 2 ++
+ src/plugins/platforms/xcb/qxcbatom.cpp                          | 2 ++
+ src/plugins/platforms/xcb/qxcbatom.h                            | 2 ++
+ src/plugins/platforms/xcb/qxcbbackingstore.cpp                  | 1 +
+ src/plugins/platforms/xcb/qxcbbackingstore.h                    | 1 +
+ src/plugins/platforms/xcb/qxcbclipboard.cpp                     | 1 +
+ src/plugins/platforms/xcb/qxcbclipboard.h                       | 1 +
+ src/plugins/platforms/xcb/qxcbconnection.cpp                    | 1 +
+ src/plugins/platforms/xcb/qxcbconnection.h                      | 1 +
+ src/plugins/platforms/xcb/qxcbconnection_basic.cpp              | 2 ++
+ src/plugins/platforms/xcb/qxcbconnection_basic.h                | 1 +
+ src/plugins/platforms/xcb/qxcbconnection_screens.cpp            | 2 ++
+ src/plugins/platforms/xcb/qxcbconnection_xi2.cpp                | 1 +
+ src/plugins/platforms/xcb/qxcbcursor.cpp                        | 1 +
+ src/plugins/platforms/xcb/qxcbcursor.h                          | 1 +
+ src/plugins/platforms/xcb/qxcbcursorfont.h                      | 1 +
+ src/plugins/platforms/xcb/qxcbdrag.cpp                          | 1 +
+ src/plugins/platforms/xcb/qxcbdrag.h                            | 1 +
+ src/plugins/platforms/xcb/qxcbeventdispatcher.cpp               | 2 ++
+ src/plugins/platforms/xcb/qxcbeventdispatcher.h                 | 1 +
+ src/plugins/platforms/xcb/qxcbeventqueue.cpp                    | 2 ++
+ src/plugins/platforms/xcb/qxcbeventqueue.h                      | 1 +
+ src/plugins/platforms/xcb/qxcbexport.h                          | 1 +
+ src/plugins/platforms/xcb/qxcbimage.cpp                         | 1 +
+ src/plugins/platforms/xcb/qxcbimage.h                           | 1 +
+ src/plugins/platforms/xcb/qxcbintegration.cpp                   | 1 +
+ src/plugins/platforms/xcb/qxcbintegration.h                     | 1 +
+ src/plugins/platforms/xcb/qxcbkeyboard.cpp                      | 2 ++
+ src/plugins/platforms/xcb/qxcbkeyboard.h                        | 1 +
+ src/plugins/platforms/xcb/qxcbmain.cpp                          | 1 +
+ src/plugins/platforms/xcb/qxcbmime.cpp                          | 1 +
+ src/plugins/platforms/xcb/qxcbmime.h                            | 1 +
+ src/plugins/platforms/xcb/qxcbnativeinterface.cpp               | 1 +
+ src/plugins/platforms/xcb/qxcbnativeinterface.h                 | 1 +
+ src/plugins/platforms/xcb/qxcbobject.h                          | 1 +
+ src/plugins/platforms/xcb/qxcbscreen.cpp                        | 1 +
+ src/plugins/platforms/xcb/qxcbscreen.h                          | 1 +
+ src/plugins/platforms/xcb/qxcbscrollingdevice.cpp               | 2 ++
+ src/plugins/platforms/xcb/qxcbscrollingdevice_p.h               | 1 +
+ src/plugins/platforms/xcb/qxcbsessionmanager.cpp                | 1 +
+ src/plugins/platforms/xcb/qxcbsessionmanager.h                  | 1 +
+ src/plugins/platforms/xcb/qxcbsystemtraytracker.cpp             | 1 +
+ src/plugins/platforms/xcb/qxcbsystemtraytracker.h               | 1 +
+ src/plugins/platforms/xcb/qxcbvulkaninstance.cpp                | 1 +
+ src/plugins/platforms/xcb/qxcbvulkaninstance.h                  | 1 +
+ src/plugins/platforms/xcb/qxcbvulkanwindow.cpp                  | 1 +
+ src/plugins/platforms/xcb/qxcbvulkanwindow.h                    | 1 +
+ src/plugins/platforms/xcb/qxcbwindow.cpp                        | 1 +
+ src/plugins/platforms/xcb/qxcbwindow.h                          | 1 +
+ src/plugins/platforms/xcb/qxcbwmsupport.cpp                     | 1 +
+ src/plugins/platforms/xcb/qxcbwmsupport.h                       | 1 +
+ src/plugins/platforms/xcb/qxcbxsettings.cpp                     | 1 +
+ src/plugins/platforms/xcb/qxcbxsettings.h                       | 1 +
+ 86 files changed, 96 insertions(+)
+
+diff --git a/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglcontext.h b/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglcontext.h
+index 1598da86ab5..6122051f357 100644
+--- a/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglcontext.h
++++ b/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglcontext.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglinclude.h b/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglinclude.h
+index cf010e51a25..ee5ddc4cdcd 100644
+--- a/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglinclude.h
++++ b/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglinclude.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglintegration.cpp b/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglintegration.cpp
+index 133b992cd99..1b166d938e1 100644
+--- a/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglintegration.cpp
++++ b/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglintegration.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxcbeglintegration.h"
+ 
+diff --git a/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglintegration.h b/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglintegration.h
+index bd60677e9d2..d1e5f5bf040 100644
+--- a/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglintegration.h
++++ b/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglintegration.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglmain.cpp b/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglmain.cpp
+index 44539dd2e14..be97dc74c54 100644
+--- a/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglmain.cpp
++++ b/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglmain.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxcbglintegrationplugin.h"
+ 
+diff --git a/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglnativeinterfacehandler.cpp b/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglnativeinterfacehandler.cpp
+index 47a95d68763..a376b2e7aa9 100644
+--- a/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglnativeinterfacehandler.cpp
++++ b/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglnativeinterfacehandler.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxcbeglnativeinterfacehandler.h"
+ 
+diff --git a/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglnativeinterfacehandler.h b/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglnativeinterfacehandler.h
+index e147f251796..35be3283421 100644
+--- a/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglnativeinterfacehandler.h
++++ b/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglnativeinterfacehandler.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglwindow.cpp b/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglwindow.cpp
+index bf2ceb96f4a..80d7e03193d 100644
+--- a/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglwindow.cpp
++++ b/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglwindow.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxcbeglwindow.h"
+ 
+diff --git a/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglwindow.h b/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglwindow.h
+index d045158b687..3cf01139bd4 100644
+--- a/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglwindow.h
++++ b/src/plugins/platforms/xcb/gl_integrations/xcb_egl/qxcbeglwindow.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.cpp b/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.cpp
+index 1e8600b7b2f..2e9a48870fd 100644
+--- a/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.cpp
++++ b/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QDebug>
+ 
+diff --git a/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.h b/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.h
+index 8e80733c619..36e7e95c66b 100644
+--- a/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.h
++++ b/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qglxintegration.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxintegration.cpp b/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxintegration.cpp
+index db0de187bec..30cec079c4a 100644
+--- a/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxintegration.cpp
++++ b/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxintegration.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxcbglxintegration.h"
+ 
+diff --git a/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxintegration.h b/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxintegration.h
+index 077af6f2de3..b7538bbfa6f 100644
+--- a/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxintegration.h
++++ b/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxintegration.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxmain.cpp b/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxmain.cpp
+index 63ecaac0beb..61b6b7c51bb 100644
+--- a/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxmain.cpp
++++ b/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxmain.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxcbglintegrationplugin.h"
+ 
+diff --git a/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxnativeinterfacehandler.cpp b/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxnativeinterfacehandler.cpp
+index e363dc077fa..72ecf71c465 100644
+--- a/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxnativeinterfacehandler.cpp
++++ b/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxnativeinterfacehandler.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxcbglxnativeinterfacehandler.h"
+ 
+diff --git a/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxnativeinterfacehandler.h b/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxnativeinterfacehandler.h
+index 73a7b7b8b5a..50d39f0d129 100644
+--- a/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxnativeinterfacehandler.h
++++ b/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxnativeinterfacehandler.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxwindow.cpp b/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxwindow.cpp
+index 31bf39e4006..a08fe7de4a7 100644
+--- a/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxwindow.cpp
++++ b/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxwindow.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxcbglxwindow.h"
+ 
+diff --git a/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxwindow.h b/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxwindow.h
+index 05902efb883..656fe891814 100644
+--- a/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxwindow.h
++++ b/src/plugins/platforms/xcb/gl_integrations/xcb_glx/qxcbglxwindow.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/nativepainting/qbackingstore_x11.cpp b/src/plugins/platforms/xcb/nativepainting/qbackingstore_x11.cpp
+index d523eecc5a7..1ac5f6a64bc 100644
+--- a/src/plugins/platforms/xcb/nativepainting/qbackingstore_x11.cpp
++++ b/src/plugins/platforms/xcb/nativepainting/qbackingstore_x11.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qbackingstore_x11_p.h"
+ #include "qxcbwindow.h"
+diff --git a/src/plugins/platforms/xcb/nativepainting/qbackingstore_x11_p.h b/src/plugins/platforms/xcb/nativepainting/qbackingstore_x11_p.h
+index f2851adf23e..b730b076d3f 100644
+--- a/src/plugins/platforms/xcb/nativepainting/qbackingstore_x11_p.h
++++ b/src/plugins/platforms/xcb/nativepainting/qbackingstore_x11_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/nativepainting/qcolormap_x11.cpp b/src/plugins/platforms/xcb/nativepainting/qcolormap_x11.cpp
+index fffb1540402..fddd3e03989 100644
+--- a/src/plugins/platforms/xcb/nativepainting/qcolormap_x11.cpp
++++ b/src/plugins/platforms/xcb/nativepainting/qcolormap_x11.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QVarLengthArray>
+ 
+diff --git a/src/plugins/platforms/xcb/nativepainting/qcolormap_x11_p.h b/src/plugins/platforms/xcb/nativepainting/qcolormap_x11_p.h
+index 56955ee7939..9c9cce424c9 100644
+--- a/src/plugins/platforms/xcb/nativepainting/qcolormap_x11_p.h
++++ b/src/plugins/platforms/xcb/nativepainting/qcolormap_x11_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/nativepainting/qpaintengine_x11.cpp b/src/plugins/platforms/xcb/nativepainting/qpaintengine_x11.cpp
+index 75da805c2d7..3087ad55d43 100644
+--- a/src/plugins/platforms/xcb/nativepainting/qpaintengine_x11.cpp
++++ b/src/plugins/platforms/xcb/nativepainting/qpaintengine_x11.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QtCore/qrandom.h>
+ 
+diff --git a/src/plugins/platforms/xcb/nativepainting/qpaintengine_x11_p.h b/src/plugins/platforms/xcb/nativepainting/qpaintengine_x11_p.h
+index ad8ac57d259..bcbf84682c6 100644
+--- a/src/plugins/platforms/xcb/nativepainting/qpaintengine_x11_p.h
++++ b/src/plugins/platforms/xcb/nativepainting/qpaintengine_x11_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/nativepainting/qpixmap_x11.cpp b/src/plugins/platforms/xcb/nativepainting/qpixmap_x11.cpp
+index a4e820ea921..b47bd3f5dcc 100644
+--- a/src/plugins/platforms/xcb/nativepainting/qpixmap_x11.cpp
++++ b/src/plugins/platforms/xcb/nativepainting/qpixmap_x11.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QGuiApplication>
+ 
+diff --git a/src/plugins/platforms/xcb/nativepainting/qpixmap_x11_p.h b/src/plugins/platforms/xcb/nativepainting/qpixmap_x11_p.h
+index b7a633f5b8e..0755a34b4a8 100644
+--- a/src/plugins/platforms/xcb/nativepainting/qpixmap_x11_p.h
++++ b/src/plugins/platforms/xcb/nativepainting/qpixmap_x11_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/nativepainting/qpolygonclipper_p.h b/src/plugins/platforms/xcb/nativepainting/qpolygonclipper_p.h
+index fb0e0dd34cf..e1e31722d76 100644
+--- a/src/plugins/platforms/xcb/nativepainting/qpolygonclipper_p.h
++++ b/src/plugins/platforms/xcb/nativepainting/qpolygonclipper_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/nativepainting/qt_x11_p.h b/src/plugins/platforms/xcb/nativepainting/qt_x11_p.h
+index 4307429d2cd..2986b8f1453 100644
+--- a/src/plugins/platforms/xcb/nativepainting/qt_x11_p.h
++++ b/src/plugins/platforms/xcb/nativepainting/qt_x11_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/nativepainting/qtessellator.cpp b/src/plugins/platforms/xcb/nativepainting/qtessellator.cpp
+index 7b0094044b7..dd83f8852b7 100644
+--- a/src/plugins/platforms/xcb/nativepainting/qtessellator.cpp
++++ b/src/plugins/platforms/xcb/nativepainting/qtessellator.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qtessellator_p.h"
+ 
+diff --git a/src/plugins/platforms/xcb/nativepainting/qtessellator_p.h b/src/plugins/platforms/xcb/nativepainting/qtessellator_p.h
+index 9b64f6fdea8..ba1d3a971a3 100644
+--- a/src/plugins/platforms/xcb/nativepainting/qtessellator_p.h
++++ b/src/plugins/platforms/xcb/nativepainting/qtessellator_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/nativepainting/qxcbnativepainting.cpp b/src/plugins/platforms/xcb/nativepainting/qxcbnativepainting.cpp
+index 06eea93ff53..23155ef2e62 100644
+--- a/src/plugins/platforms/xcb/nativepainting/qxcbnativepainting.cpp
++++ b/src/plugins/platforms/xcb/nativepainting/qxcbnativepainting.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QtCore/qrandom.h>
+ 
+diff --git a/src/plugins/platforms/xcb/nativepainting/qxcbnativepainting.h b/src/plugins/platforms/xcb/nativepainting/qxcbnativepainting.h
+index 58d9b99ed38..dac9b101c43 100644
+--- a/src/plugins/platforms/xcb/nativepainting/qxcbnativepainting.h
++++ b/src/plugins/platforms/xcb/nativepainting/qxcbnativepainting.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/qt_xlib_wrapper.c b/src/plugins/platforms/xcb/qt_xlib_wrapper.c
+index f4614e5504e..b0aea454768 100644
+--- a/src/plugins/platforms/xcb/qt_xlib_wrapper.c
++++ b/src/plugins/platforms/xcb/qt_xlib_wrapper.c
+@@ -1,5 +1,7 @@
+ // Copyright (C) 2022 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
++
+ #include "qt_xlib_wrapper.h"
+ 
+ #include <X11/Xlib.h>
+diff --git a/src/plugins/platforms/xcb/qt_xlib_wrapper.h b/src/plugins/platforms/xcb/qt_xlib_wrapper.h
+index 0439adb609c..5438c942d3c 100644
+--- a/src/plugins/platforms/xcb/qt_xlib_wrapper.h
++++ b/src/plugins/platforms/xcb/qt_xlib_wrapper.h
+@@ -1,5 +1,7 @@
+ // Copyright (C) 2022 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
++
+ #pragma once
+ 
+ #ifdef __cplusplus
+diff --git a/src/plugins/platforms/xcb/qxcbatom.cpp b/src/plugins/platforms/xcb/qxcbatom.cpp
+index d31773a34db..5f712d33d56 100644
+--- a/src/plugins/platforms/xcb/qxcbatom.cpp
++++ b/src/plugins/platforms/xcb/qxcbatom.cpp
+@@ -1,5 +1,7 @@
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
++
+ #include "qxcbatom.h"
+ 
+ #include <QtCore/qglobal.h>
+diff --git a/src/plugins/platforms/xcb/qxcbatom.h b/src/plugins/platforms/xcb/qxcbatom.h
+index eccb0dc62ce..2db7bfb9814 100644
+--- a/src/plugins/platforms/xcb/qxcbatom.h
++++ b/src/plugins/platforms/xcb/qxcbatom.h
+@@ -1,5 +1,7 @@
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
++
+ #pragma once
+ 
+ #include <xcb/xcb.h>
+diff --git a/src/plugins/platforms/xcb/qxcbbackingstore.cpp b/src/plugins/platforms/xcb/qxcbbackingstore.cpp
+index fda47944d9d..fa3391e0997 100644
+--- a/src/plugins/platforms/xcb/qxcbbackingstore.cpp
++++ b/src/plugins/platforms/xcb/qxcbbackingstore.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxcbbackingstore.h"
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbbackingstore.h b/src/plugins/platforms/xcb/qxcbbackingstore.h
+index 5cda9e1ab79..f9cbf35df72 100644
+--- a/src/plugins/platforms/xcb/qxcbbackingstore.h
++++ b/src/plugins/platforms/xcb/qxcbbackingstore.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbclipboard.cpp b/src/plugins/platforms/xcb/qxcbclipboard.cpp
+index 53f45e0775d..bf2a11c9423 100644
+--- a/src/plugins/platforms/xcb/qxcbclipboard.cpp
++++ b/src/plugins/platforms/xcb/qxcbclipboard.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxcbclipboard.h"
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbclipboard.h b/src/plugins/platforms/xcb/qxcbclipboard.h
+index 36eff4d8dfc..8a728fd2dd5 100644
+--- a/src/plugins/platforms/xcb/qxcbclipboard.h
++++ b/src/plugins/platforms/xcb/qxcbclipboard.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbconnection.cpp b/src/plugins/platforms/xcb/qxcbconnection.cpp
+index e6d232d0ef9..0a6ac915d77 100644
+--- a/src/plugins/platforms/xcb/qxcbconnection.cpp
++++ b/src/plugins/platforms/xcb/qxcbconnection.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QtGui/private/qguiapplication_p.h>
+ #include <QtCore/QDebug>
+diff --git a/src/plugins/platforms/xcb/qxcbconnection.h b/src/plugins/platforms/xcb/qxcbconnection.h
+index 41cf7d4b35b..cac74601f36 100644
+--- a/src/plugins/platforms/xcb/qxcbconnection.h
++++ b/src/plugins/platforms/xcb/qxcbconnection.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbconnection_basic.cpp b/src/plugins/platforms/xcb/qxcbconnection_basic.cpp
+index 6416003bead..314ffcbf220 100644
+--- a/src/plugins/platforms/xcb/qxcbconnection_basic.cpp
++++ b/src/plugins/platforms/xcb/qxcbconnection_basic.cpp
+@@ -1,5 +1,7 @@
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
++
+ #include "qxcbconnection_basic.h"
+ #include "qxcbbackingstore.h" // for createSystemVShmSegment()
+ #include "private/qoffsetstringarray_p.h"
+diff --git a/src/plugins/platforms/xcb/qxcbconnection_basic.h b/src/plugins/platforms/xcb/qxcbconnection_basic.h
+index b66bb384c82..706f60214af 100644
+--- a/src/plugins/platforms/xcb/qxcbconnection_basic.h
++++ b/src/plugins/platforms/xcb/qxcbconnection_basic.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbconnection_screens.cpp b/src/plugins/platforms/xcb/qxcbconnection_screens.cpp
+index a99538d6eb5..b672e25365d 100644
+--- a/src/plugins/platforms/xcb/qxcbconnection_screens.cpp
++++ b/src/plugins/platforms/xcb/qxcbconnection_screens.cpp
+@@ -1,5 +1,7 @@
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
++
+ #include "qxcbconnection.h"
+ #include "qxcbscreen.h"
+ #include "qxcbintegration.h"
+diff --git a/src/plugins/platforms/xcb/qxcbconnection_xi2.cpp b/src/plugins/platforms/xcb/qxcbconnection_xi2.cpp
+index 087256b9a30..768848ca916 100644
+--- a/src/plugins/platforms/xcb/qxcbconnection_xi2.cpp
++++ b/src/plugins/platforms/xcb/qxcbconnection_xi2.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxcbconnection.h"
+ #include "qxcbkeyboard.h"
+diff --git a/src/plugins/platforms/xcb/qxcbcursor.cpp b/src/plugins/platforms/xcb/qxcbcursor.cpp
+index d1d95f79f08..9c42ea8923c 100644
+--- a/src/plugins/platforms/xcb/qxcbcursor.cpp
++++ b/src/plugins/platforms/xcb/qxcbcursor.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2022 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxcbcursor.h"
+ #include "qxcbconnection.h"
+diff --git a/src/plugins/platforms/xcb/qxcbcursor.h b/src/plugins/platforms/xcb/qxcbcursor.h
+index d8c78882878..0b51c605c61 100644
+--- a/src/plugins/platforms/xcb/qxcbcursor.h
++++ b/src/plugins/platforms/xcb/qxcbcursor.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2022 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbcursorfont.h b/src/plugins/platforms/xcb/qxcbcursorfont.h
+index 92108641909..3e9c1e3e75f 100644
+--- a/src/plugins/platforms/xcb/qxcbcursorfont.h
++++ b/src/plugins/platforms/xcb/qxcbcursorfont.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2022 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ // copied from <X11/cursorfont.h>
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbdrag.cpp b/src/plugins/platforms/xcb/qxcbdrag.cpp
+index 6b1f02d0ceb..2d35c44c489 100644
+--- a/src/plugins/platforms/xcb/qxcbdrag.cpp
++++ b/src/plugins/platforms/xcb/qxcbdrag.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxcbdrag.h"
+ #include <xcb/xcb.h>
+diff --git a/src/plugins/platforms/xcb/qxcbdrag.h b/src/plugins/platforms/xcb/qxcbdrag.h
+index 784b8050df7..1c6c007059c 100644
+--- a/src/plugins/platforms/xcb/qxcbdrag.h
++++ b/src/plugins/platforms/xcb/qxcbdrag.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbeventdispatcher.cpp b/src/plugins/platforms/xcb/qxcbeventdispatcher.cpp
+index 7049fd86562..8829f179698 100644
+--- a/src/plugins/platforms/xcb/qxcbeventdispatcher.cpp
++++ b/src/plugins/platforms/xcb/qxcbeventdispatcher.cpp
+@@ -1,5 +1,7 @@
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
++
+ #include "qxcbeventdispatcher.h"
+ #include "qxcbconnection.h"
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbeventdispatcher.h b/src/plugins/platforms/xcb/qxcbeventdispatcher.h
+index 717dd97b3f2..ce8ce71e3a0 100644
+--- a/src/plugins/platforms/xcb/qxcbeventdispatcher.h
++++ b/src/plugins/platforms/xcb/qxcbeventdispatcher.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbeventqueue.cpp b/src/plugins/platforms/xcb/qxcbeventqueue.cpp
+index 33795d63cf1..fa9a7a3c14f 100644
+--- a/src/plugins/platforms/xcb/qxcbeventqueue.cpp
++++ b/src/plugins/platforms/xcb/qxcbeventqueue.cpp
+@@ -1,5 +1,7 @@
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
++
+ #include "qxcbeventqueue.h"
+ #include "qxcbconnection.h"
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbeventqueue.h b/src/plugins/platforms/xcb/qxcbeventqueue.h
+index 7880b9bda8f..17196580232 100644
+--- a/src/plugins/platforms/xcb/qxcbeventqueue.h
++++ b/src/plugins/platforms/xcb/qxcbeventqueue.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbexport.h b/src/plugins/platforms/xcb/qxcbexport.h
+index e282a1fcffe..662d00f76ce 100644
+--- a/src/plugins/platforms/xcb/qxcbexport.h
++++ b/src/plugins/platforms/xcb/qxcbexport.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbimage.cpp b/src/plugins/platforms/xcb/qxcbimage.cpp
+index 8b4d9198758..5b78c2c08ab 100644
+--- a/src/plugins/platforms/xcb/qxcbimage.cpp
++++ b/src/plugins/platforms/xcb/qxcbimage.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxcbimage.h"
+ #include <QtCore/QtEndian>
+diff --git a/src/plugins/platforms/xcb/qxcbimage.h b/src/plugins/platforms/xcb/qxcbimage.h
+index 7b5f0f44d95..9d966af2556 100644
+--- a/src/plugins/platforms/xcb/qxcbimage.h
++++ b/src/plugins/platforms/xcb/qxcbimage.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbintegration.cpp b/src/plugins/platforms/xcb/qxcbintegration.cpp
+index 9de57a26b92..8dca7e676bb 100644
+--- a/src/plugins/platforms/xcb/qxcbintegration.cpp
++++ b/src/plugins/platforms/xcb/qxcbintegration.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxcbintegration.h"
+ #include "qxcbconnection.h"
+diff --git a/src/plugins/platforms/xcb/qxcbintegration.h b/src/plugins/platforms/xcb/qxcbintegration.h
+index f05afa29b13..10cc67af55f 100644
+--- a/src/plugins/platforms/xcb/qxcbintegration.h
++++ b/src/plugins/platforms/xcb/qxcbintegration.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbkeyboard.cpp b/src/plugins/platforms/xcb/qxcbkeyboard.cpp
+index 17da54bc7ad..4e0a32145a6 100644
+--- a/src/plugins/platforms/xcb/qxcbkeyboard.cpp
++++ b/src/plugins/platforms/xcb/qxcbkeyboard.cpp
+@@ -1,5 +1,7 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
++
+ #include "qxcbkeyboard.h"
+ #include "qxcbwindow.h"
+ #include "qxcbscreen.h"
+diff --git a/src/plugins/platforms/xcb/qxcbkeyboard.h b/src/plugins/platforms/xcb/qxcbkeyboard.h
+index 9528b8a7e47..febc2658b3d 100644
+--- a/src/plugins/platforms/xcb/qxcbkeyboard.h
++++ b/src/plugins/platforms/xcb/qxcbkeyboard.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbmain.cpp b/src/plugins/platforms/xcb/qxcbmain.cpp
+index e4254203fce..1571ed7ba28 100644
+--- a/src/plugins/platforms/xcb/qxcbmain.cpp
++++ b/src/plugins/platforms/xcb/qxcbmain.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <qpa/qplatformintegrationplugin.h>
+ #include "qxcbintegration.h"
+diff --git a/src/plugins/platforms/xcb/qxcbmime.cpp b/src/plugins/platforms/xcb/qxcbmime.cpp
+index 860d195d132..001a5b753b5 100644
+--- a/src/plugins/platforms/xcb/qxcbmime.cpp
++++ b/src/plugins/platforms/xcb/qxcbmime.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxcbmime.h"
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbmime.h b/src/plugins/platforms/xcb/qxcbmime.h
+index 2aee718bd9c..34d228be514 100644
+--- a/src/plugins/platforms/xcb/qxcbmime.h
++++ b/src/plugins/platforms/xcb/qxcbmime.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbnativeinterface.cpp b/src/plugins/platforms/xcb/qxcbnativeinterface.cpp
+index 06f5241d8c0..3bd9a80c35f 100644
+--- a/src/plugins/platforms/xcb/qxcbnativeinterface.cpp
++++ b/src/plugins/platforms/xcb/qxcbnativeinterface.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxcbnativeinterface.h"
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbnativeinterface.h b/src/plugins/platforms/xcb/qxcbnativeinterface.h
+index 45be5c7ef4c..0542a45c768 100644
+--- a/src/plugins/platforms/xcb/qxcbnativeinterface.h
++++ b/src/plugins/platforms/xcb/qxcbnativeinterface.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbobject.h b/src/plugins/platforms/xcb/qxcbobject.h
+index fe26aef9f14..5e5e7a5dbc2 100644
+--- a/src/plugins/platforms/xcb/qxcbobject.h
++++ b/src/plugins/platforms/xcb/qxcbobject.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbscreen.cpp b/src/plugins/platforms/xcb/qxcbscreen.cpp
+index c1b8f849ddb..f6dbe8c1897 100644
+--- a/src/plugins/platforms/xcb/qxcbscreen.cpp
++++ b/src/plugins/platforms/xcb/qxcbscreen.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxcbscreen.h"
+ #include "qxcbwindow.h"
+diff --git a/src/plugins/platforms/xcb/qxcbscreen.h b/src/plugins/platforms/xcb/qxcbscreen.h
+index 4fb0171a124..cb93e75dfcd 100644
+--- a/src/plugins/platforms/xcb/qxcbscreen.h
++++ b/src/plugins/platforms/xcb/qxcbscreen.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbscrollingdevice.cpp b/src/plugins/platforms/xcb/qxcbscrollingdevice.cpp
+index cf808558546..540d0877e51 100644
+--- a/src/plugins/platforms/xcb/qxcbscrollingdevice.cpp
++++ b/src/plugins/platforms/xcb/qxcbscrollingdevice.cpp
+@@ -1,5 +1,7 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
++
+ #include "qxcbscrollingdevice_p.h"
+ 
+ QT_BEGIN_NAMESPACE
+diff --git a/src/plugins/platforms/xcb/qxcbscrollingdevice_p.h b/src/plugins/platforms/xcb/qxcbscrollingdevice_p.h
+index 044cd40358d..8bfc7601209 100644
+--- a/src/plugins/platforms/xcb/qxcbscrollingdevice_p.h
++++ b/src/plugins/platforms/xcb/qxcbscrollingdevice_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbsessionmanager.cpp b/src/plugins/platforms/xcb/qxcbsessionmanager.cpp
+index b4e28ab831c..d8bb4fbc081 100644
+--- a/src/plugins/platforms/xcb/qxcbsessionmanager.cpp
++++ b/src/plugins/platforms/xcb/qxcbsessionmanager.cpp
+@@ -1,6 +1,7 @@
+ // Copyright (C) 2013 Teo Mrnjavac <teo@kde.org>
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxcbsessionmanager.h"
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbsessionmanager.h b/src/plugins/platforms/xcb/qxcbsessionmanager.h
+index 553ebb271b0..0fb62673425 100644
+--- a/src/plugins/platforms/xcb/qxcbsessionmanager.h
++++ b/src/plugins/platforms/xcb/qxcbsessionmanager.h
+@@ -1,6 +1,7 @@
+ // Copyright (C) 2013 Teo Mrnjavac <teo@kde.org>
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbsystemtraytracker.cpp b/src/plugins/platforms/xcb/qxcbsystemtraytracker.cpp
+index 84d2d73f91b..3072f0c1ed7 100644
+--- a/src/plugins/platforms/xcb/qxcbsystemtraytracker.cpp
++++ b/src/plugins/platforms/xcb/qxcbsystemtraytracker.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxcbsystemtraytracker.h"
+ #include "qxcbconnection.h"
+diff --git a/src/plugins/platforms/xcb/qxcbsystemtraytracker.h b/src/plugins/platforms/xcb/qxcbsystemtraytracker.h
+index c2e58e6e225..1ec9f20d849 100644
+--- a/src/plugins/platforms/xcb/qxcbsystemtraytracker.h
++++ b/src/plugins/platforms/xcb/qxcbsystemtraytracker.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbvulkaninstance.cpp b/src/plugins/platforms/xcb/qxcbvulkaninstance.cpp
+index b1fcfd665b0..ad34aedfae6 100644
+--- a/src/plugins/platforms/xcb/qxcbvulkaninstance.cpp
++++ b/src/plugins/platforms/xcb/qxcbvulkaninstance.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2017 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxcbvulkaninstance.h"
+ #include "qxcbwindow.h"
+diff --git a/src/plugins/platforms/xcb/qxcbvulkaninstance.h b/src/plugins/platforms/xcb/qxcbvulkaninstance.h
+index 24544f61a1f..8c74126b30d 100644
+--- a/src/plugins/platforms/xcb/qxcbvulkaninstance.h
++++ b/src/plugins/platforms/xcb/qxcbvulkaninstance.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2017 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbvulkanwindow.cpp b/src/plugins/platforms/xcb/qxcbvulkanwindow.cpp
+index b8cd75588a8..41a0720c79b 100644
+--- a/src/plugins/platforms/xcb/qxcbvulkanwindow.cpp
++++ b/src/plugins/platforms/xcb/qxcbvulkanwindow.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2017 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxcbvulkanwindow.h"
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbvulkanwindow.h b/src/plugins/platforms/xcb/qxcbvulkanwindow.h
+index 88fbab03867..337191834a3 100644
+--- a/src/plugins/platforms/xcb/qxcbvulkanwindow.h
++++ b/src/plugins/platforms/xcb/qxcbvulkanwindow.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2017 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbwindow.cpp b/src/plugins/platforms/xcb/qxcbwindow.cpp
+index fde9653fe4f..9b887f4cb38 100644
+--- a/src/plugins/platforms/xcb/qxcbwindow.cpp
++++ b/src/plugins/platforms/xcb/qxcbwindow.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxcbwindow.h"
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbwindow.h b/src/plugins/platforms/xcb/qxcbwindow.h
+index e7f8a5e66ca..6644dddc6bd 100644
+--- a/src/plugins/platforms/xcb/qxcbwindow.h
++++ b/src/plugins/platforms/xcb/qxcbwindow.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbwmsupport.cpp b/src/plugins/platforms/xcb/qxcbwmsupport.cpp
+index 0e3c470c894..462986cbd2f 100644
+--- a/src/plugins/platforms/xcb/qxcbwmsupport.cpp
++++ b/src/plugins/platforms/xcb/qxcbwmsupport.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxcbwmsupport.h"
+ #include "qxcbscreen.h"
+diff --git a/src/plugins/platforms/xcb/qxcbwmsupport.h b/src/plugins/platforms/xcb/qxcbwmsupport.h
+index f448d2daeca..a53f2362ae1 100644
+--- a/src/plugins/platforms/xcb/qxcbwmsupport.h
++++ b/src/plugins/platforms/xcb/qxcbwmsupport.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbxsettings.cpp b/src/plugins/platforms/xcb/qxcbxsettings.cpp
+index 6b62864addf..20d88f7a6fb 100644
+--- a/src/plugins/platforms/xcb/qxcbxsettings.cpp
++++ b/src/plugins/platforms/xcb/qxcbxsettings.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxcbxsettings.h"
+ 
+diff --git a/src/plugins/platforms/xcb/qxcbxsettings.h b/src/plugins/platforms/xcb/qxcbxsettings.h
+index e8a75e3556b..d28c29f4a33 100644
+--- a/src/plugins/platforms/xcb/qxcbxsettings.h
++++ b/src/plugins/platforms/xcb/qxcbxsettings.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #pragma once
+ 
+-- 
+2.51.2
+

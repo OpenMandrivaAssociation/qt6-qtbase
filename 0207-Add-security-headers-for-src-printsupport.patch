@@ -1,0 +1,677 @@
+From 4d1c326180979bb4b0f3da0d18dbe09c8a23f6ec Mon Sep 17 00:00:00 2001
+From: Sadegh Taghavi <sadegh.taghavi@qt.io>
+Date: Wed, 24 Sep 2025 12:40:56 +0300
+Subject: [PATCH 207/553] Add security headers for src\printsupport
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+As defined in QUIP 23, security critical files should be marked with
+Qt-Security score:critical. This change also marks all non-critical
+files as significant (the default) to make it clear that all files
+have been considered.
+
+As all printing to the device using the input data falls under the
+responsibility of other modules, such as parsing a document and painting
+it to the device. There are no direct network access or parsing
+operations in the printing subsystem other than wrapping around the
+native APIs.
+
+Then we cannot mark anything here as Critical.
+
+There are some parsing functions like QPrintUtils::parsePpdResolution,
+QCUPSSupport::findPpdOption, and QCocoaPrintDevice::defaultColorMode(),
+but all rely on the native ppd APIs.
+
+Fixes: QTBUG-134646
+Pick-to: 6.9 6.8
+Change-Id: Ic02a81051f4a03f9caf188f091dcbf29f8094ed1
+Reviewed-by: Tor Arne Vestbø <tor.arne.vestbo@qt.io>
+(cherry picked from commit c5d9d4d6f50fb86263009c0860c9897c8682485a)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/printsupport/dialogs/qabstractprintdialog.cpp            | 1 +
+ src/printsupport/dialogs/qabstractprintdialog.h              | 1 +
+ src/printsupport/dialogs/qabstractprintdialog_p.h            | 1 +
+ src/printsupport/dialogs/qpagesetupdialog.cpp                | 1 +
+ src/printsupport/dialogs/qpagesetupdialog.h                  | 1 +
+ src/printsupport/dialogs/qpagesetupdialog_p.h                | 1 +
+ src/printsupport/dialogs/qpagesetupdialog_win.cpp            | 1 +
+ src/printsupport/dialogs/qprintdialog.h                      | 1 +
+ src/printsupport/dialogs/qprintdialog_win.cpp                | 1 +
+ src/printsupport/dialogs/qprintpreviewdialog.cpp             | 1 +
+ src/printsupport/dialogs/qprintpreviewdialog.h               | 1 +
+ src/printsupport/kernel/qpaintengine_alpha.cpp               | 1 +
+ src/printsupport/kernel/qpaintengine_alpha_p.h               | 1 +
+ src/printsupport/kernel/qpaintengine_preview.cpp             | 1 +
+ src/printsupport/kernel/qpaintengine_preview_p.h             | 1 +
+ src/printsupport/kernel/qplatformprintdevice.cpp             | 1 +
+ src/printsupport/kernel/qplatformprintdevice.h               | 1 +
+ src/printsupport/kernel/qplatformprintersupport.cpp          | 1 +
+ src/printsupport/kernel/qplatformprintersupport.h            | 1 +
+ src/printsupport/kernel/qplatformprintplugin.cpp             | 1 +
+ src/printsupport/kernel/qplatformprintplugin.h               | 1 +
+ src/printsupport/kernel/qprint.cpp                           | 1 +
+ src/printsupport/kernel/qprint_p.h                           | 1 +
+ src/printsupport/kernel/qprintdevice.cpp                     | 1 +
+ src/printsupport/kernel/qprintdevice_p.h                     | 1 +
+ src/printsupport/kernel/qprintengine.cpp                     | 1 +
+ src/printsupport/kernel/qprintengine.h                       | 1 +
+ src/printsupport/kernel/qprintengine_pdf.cpp                 | 1 +
+ src/printsupport/kernel/qprintengine_pdf_p.h                 | 1 +
+ src/printsupport/kernel/qprinter.cpp                         | 1 +
+ src/printsupport/kernel/qprinter.h                           | 1 +
+ src/printsupport/kernel/qprinter_p.h                         | 1 +
+ src/printsupport/kernel/qprinterinfo.cpp                     | 1 +
+ src/printsupport/kernel/qprinterinfo.h                       | 1 +
+ src/printsupport/kernel/qprinterinfo_p.h                     | 1 +
+ src/printsupport/kernel/qtprintsupportglobal.h               | 1 +
+ src/printsupport/kernel/qtprintsupportglobal_p.h             | 1 +
+ src/printsupport/platform/macos/qcocoaprintdevice.mm         | 1 +
+ src/printsupport/platform/macos/qcocoaprintdevice_p.h        | 1 +
+ src/printsupport/platform/macos/qcocoaprintersupport.mm      | 1 +
+ src/printsupport/platform/macos/qcocoaprintersupport_p.h     | 1 +
+ src/printsupport/platform/macos/qpaintengine_mac.mm          | 1 +
+ src/printsupport/platform/macos/qpaintengine_mac_p.h         | 1 +
+ src/printsupport/platform/macos/qprintengine_mac.mm          | 1 +
+ src/printsupport/platform/macos/qprintengine_mac_p.h         | 1 +
+ src/printsupport/platform/windows/qprintengine_win.cpp       | 1 +
+ src/printsupport/platform/windows/qprintengine_win_p.h       | 1 +
+ src/printsupport/platform/windows/qwindowsprintdevice.cpp    | 1 +
+ src/printsupport/platform/windows/qwindowsprintdevice_p.h    | 1 +
+ src/printsupport/platform/windows/qwindowsprintersupport.cpp | 1 +
+ src/printsupport/platform/windows/qwindowsprintersupport_p.h | 1 +
+ src/printsupport/widgets/qprintpreviewwidget.cpp             | 1 +
+ src/printsupport/widgets/qprintpreviewwidget.h               | 1 +
+ 53 files changed, 53 insertions(+)
+
+diff --git a/src/printsupport/dialogs/qabstractprintdialog.cpp b/src/printsupport/dialogs/qabstractprintdialog.cpp
+index 30276a6121f..117808316fc 100644
+--- a/src/printsupport/dialogs/qabstractprintdialog.cpp
++++ b/src/printsupport/dialogs/qabstractprintdialog.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qabstractprintdialog_p.h"
+ #include "qcoreapplication.h"
+diff --git a/src/printsupport/dialogs/qabstractprintdialog.h b/src/printsupport/dialogs/qabstractprintdialog.h
+index 7f3f929d8a2..594e7f067b8 100644
+--- a/src/printsupport/dialogs/qabstractprintdialog.h
++++ b/src/printsupport/dialogs/qabstractprintdialog.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QABSTRACTPRINTDIALOG_H
+ #define QABSTRACTPRINTDIALOG_H
+diff --git a/src/printsupport/dialogs/qabstractprintdialog_p.h b/src/printsupport/dialogs/qabstractprintdialog_p.h
+index 40f25d454ad..bd98752e6ca 100644
+--- a/src/printsupport/dialogs/qabstractprintdialog_p.h
++++ b/src/printsupport/dialogs/qabstractprintdialog_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QABSTRACTPRINTDIALOG_P_H
+ #define QABSTRACTPRINTDIALOG_P_H
+diff --git a/src/printsupport/dialogs/qpagesetupdialog.cpp b/src/printsupport/dialogs/qpagesetupdialog.cpp
+index 40893cddabf..519d9505173 100644
+--- a/src/printsupport/dialogs/qpagesetupdialog.cpp
++++ b/src/printsupport/dialogs/qpagesetupdialog.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qpagesetupdialog.h"
+ #include <private/qpagesetupdialog_p.h>
+diff --git a/src/printsupport/dialogs/qpagesetupdialog.h b/src/printsupport/dialogs/qpagesetupdialog.h
+index 89056c70dd2..0a356c0c9a2 100644
+--- a/src/printsupport/dialogs/qpagesetupdialog.h
++++ b/src/printsupport/dialogs/qpagesetupdialog.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPAGESETUPDIALOG_H
+ #define QPAGESETUPDIALOG_H
+diff --git a/src/printsupport/dialogs/qpagesetupdialog_p.h b/src/printsupport/dialogs/qpagesetupdialog_p.h
+index 1b02f1e62db..a7a6223333d 100644
+--- a/src/printsupport/dialogs/qpagesetupdialog_p.h
++++ b/src/printsupport/dialogs/qpagesetupdialog_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPAGESETUPDIALOG_P_H
+ #define QPAGESETUPDIALOG_P_H
+diff --git a/src/printsupport/dialogs/qpagesetupdialog_win.cpp b/src/printsupport/dialogs/qpagesetupdialog_win.cpp
+index 1d2fdc98b7f..931f93cd2f2 100644
+--- a/src/printsupport/dialogs/qpagesetupdialog_win.cpp
++++ b/src/printsupport/dialogs/qpagesetupdialog_win.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qpagesetupdialog.h"
+ 
+diff --git a/src/printsupport/dialogs/qprintdialog.h b/src/printsupport/dialogs/qprintdialog.h
+index 4ba6ddfd484..8a578480f25 100644
+--- a/src/printsupport/dialogs/qprintdialog.h
++++ b/src/printsupport/dialogs/qprintdialog.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPRINTDIALOG_H
+ #define QPRINTDIALOG_H
+diff --git a/src/printsupport/dialogs/qprintdialog_win.cpp b/src/printsupport/dialogs/qprintdialog_win.cpp
+index 6d8c2d0f4d7..6cc2b8eded8 100644
+--- a/src/printsupport/dialogs/qprintdialog_win.cpp
++++ b/src/printsupport/dialogs/qprintdialog_win.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QtPrintSupport/qtprintsupportglobal.h>
+ 
+diff --git a/src/printsupport/dialogs/qprintpreviewdialog.cpp b/src/printsupport/dialogs/qprintpreviewdialog.cpp
+index 86742c4906e..9dc2b476b7b 100644
+--- a/src/printsupport/dialogs/qprintpreviewdialog.cpp
++++ b/src/printsupport/dialogs/qprintpreviewdialog.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qprintpreviewdialog.h"
+ #include "qprintpreviewwidget.h"
+diff --git a/src/printsupport/dialogs/qprintpreviewdialog.h b/src/printsupport/dialogs/qprintpreviewdialog.h
+index 5c0cb8de98e..3da64f1ed83 100644
+--- a/src/printsupport/dialogs/qprintpreviewdialog.h
++++ b/src/printsupport/dialogs/qprintpreviewdialog.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPRINTPREVIEWDIALOG_H
+ #define QPRINTPREVIEWDIALOG_H
+diff --git a/src/printsupport/kernel/qpaintengine_alpha.cpp b/src/printsupport/kernel/qpaintengine_alpha.cpp
+index 4c34457570e..31cb1c5e089 100644
+--- a/src/printsupport/kernel/qpaintengine_alpha.cpp
++++ b/src/printsupport/kernel/qpaintengine_alpha.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <qtprintsupportglobal.h>
+ 
+diff --git a/src/printsupport/kernel/qpaintengine_alpha_p.h b/src/printsupport/kernel/qpaintengine_alpha_p.h
+index 221194d4ad6..55fa87d5139 100644
+--- a/src/printsupport/kernel/qpaintengine_alpha_p.h
++++ b/src/printsupport/kernel/qpaintengine_alpha_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPAINTENGINE_ALPHA_P_H
+ #define QPAINTENGINE_ALPHA_P_H
+diff --git a/src/printsupport/kernel/qpaintengine_preview.cpp b/src/printsupport/kernel/qpaintengine_preview.cpp
+index 7e3a9f8c606..43ed6931a6d 100644
+--- a/src/printsupport/kernel/qpaintengine_preview.cpp
++++ b/src/printsupport/kernel/qpaintengine_preview.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <private/qpaintengine_preview_p.h>
+ #include <private/qpainter_p.h>
+diff --git a/src/printsupport/kernel/qpaintengine_preview_p.h b/src/printsupport/kernel/qpaintengine_preview_p.h
+index 87692a0b929..f393ef9b66e 100644
+--- a/src/printsupport/kernel/qpaintengine_preview_p.h
++++ b/src/printsupport/kernel/qpaintengine_preview_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPAINTENGINE_PREVIEW_P_H
+ #define QPAINTENGINE_PREVIEW_P_H
+diff --git a/src/printsupport/kernel/qplatformprintdevice.cpp b/src/printsupport/kernel/qplatformprintdevice.cpp
+index a2ee51f8872..5865efa972e 100644
+--- a/src/printsupport/kernel/qplatformprintdevice.cpp
++++ b/src/printsupport/kernel/qplatformprintdevice.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2014 John Layt <jlayt@kde.org>
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qplatformprintdevice.h"
+ 
+diff --git a/src/printsupport/kernel/qplatformprintdevice.h b/src/printsupport/kernel/qplatformprintdevice.h
+index a8d9c10f7f4..6824b97580a 100644
+--- a/src/printsupport/kernel/qplatformprintdevice.h
++++ b/src/printsupport/kernel/qplatformprintdevice.h
+@@ -1,6 +1,7 @@
+ // Copyright (C) 2014 John Layt <jlayt@kde.org>
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPLATFORMPRINTDEVICE_H
+ #define QPLATFORMPRINTDEVICE_H
+diff --git a/src/printsupport/kernel/qplatformprintersupport.cpp b/src/printsupport/kernel/qplatformprintersupport.cpp
+index f900de62c48..1683960d6df 100644
+--- a/src/printsupport/kernel/qplatformprintersupport.cpp
++++ b/src/printsupport/kernel/qplatformprintersupport.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qplatformprintersupport.h"
+ #include "qplatformprintdevice.h"
+diff --git a/src/printsupport/kernel/qplatformprintersupport.h b/src/printsupport/kernel/qplatformprintersupport.h
+index 0aba2eab599..509cd29ec8e 100644
+--- a/src/printsupport/kernel/qplatformprintersupport.h
++++ b/src/printsupport/kernel/qplatformprintersupport.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPLATFORMPRINTERSUPPORT_H
+ #define QPLATFORMPRINTERSUPPORT_H
+diff --git a/src/printsupport/kernel/qplatformprintplugin.cpp b/src/printsupport/kernel/qplatformprintplugin.cpp
+index 37222eb039d..8dab3efd103 100644
+--- a/src/printsupport/kernel/qplatformprintplugin.cpp
++++ b/src/printsupport/kernel/qplatformprintplugin.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qplatformprintplugin.h"
+ #include "qplatformprintersupport.h"
+diff --git a/src/printsupport/kernel/qplatformprintplugin.h b/src/printsupport/kernel/qplatformprintplugin.h
+index 0e7ec9cd9f9..c049ab48a7f 100644
+--- a/src/printsupport/kernel/qplatformprintplugin.h
++++ b/src/printsupport/kernel/qplatformprintplugin.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPLATFORMPRINTPLUGIN_H
+ #define QPLATFORMPRINTPLUGIN_H
+diff --git a/src/printsupport/kernel/qprint.cpp b/src/printsupport/kernel/qprint.cpp
+index 755da40a084..e8fc9ffa42b 100644
+--- a/src/printsupport/kernel/qprint.cpp
++++ b/src/printsupport/kernel/qprint.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2022 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qprint_p.h"
+ 
+diff --git a/src/printsupport/kernel/qprint_p.h b/src/printsupport/kernel/qprint_p.h
+index 0a94aa8db37..ab79fe83ddb 100644
+--- a/src/printsupport/kernel/qprint_p.h
++++ b/src/printsupport/kernel/qprint_p.h
+@@ -1,6 +1,7 @@
+ // Copyright (C) 2022 The Qt Company Ltd.
+ // Copyright (C) 2014 John Layt <jlayt@kde.org>
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPRINT_P_H
+ #define QPRINT_P_H
+diff --git a/src/printsupport/kernel/qprintdevice.cpp b/src/printsupport/kernel/qprintdevice.cpp
+index acf6d0f3295..14708a748cc 100644
+--- a/src/printsupport/kernel/qprintdevice.cpp
++++ b/src/printsupport/kernel/qprintdevice.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2014 John Layt <jlayt@kde.org>
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qprintdevice_p.h"
+ #include "qplatformprintdevice.h"
+diff --git a/src/printsupport/kernel/qprintdevice_p.h b/src/printsupport/kernel/qprintdevice_p.h
+index ec4b9c59fc7..d2eab8f5b2d 100644
+--- a/src/printsupport/kernel/qprintdevice_p.h
++++ b/src/printsupport/kernel/qprintdevice_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2014 John Layt <jlayt@kde.org>
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPRINTDEVICE_H
+ #define QPRINTDEVICE_H
+diff --git a/src/printsupport/kernel/qprintengine.cpp b/src/printsupport/kernel/qprintengine.cpp
+index b9afb282925..7479bfb335d 100644
+--- a/src/printsupport/kernel/qprintengine.cpp
++++ b/src/printsupport/kernel/qprintengine.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2024 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QtPrintSupport/qprintengine.h>
+ 
+diff --git a/src/printsupport/kernel/qprintengine.h b/src/printsupport/kernel/qprintengine.h
+index a18930c9a93..428798f692d 100644
+--- a/src/printsupport/kernel/qprintengine.h
++++ b/src/printsupport/kernel/qprintengine.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPRINTENGINE_H
+ #define QPRINTENGINE_H
+diff --git a/src/printsupport/kernel/qprintengine_pdf.cpp b/src/printsupport/kernel/qprintengine_pdf.cpp
+index 5b5a5e8c86c..46f5fb925b7 100644
+--- a/src/printsupport/kernel/qprintengine_pdf.cpp
++++ b/src/printsupport/kernel/qprintengine_pdf.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qprintengine_pdf_p.h"
+ 
+diff --git a/src/printsupport/kernel/qprintengine_pdf_p.h b/src/printsupport/kernel/qprintengine_pdf_p.h
+index dbf50080a4e..4c38bfa709c 100644
+--- a/src/printsupport/kernel/qprintengine_pdf_p.h
++++ b/src/printsupport/kernel/qprintengine_pdf_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPRINTENGINE_PDF_P_H
+ #define QPRINTENGINE_PDF_P_H
+diff --git a/src/printsupport/kernel/qprinter.cpp b/src/printsupport/kernel/qprinter.cpp
+index cc95c97344a..6dc3c90460b 100644
+--- a/src/printsupport/kernel/qprinter.cpp
++++ b/src/printsupport/kernel/qprinter.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qprinter.h"
+ #include "qprinter_p.h"
+diff --git a/src/printsupport/kernel/qprinter.h b/src/printsupport/kernel/qprinter.h
+index c60f0eea1f3..5d6efa267e5 100644
+--- a/src/printsupport/kernel/qprinter.h
++++ b/src/printsupport/kernel/qprinter.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPRINTER_H
+ #define QPRINTER_H
+diff --git a/src/printsupport/kernel/qprinter_p.h b/src/printsupport/kernel/qprinter_p.h
+index 77dd5fb4bc3..7295a093c2e 100644
+--- a/src/printsupport/kernel/qprinter_p.h
++++ b/src/printsupport/kernel/qprinter_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPRINTER_P_H
+ #define QPRINTER_P_H
+diff --git a/src/printsupport/kernel/qprinterinfo.cpp b/src/printsupport/kernel/qprinterinfo.cpp
+index 99df3502c1f..d4986a33a72 100644
+--- a/src/printsupport/kernel/qprinterinfo.cpp
++++ b/src/printsupport/kernel/qprinterinfo.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qprinterinfo.h"
+ #include "qprinterinfo_p.h"
+diff --git a/src/printsupport/kernel/qprinterinfo.h b/src/printsupport/kernel/qprinterinfo.h
+index f1b16e7ccb8..80a17e53841 100644
+--- a/src/printsupport/kernel/qprinterinfo.h
++++ b/src/printsupport/kernel/qprinterinfo.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPRINTERINFO_H
+ #define QPRINTERINFO_H
+diff --git a/src/printsupport/kernel/qprinterinfo_p.h b/src/printsupport/kernel/qprinterinfo_p.h
+index 84579a35126..29572a7a32c 100644
+--- a/src/printsupport/kernel/qprinterinfo_p.h
++++ b/src/printsupport/kernel/qprinterinfo_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPRINTERINFO_P_H
+ #define QPRINTERINFO_P_H
+diff --git a/src/printsupport/kernel/qtprintsupportglobal.h b/src/printsupport/kernel/qtprintsupportglobal.h
+index 95f52d18f51..fb69db3faf5 100644
+--- a/src/printsupport/kernel/qtprintsupportglobal.h
++++ b/src/printsupport/kernel/qtprintsupportglobal.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 Intel Corporation.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QTPRINTSUPPORTGLOBAL_H
+ #define QTPRINTSUPPORTGLOBAL_H
+diff --git a/src/printsupport/kernel/qtprintsupportglobal_p.h b/src/printsupport/kernel/qtprintsupportglobal_p.h
+index 53afe86e56a..54add08a4d3 100644
+--- a/src/printsupport/kernel/qtprintsupportglobal_p.h
++++ b/src/printsupport/kernel/qtprintsupportglobal_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QTPRINTSUPPORTGLOBAL_P_H
+ #define QTPRINTSUPPORTGLOBAL_P_H
+diff --git a/src/printsupport/platform/macos/qcocoaprintdevice.mm b/src/printsupport/platform/macos/qcocoaprintdevice.mm
+index 867e5225db7..8f2df677806 100644
+--- a/src/printsupport/platform/macos/qcocoaprintdevice.mm
++++ b/src/printsupport/platform/macos/qcocoaprintdevice.mm
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2014 John Layt <jlayt@kde.org>
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <ApplicationServices/ApplicationServices.h>
+ 
+diff --git a/src/printsupport/platform/macos/qcocoaprintdevice_p.h b/src/printsupport/platform/macos/qcocoaprintdevice_p.h
+index f27b544b0f7..33f9c0669d0 100644
+--- a/src/printsupport/platform/macos/qcocoaprintdevice_p.h
++++ b/src/printsupport/platform/macos/qcocoaprintdevice_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2014 John Layt <jlayt@kde.org>
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QCOCOAPRINTDEVICE_H
+ #define QCOCOAPRINTDEVICE_H
+diff --git a/src/printsupport/platform/macos/qcocoaprintersupport.mm b/src/printsupport/platform/macos/qcocoaprintersupport.mm
+index ed03e87f29c..9a5e1ab70b2 100644
+--- a/src/printsupport/platform/macos/qcocoaprintersupport.mm
++++ b/src/printsupport/platform/macos/qcocoaprintersupport.mm
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <AppKit/AppKit.h>
+ 
+diff --git a/src/printsupport/platform/macos/qcocoaprintersupport_p.h b/src/printsupport/platform/macos/qcocoaprintersupport_p.h
+index 73ebe7c90a7..f4105730818 100644
+--- a/src/printsupport/platform/macos/qcocoaprintersupport_p.h
++++ b/src/printsupport/platform/macos/qcocoaprintersupport_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QCOCOAPRINTERSUPPORT_H
+ #define QCOCOAPRINTERSUPPORT_H
+diff --git a/src/printsupport/platform/macos/qpaintengine_mac.mm b/src/printsupport/platform/macos/qpaintengine_mac.mm
+index a2c08b416bf..f1c78be11a0 100644
+--- a/src/printsupport/platform/macos/qpaintengine_mac.mm
++++ b/src/printsupport/platform/macos/qpaintengine_mac.mm
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <AppKit/AppKit.h>
+ #include <CoreGraphics/CoreGraphics.h>
+diff --git a/src/printsupport/platform/macos/qpaintengine_mac_p.h b/src/printsupport/platform/macos/qpaintengine_mac_p.h
+index a619a3a04a3..d6eadd3eae7 100644
+--- a/src/printsupport/platform/macos/qpaintengine_mac_p.h
++++ b/src/printsupport/platform/macos/qpaintengine_mac_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPAINTENGINE_MAC_P_H
+ #define QPAINTENGINE_MAC_P_H
+diff --git a/src/printsupport/platform/macos/qprintengine_mac.mm b/src/printsupport/platform/macos/qprintengine_mac.mm
+index d6eb71f66da..cfad43e7248 100644
+--- a/src/printsupport/platform/macos/qprintengine_mac.mm
++++ b/src/printsupport/platform/macos/qprintengine_mac.mm
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <AppKit/AppKit.h>
+ #include <ApplicationServices/ApplicationServices.h>
+diff --git a/src/printsupport/platform/macos/qprintengine_mac_p.h b/src/printsupport/platform/macos/qprintengine_mac_p.h
+index 7a0390cf41d..95f9ce20fee 100644
+--- a/src/printsupport/platform/macos/qprintengine_mac_p.h
++++ b/src/printsupport/platform/macos/qprintengine_mac_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPRINTENGINE_MAC_P_H
+ #define QPRINTENGINE_MAC_P_H
+diff --git a/src/printsupport/platform/windows/qprintengine_win.cpp b/src/printsupport/platform/windows/qprintengine_win.cpp
+index 8fb0b7aef19..406d9fa8f91 100644
+--- a/src/printsupport/platform/windows/qprintengine_win.cpp
++++ b/src/printsupport/platform/windows/qprintengine_win.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QtPrintSupport/qtprintsupportglobal.h>
+ 
+diff --git a/src/printsupport/platform/windows/qprintengine_win_p.h b/src/printsupport/platform/windows/qprintengine_win_p.h
+index 995c31ff1e7..da9ada9e43f 100644
+--- a/src/printsupport/platform/windows/qprintengine_win_p.h
++++ b/src/printsupport/platform/windows/qprintengine_win_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPRINTENGINE_WIN_P_H
+ #define QPRINTENGINE_WIN_P_H
+diff --git a/src/printsupport/platform/windows/qwindowsprintdevice.cpp b/src/printsupport/platform/windows/qwindowsprintdevice.cpp
+index 9445871ed74..06c2893f994 100644
+--- a/src/printsupport/platform/windows/qwindowsprintdevice.cpp
++++ b/src/printsupport/platform/windows/qwindowsprintdevice.cpp
+@@ -1,6 +1,7 @@
+ // Copyright (C) 2014 John Layt <jlayt@kde.org>
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qwindowsprintdevice_p.h"
+ 
+diff --git a/src/printsupport/platform/windows/qwindowsprintdevice_p.h b/src/printsupport/platform/windows/qwindowsprintdevice_p.h
+index edca1894e60..818d82bf91c 100644
+--- a/src/printsupport/platform/windows/qwindowsprintdevice_p.h
++++ b/src/printsupport/platform/windows/qwindowsprintdevice_p.h
+@@ -1,6 +1,7 @@
+ // Copyright (C) 2014 John Layt <jlayt@kde.org>
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QWINDOWSPRINTDEVICE_H
+ #define QWINDOWSPRINTDEVICE_H
+diff --git a/src/printsupport/platform/windows/qwindowsprintersupport.cpp b/src/printsupport/platform/windows/qwindowsprintersupport.cpp
+index 7cbd4dc491e..6d2be4d2001 100644
+--- a/src/printsupport/platform/windows/qwindowsprintersupport.cpp
++++ b/src/printsupport/platform/windows/qwindowsprintersupport.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qwindowsprintersupport_p.h"
+ 
+diff --git a/src/printsupport/platform/windows/qwindowsprintersupport_p.h b/src/printsupport/platform/windows/qwindowsprintersupport_p.h
+index cee04e97d65..ea2b7ccb8f7 100644
+--- a/src/printsupport/platform/windows/qwindowsprintersupport_p.h
++++ b/src/printsupport/platform/windows/qwindowsprintersupport_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef WINDOWSPRINTERSUPPORT_H
+ #define WINDOWSPRINTERSUPPORT_H
+diff --git a/src/printsupport/widgets/qprintpreviewwidget.cpp b/src/printsupport/widgets/qprintpreviewwidget.cpp
+index eb111a6efcf..e26e9778ea6 100644
+--- a/src/printsupport/widgets/qprintpreviewwidget.cpp
++++ b/src/printsupport/widgets/qprintpreviewwidget.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qprintpreviewwidget.h"
+ #include "private/qwidget_p.h"
+diff --git a/src/printsupport/widgets/qprintpreviewwidget.h b/src/printsupport/widgets/qprintpreviewwidget.h
+index bda4124a5ca..b04464729e9 100644
+--- a/src/printsupport/widgets/qprintpreviewwidget.h
++++ b/src/printsupport/widgets/qprintpreviewwidget.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPRINTPREVIEWWIDGET_H
+ #define QPRINTPREVIEWWIDGET_H
+-- 
+2.51.2
+

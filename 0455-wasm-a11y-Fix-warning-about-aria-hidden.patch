@@ -1,0 +1,114 @@
+From 3d40dfdc9824fcd19745dad46ade337c7c6bf3d4 Mon Sep 17 00:00:00 2001
+From: Even Oscar Andersen <even.oscar.andersen@qt.io>
+Date: Thu, 16 Oct 2025 12:00:45 +0200
+Subject: [PATCH 455/553] wasm: a11y - Fix warning about aria-hidden
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fix warning by only enabling aria-hidden if a11y is enabled.
+
+Change-Id: Ied957b14cb2f6bc64b6b907130cf2500bf14c151
+Reviewed-by: Morten Johan Sørvig <morten.sorvig@qt.io>
+---
+ src/plugins/platforms/wasm/qwasmaccessibility.cpp |  7 +++++++
+ src/plugins/platforms/wasm/qwasmaccessibility.h   |  1 +
+ src/plugins/platforms/wasm/qwasmwindow.cpp        | 11 +++++++++--
+ src/plugins/platforms/wasm/qwasmwindow.h          |  1 +
+ 4 files changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/src/plugins/platforms/wasm/qwasmaccessibility.cpp b/src/plugins/platforms/wasm/qwasmaccessibility.cpp
+index 842d70145a1..503ac00f665 100644
+--- a/src/plugins/platforms/wasm/qwasmaccessibility.cpp
++++ b/src/plugins/platforms/wasm/qwasmaccessibility.cpp
+@@ -73,6 +73,11 @@ void QWasmAccessibility::onRemoveWindow(QWindow *window)
+     get()->onRemoveWindowImpl(window);
+ }
+ 
++bool QWasmAccessibility::isEnabled()
++{
++    return get()->m_accessibilityEnabled;
++}
++
+ void QWasmAccessibility::addAccessibilityEnableButtonImpl(QWindow *window)
+ {
+     if (m_accessibilityEnabled)
+@@ -139,6 +144,8 @@ void QWasmAccessibility::enableAccessibility()
+     for (const auto& [key, value] : m_enableButtons) {
+         const auto &[element, callback] = value;
+         Q_UNUSED(callback);
++        if (auto wasmWindow = QWasmWindow::fromWindow(key))
++            wasmWindow->onAccessibilityEnable();
+         onShowWindowImpl(key);
+         element["parentElement"].call<void>("removeChild", element);
+     }
+diff --git a/src/plugins/platforms/wasm/qwasmaccessibility.h b/src/plugins/platforms/wasm/qwasmaccessibility.h
+index c5dc9d9cb73..def411be4e5 100644
+--- a/src/plugins/platforms/wasm/qwasmaccessibility.h
++++ b/src/plugins/platforms/wasm/qwasmaccessibility.h
+@@ -32,6 +32,7 @@ public:
+     static void addAccessibilityEnableButton(QWindow *window);
+     static void onShowWindow(QWindow *);
+     static void onRemoveWindow(QWindow *);
++    static bool isEnabled();
+ 
+ private:
+     void addAccessibilityEnableButtonImpl(QWindow *window);
+diff --git a/src/plugins/platforms/wasm/qwasmwindow.cpp b/src/plugins/platforms/wasm/qwasmwindow.cpp
+index f3882c8bfcd..ca6586954c9 100644
+--- a/src/plugins/platforms/wasm/qwasmwindow.cpp
++++ b/src/plugins/platforms/wasm/qwasmwindow.cpp
+@@ -97,7 +97,6 @@ QWasmWindow::QWasmWindow(QWindow *w, QWasmDeadKeySupport *deadKeySupport,
+     // Set inputMode=none set to prevent the virtual keyboard from popping up.
+     m_focusHelper["classList"].call<void>("add", emscripten::val("qt-window-focus-helper"));
+     m_focusHelper.set("inputMode", std::string("none"));
+-    m_focusHelper.call<void>("setAttribute", std::string("aria-hidden"), std::string("true"));
+     m_focusHelper.call<void>("setAttribute", std::string("contenteditable"), std::string("true"));
+     m_focusHelper["style"].set("position", "absolute");
+     m_focusHelper["style"].set("left", 0);
+@@ -112,7 +111,6 @@ QWasmWindow::QWasmWindow(QWindow *w, QWasmDeadKeySupport *deadKeySupport,
+     // foucus.
+     m_inputElement["classList"].call<void>("add", emscripten::val("qt-window-input-element"));
+     m_inputElement.set("type", "text");
+-    m_inputElement.call<void>("setAttribute", std::string("aria-hidden"), std::string("true"));
+     m_inputElement["style"].set("position", "absolute");
+     m_inputElement["style"].set("left", 0);
+     m_inputElement["style"].set("top", 0);
+@@ -130,6 +128,9 @@ QWasmWindow::QWasmWindow(QWindow *w, QWasmDeadKeySupport *deadKeySupport,
+     m_a11yContainer["classList"].call<void>("add", emscripten::val("qt-window-a11y-container"));
+     m_window.call<void>("appendChild", m_a11yContainer);
+ 
++    if (QWasmAccessibility::isEnabled())
++        onAccessibilityEnable();
++
+     const bool rendersTo2dContext = w->surfaceType() != QSurface::OpenGLSurface;
+     if (rendersTo2dContext)
+         m_context2d = m_canvas.call<emscripten::val>("getContext", emscripten::val("2d"));
+@@ -1102,6 +1103,12 @@ void QWasmWindow::focus()
+     m_focusHelper.call<void>("focus");
+ }
+ 
++void QWasmWindow::onAccessibilityEnable()
++{
++    m_focusHelper.call<void>("setAttribute", std::string("aria-hidden"), std::string("true"));
++    m_inputElement.call<void>("setAttribute", std::string("aria-hidden"), std::string("true"));
++}
++
+ bool QWasmWindow::setMouseGrabEnabled(bool grab)
+ {
+     Q_UNUSED(grab);
+diff --git a/src/plugins/platforms/wasm/qwasmwindow.h b/src/plugins/platforms/wasm/qwasmwindow.h
+index 0c63ebdc16e..cbe930dce89 100644
+--- a/src/plugins/platforms/wasm/qwasmwindow.h
++++ b/src/plugins/platforms/wasm/qwasmwindow.h
+@@ -90,6 +90,7 @@ public:
+     void setMask(const QRegion &region) final;
+     void setParent(const QPlatformWindow *window) final;
+     void focus();
++    void onAccessibilityEnable();
+ 
+     QWasmScreen *platformScreen() const;
+     void setBackingStore(QWasmBackingStore *store) { m_backingStore = store; }
+-- 
+2.51.2
+

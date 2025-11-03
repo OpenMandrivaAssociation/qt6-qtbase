@@ -1,0 +1,332 @@
+From 4907a74ae1c83a6aaaff997e06eabf235e6ad4f5 Mon Sep 17 00:00:00 2001
+From: Liang Qi <liang.qi@qt.io>
+Date: Wed, 24 Sep 2025 07:19:52 +0200
+Subject: [PATCH 200/553] CRA review: gui/platform/unix/*
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The files that we maintain by hand are marked as significant.
+* QDBus and QSettings are in used very often in most classes.
+* D-Bus and QSettings are security critical, but the implementation is
+  merely a user, and does not do any parsing or communication on its own.
+
+Notes:
+* dbusmenu and dbustray sub directories in seperate changes.
+* qdesktopunixservices_p.h as security critical which just follows
+  qdesktopunixservices.cpp in ad98583911a8252e56648cd2efc748b09b3691f3
+
+QUIP: 23
+Task-number: QTBUG-134573
+Pick-to: 6.8
+Change-Id: I5cdcaedb1f987a86cf7a16c843ebfe7f0e7238c7
+Reviewed-by: Tor Arne Vestbø <tor.arne.vestbo@qt.io>
+(cherry picked from commit 3eca06c7fa4e9850f97e42439f9346ad093176d5)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/gui/platform/unix/qdbuslistener.cpp               | 1 +
+ src/gui/platform/unix/qdbuslistener_p.h               | 1 +
+ src/gui/platform/unix/qdbussettings.cpp               | 1 +
+ src/gui/platform/unix/qdbussettings_p.h               | 1 +
+ src/gui/platform/unix/qdesktopunixservices_p.h        | 1 +
+ src/gui/platform/unix/qeventdispatcher_glib.cpp       | 1 +
+ src/gui/platform/unix/qeventdispatcher_glib_p.h       | 1 +
+ src/gui/platform/unix/qgenericunixeventdispatcher.cpp | 1 +
+ src/gui/platform/unix/qgenericunixeventdispatcher_p.h | 1 +
+ src/gui/platform/unix/qgenericunixtheme.cpp           | 1 +
+ src/gui/platform/unix/qgenericunixtheme_p.h           | 1 +
+ src/gui/platform/unix/qgnomeportalinterface.cpp       | 1 +
+ src/gui/platform/unix/qgnomeportalinterface_p.h       | 1 +
+ src/gui/platform/unix/qgnometheme.cpp                 | 1 +
+ src/gui/platform/unix/qgnometheme_p.h                 | 1 +
+ src/gui/platform/unix/qkdetheme.cpp                   | 1 +
+ src/gui/platform/unix/qkdetheme_p.h                   | 1 +
+ src/gui/platform/unix/qtx11extras.cpp                 | 1 +
+ src/gui/platform/unix/qtx11extras_p.h                 | 1 +
+ src/gui/platform/unix/qunixeventdispatcher.cpp        | 1 +
+ src/gui/platform/unix/qunixeventdispatcher_qpa_p.h    | 1 +
+ src/gui/platform/unix/qunixnativeinterface.cpp        | 1 +
+ src/gui/platform/unix/qxkbcommon.cpp                  | 1 +
+ src/gui/platform/unix/qxkbcommon_3rdparty.cpp         | 1 +
+ src/gui/platform/unix/qxkbcommon_p.h                  | 1 +
+ 25 files changed, 25 insertions(+)
+
+diff --git a/src/gui/platform/unix/qdbuslistener.cpp b/src/gui/platform/unix/qdbuslistener.cpp
+index 5057931b12d..7570f2b7724 100644
+--- a/src/gui/platform/unix/qdbuslistener.cpp
++++ b/src/gui/platform/unix/qdbuslistener.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2025 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qdbuslistener_p.h"
+ #include "qdbussettings_p.h"
+diff --git a/src/gui/platform/unix/qdbuslistener_p.h b/src/gui/platform/unix/qdbuslistener_p.h
+index 9e06d20d839..9b60528c760 100644
+--- a/src/gui/platform/unix/qdbuslistener_p.h
++++ b/src/gui/platform/unix/qdbuslistener_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2025 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QDBUSLISTENER_P_H
+ #define QDBUSLISTENER_P_H
+diff --git a/src/gui/platform/unix/qdbussettings.cpp b/src/gui/platform/unix/qdbussettings.cpp
+index 8d5f5d972bc..4d8bb246e7b 100644
+--- a/src/gui/platform/unix/qdbussettings.cpp
++++ b/src/gui/platform/unix/qdbussettings.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2025 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qdbussettings_p.h"
+ #include <QtCore/qvariant.h>
+diff --git a/src/gui/platform/unix/qdbussettings_p.h b/src/gui/platform/unix/qdbussettings_p.h
+index 7d7ea476464..489a26a2703 100644
+--- a/src/gui/platform/unix/qdbussettings_p.h
++++ b/src/gui/platform/unix/qdbussettings_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2025 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QDBUSSETTINGS_P_H
+ #define QDBUSSETTINGS_P_H
+diff --git a/src/gui/platform/unix/qdesktopunixservices_p.h b/src/gui/platform/unix/qdesktopunixservices_p.h
+index 903bd6e6510..bb29f5248df 100644
+--- a/src/gui/platform/unix/qdesktopunixservices_p.h
++++ b/src/gui/platform/unix/qdesktopunixservices_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:critical reason:execute-external-code
+ 
+ #ifndef QDESKTOPUNIXSERVICES_H
+ #define QDESKTOPUNIXSERVICES_H
+diff --git a/src/gui/platform/unix/qeventdispatcher_glib.cpp b/src/gui/platform/unix/qeventdispatcher_glib.cpp
+index 964d844bd53..aff46c43b9f 100644
+--- a/src/gui/platform/unix/qeventdispatcher_glib.cpp
++++ b/src/gui/platform/unix/qeventdispatcher_glib.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qeventdispatcher_glib_p.h"
+ 
+diff --git a/src/gui/platform/unix/qeventdispatcher_glib_p.h b/src/gui/platform/unix/qeventdispatcher_glib_p.h
+index 9c8f06f0e97..6967c5e87ac 100644
+--- a/src/gui/platform/unix/qeventdispatcher_glib_p.h
++++ b/src/gui/platform/unix/qeventdispatcher_glib_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QEVENTDISPATCHER_GLIB_QPA_P_H
+ #define QEVENTDISPATCHER_GLIB_QPA_P_H
+diff --git a/src/gui/platform/unix/qgenericunixeventdispatcher.cpp b/src/gui/platform/unix/qgenericunixeventdispatcher.cpp
+index b551aefe993..332a6b3fe30 100644
+--- a/src/gui/platform/unix/qgenericunixeventdispatcher.cpp
++++ b/src/gui/platform/unix/qgenericunixeventdispatcher.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qgenericunixeventdispatcher_p.h"
+ #include "qunixeventdispatcher_qpa_p.h"
+diff --git a/src/gui/platform/unix/qgenericunixeventdispatcher_p.h b/src/gui/platform/unix/qgenericunixeventdispatcher_p.h
+index 82dc35da0bd..9c39cd1b914 100644
+--- a/src/gui/platform/unix/qgenericunixeventdispatcher_p.h
++++ b/src/gui/platform/unix/qgenericunixeventdispatcher_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ //
+ //  W A R N I N G
+diff --git a/src/gui/platform/unix/qgenericunixtheme.cpp b/src/gui/platform/unix/qgenericunixtheme.cpp
+index afd2c4cd7de..b5af0f9fee6 100644
+--- a/src/gui/platform/unix/qgenericunixtheme.cpp
++++ b/src/gui/platform/unix/qgenericunixtheme.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2022 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qgenericunixtheme_p.h"
+ #include "qgnometheme_p.h"
+diff --git a/src/gui/platform/unix/qgenericunixtheme_p.h b/src/gui/platform/unix/qgenericunixtheme_p.h
+index 2d1a118b1ae..1df8591eff1 100644
+--- a/src/gui/platform/unix/qgenericunixtheme_p.h
++++ b/src/gui/platform/unix/qgenericunixtheme_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QGENERICUNIXTHEME_H
+ #define QGENERICUNIXTHEME_H
+diff --git a/src/gui/platform/unix/qgnomeportalinterface.cpp b/src/gui/platform/unix/qgnomeportalinterface.cpp
+index 8528ed19328..8c089388a7b 100644
+--- a/src/gui/platform/unix/qgnomeportalinterface.cpp
++++ b/src/gui/platform/unix/qgnomeportalinterface.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2025 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qgnomeportalinterface_p.h"
+ #include "qdbussettings_p.h"
+diff --git a/src/gui/platform/unix/qgnomeportalinterface_p.h b/src/gui/platform/unix/qgnomeportalinterface_p.h
+index 4dee4f310f5..a1ff267f5a3 100644
+--- a/src/gui/platform/unix/qgnomeportalinterface_p.h
++++ b/src/gui/platform/unix/qgnomeportalinterface_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2025 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QGNOMEPORTALINTERFACE_P_H
+ #define QGNOMEPORTALINTERFACE_P_H
+diff --git a/src/gui/platform/unix/qgnometheme.cpp b/src/gui/platform/unix/qgnometheme.cpp
+index a9fb85e15bc..2e69eced13a 100644
+--- a/src/gui/platform/unix/qgnometheme.cpp
++++ b/src/gui/platform/unix/qgnometheme.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2025 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qgnometheme_p.h"
+ #include <qpa/qplatformdialoghelper.h>
+diff --git a/src/gui/platform/unix/qgnometheme_p.h b/src/gui/platform/unix/qgnometheme_p.h
+index 17b91931876..263de178538 100644
+--- a/src/gui/platform/unix/qgnometheme_p.h
++++ b/src/gui/platform/unix/qgnometheme_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2025 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QGNOMETHEME_P_H
+ #define QGNOMETHEME_P_H
+diff --git a/src/gui/platform/unix/qkdetheme.cpp b/src/gui/platform/unix/qkdetheme.cpp
+index ef1f9b3455c..7573a5c4bec 100644
+--- a/src/gui/platform/unix/qkdetheme.cpp
++++ b/src/gui/platform/unix/qkdetheme.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2025 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qkdetheme_p.h"
+ #include <qpa/qplatformtheme_p.h>
+diff --git a/src/gui/platform/unix/qkdetheme_p.h b/src/gui/platform/unix/qkdetheme_p.h
+index 212a79a7da8..001e5ee65e2 100644
+--- a/src/gui/platform/unix/qkdetheme_p.h
++++ b/src/gui/platform/unix/qkdetheme_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2025 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QKDETHEME_P_H
+ #define QKDETHEME_P_H
+diff --git a/src/gui/platform/unix/qtx11extras.cpp b/src/gui/platform/unix/qtx11extras.cpp
+index ef37518d956..3eb3d6624a4 100644
+--- a/src/gui/platform/unix/qtx11extras.cpp
++++ b/src/gui/platform/unix/qtx11extras.cpp
+@@ -2,6 +2,7 @@
+ // Copyright (C) 2016 Richard Moore <rich@kde.org>
+ // Copyright (C) 2016 David Faure <david.faure@kdab.com>
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qtx11extras_p.h"
+ 
+diff --git a/src/gui/platform/unix/qtx11extras_p.h b/src/gui/platform/unix/qtx11extras_p.h
+index 253162f83a4..f4612af5e71 100644
+--- a/src/gui/platform/unix/qtx11extras_p.h
++++ b/src/gui/platform/unix/qtx11extras_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2021 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QTX11EXTRAS_P_H
+ #define QTX11EXTRAS_P_H
+diff --git a/src/gui/platform/unix/qunixeventdispatcher.cpp b/src/gui/platform/unix/qunixeventdispatcher.cpp
+index 0178b7544e1..144fa9b40b6 100644
+--- a/src/gui/platform/unix/qunixeventdispatcher.cpp
++++ b/src/gui/platform/unix/qunixeventdispatcher.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qplatformdefs.h"
+ #include "qcoreapplication.h"
+diff --git a/src/gui/platform/unix/qunixeventdispatcher_qpa_p.h b/src/gui/platform/unix/qunixeventdispatcher_qpa_p.h
+index bcae9b5a1cb..2a0d6ed8d01 100644
+--- a/src/gui/platform/unix/qunixeventdispatcher_qpa_p.h
++++ b/src/gui/platform/unix/qunixeventdispatcher_qpa_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QUNIXEVENTDISPATCHER_QPA_H
+ #define QUNIXEVENTDISPATCHER_QPA_H
+diff --git a/src/gui/platform/unix/qunixnativeinterface.cpp b/src/gui/platform/unix/qunixnativeinterface.cpp
+index 2291467740d..91d27379d52 100644
+--- a/src/gui/platform/unix/qunixnativeinterface.cpp
++++ b/src/gui/platform/unix/qunixnativeinterface.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QtGui/private/qtguiglobal_p.h>
+ 
+diff --git a/src/gui/platform/unix/qxkbcommon.cpp b/src/gui/platform/unix/qxkbcommon.cpp
+index 6d921533dbf..ebac9f108e8 100644
+--- a/src/gui/platform/unix/qxkbcommon.cpp
++++ b/src/gui/platform/unix/qxkbcommon.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2019 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qxkbcommon_p.h"
+ 
+diff --git a/src/gui/platform/unix/qxkbcommon_3rdparty.cpp b/src/gui/platform/unix/qxkbcommon_3rdparty.cpp
+index 207c1032353..5fdd490f76e 100644
+--- a/src/gui/platform/unix/qxkbcommon_3rdparty.cpp
++++ b/src/gui/platform/unix/qxkbcommon_3rdparty.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2019 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ /* Copyright 1985, 1987, 1990, 1998  The Open Group
+ 
+diff --git a/src/gui/platform/unix/qxkbcommon_p.h b/src/gui/platform/unix/qxkbcommon_p.h
+index a40d794451d..f12ee0bffdc 100644
+--- a/src/gui/platform/unix/qxkbcommon_p.h
++++ b/src/gui/platform/unix/qxkbcommon_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QXKBCOMMON_P_H
+ #define QXKBCOMMON_P_H
+-- 
+2.51.2
+

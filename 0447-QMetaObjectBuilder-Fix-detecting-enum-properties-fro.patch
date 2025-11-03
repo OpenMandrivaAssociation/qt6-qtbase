@@ -1,0 +1,73 @@
+From 60734c9b312ecf01ec4d6caea7b6831759a24051 Mon Sep 17 00:00:00 2001
+From: Friedemann Kleint <Friedemann.Kleint@qt.io>
+Date: Mon, 20 Oct 2025 08:43:23 +0200
+Subject: [PATCH 447/553] QMetaObjectBuilder: Fix detecting enum properties
+ from QMetaType
+
+Fix condition wrongly inverted by dd95d5126ce9e022dfd25f0f44ee0f2a9e50f45e.
+
+Fixes: PYSIDE-3217
+Change-Id: I3c30541617a90ac32020aaddfca79024ba1ba351
+Reviewed-by: Fabian Kosmale <fabian.kosmale@qt.io>
+(cherry picked from commit 88f47e44d2d62286b3c3468642d9c9efa54e7fb6)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/kernel/qmetaobjectbuilder.cpp     |  2 +-
+ .../tst_qmetaobjectbuilder.cpp                | 21 +++++++++++++++++++
+ 2 files changed, 22 insertions(+), 1 deletion(-)
+
+diff --git a/src/corelib/kernel/qmetaobjectbuilder.cpp b/src/corelib/kernel/qmetaobjectbuilder.cpp
+index 0a8351668cf..7e65444ce6a 100644
+--- a/src/corelib/kernel/qmetaobjectbuilder.cpp
++++ b/src/corelib/kernel/qmetaobjectbuilder.cpp
+@@ -1326,7 +1326,7 @@ static int buildMetaObject(QMetaObjectBuilderPrivate *d, char *buf,
+ 
+         [[maybe_unused]] int flags = prop.flags;
+ 
+-        if (isBuiltinType(prop.type))
++        if (!isBuiltinType(prop.type))
+             flags |= EnumOrFlag;
+ 
+         if constexpr (mode == Construct) {
+diff --git a/tests/auto/corelib/kernel/qmetaobjectbuilder/tst_qmetaobjectbuilder.cpp b/tests/auto/corelib/kernel/qmetaobjectbuilder/tst_qmetaobjectbuilder.cpp
+index 450c8d4297a..4de1f083406 100644
+--- a/tests/auto/corelib/kernel/qmetaobjectbuilder/tst_qmetaobjectbuilder.cpp
++++ b/tests/auto/corelib/kernel/qmetaobjectbuilder/tst_qmetaobjectbuilder.cpp
+@@ -22,6 +22,7 @@ private slots:
+     void variantProperty();
+     void notifySignal();
+     void enumerator();
++    void enumProperty();
+     void classInfo();
+     void relatedMetaObject();
+     void staticMetacall();
+@@ -993,6 +994,26 @@ void tst_QMetaObjectBuilder::enumerator()
+     QVERIFY(checkForSideEffects(builder, QMetaObjectBuilder::Enumerators));
+ }
+ 
++void tst_QMetaObjectBuilder::enumProperty()
++{
++    // When adding property with an enumeration type, QMetaProperty::isEnumType()
++    // should return true.
++    QMetaObjectBuilder builder;
++    builder.setSuperClass(QObject::metaObject());
++
++    auto enumMetaType = QMetaType::fromType<Qt::Orientation>();
++    QVERIFY(enumMetaType.isValid());
++
++    builder.addProperty("orientation", "Qt::Orientation", enumMetaType);
++
++    auto *mo = builder.toMetaObject();
++    QVERIFY(mo != nullptr);
++    const int index = mo->indexOfProperty("orientation");
++    QVERIFY(index != -1);
++    QVERIFY(mo->property(index).isEnumType());
++    free(mo);
++}
++
+ void tst_QMetaObjectBuilder::classInfo()
+ {
+     QMetaObjectBuilder builder;
+-- 
+2.51.2
+

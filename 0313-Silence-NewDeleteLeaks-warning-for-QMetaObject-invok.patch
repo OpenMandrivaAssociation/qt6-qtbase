@@ -1,0 +1,45 @@
+From 920d173c87a70d401c00070566d76fcf0c26ff58 Mon Sep 17 00:00:00 2001
+From: Mike Senter <mikejsenter@gmail.com>
+Date: Mon, 6 Oct 2025 16:34:53 -0500
+Subject: [PATCH 313/553] Silence NewDeleteLeaks warning for
+ QMetaObject::invokeMethod
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Using the functor version of QMetaObject::invokeMethod resulted
+in a NewDeleteLeaks warning from clang-tidy. There was a
+NOLINTNEXTLINE at the source of the problem, but it was placed
+incorrectly. This replaces it with NOLINTBEGIN/NOLINTEND
+wrapping around the problem lines.
+
+Pick-to: 6.8
+Change-Id: I351f1a4691648a12d3e0f6c2da4ecef8adce5714
+Reviewed-by: Mårten Nordheim <marten.nordheim@qt.io>
+(cherry picked from commit d768b24b3aa8e81efc3ef735083dae55dbceda4a)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/kernel/qobjectdefs.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/corelib/kernel/qobjectdefs.h b/src/corelib/kernel/qobjectdefs.h
+index 79dcd82f0c5..848102cc57a 100644
+--- a/src/corelib/kernel/qobjectdefs.h
++++ b/src/corelib/kernel/qobjectdefs.h
+@@ -640,11 +640,12 @@ private:
+ 
+         auto h = QtPrivate::invokeMethodHelper(ret, std::forward<Args>(args)...);
+ 
+-        // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
++        // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks)
+         auto callable = new QtPrivate::QCallableObject<std::decay_t<Func>, ActualArguments,
+                 typename Callable::ReturnType>(std::forward<Func>(function));
+         return invokeMethodImpl(object, callable, type, h.parameterCount(), h.parameters.data(),
+                 h.typeNames.data(), h.metaTypes.data());
++        // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
+     }
+ 
+     static bool invokeMethodImpl(QObject *object, const char *member, Qt::ConnectionType type,
+-- 
+2.51.2
+

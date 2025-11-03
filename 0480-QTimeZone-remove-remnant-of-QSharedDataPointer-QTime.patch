@@ -1,0 +1,58 @@
+From f1bdebff7fe415faa49c32f9642f1e272a1c22c9 Mon Sep 17 00:00:00 2001
+From: Thiago Macieira <thiago.macieira@intel.com>
+Date: Thu, 2 Oct 2025 23:36:35 -0700
+Subject: [PATCH 480/553] QTimeZone: remove remnant of
+ QSharedDataPointer<QTimeZonePrivate>
+
+Amends commit ae6186c7e8cfdb9420b9119f5affbba7d069598d, which replaced
+the implicit d-pointer using QSharedDataPointer of the original Qt 5.2
+design with an explicit implementation, with support for a "short
+object" of just an offset.
+
+There's a QExplicitlySharedDataPointer<QTimeZonePrivate> in
+qtimezone.cpp, which currently doesn't detach at all. If and when it
+does, reimplementing this may be needed.
+
+Pick-to: 6.8
+Change-Id: I92b4b30f60689d0a1f5ffffd53f6f71cd1834f15
+Reviewed-by: Edward Welbourne <edward.welbourne@qt.io>
+(cherry picked from commit 7c2f8a515e3a67f523cdc7b9edb5485b0a9497bd)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/time/qtimezoneprivate.cpp | 6 ------
+ src/corelib/time/qtimezoneprivate_p.h | 2 --
+ 2 files changed, 8 deletions(-)
+
+diff --git a/src/corelib/time/qtimezoneprivate.cpp b/src/corelib/time/qtimezoneprivate.cpp
+index fa45d05766b..4d9418a2f2b 100644
+--- a/src/corelib/time/qtimezoneprivate.cpp
++++ b/src/corelib/time/qtimezoneprivate.cpp
+@@ -1048,12 +1048,6 @@ QList<QByteArray> QTimeZonePrivate::windowsIdToIanaIds(const QByteArray &windows
+     return list;
+ }
+ 
+-// Define template for derived classes to reimplement so QSharedDataPointer clone() works correctly
+-template<> QTimeZonePrivate *QSharedDataPointer<QTimeZonePrivate>::clone()
+-{
+-    return d->clone();
+-}
+-
+ static bool isEntryInIanaList(QByteArrayView id, QByteArrayView ianaIds)
+ {
+     qsizetype cut;
+diff --git a/src/corelib/time/qtimezoneprivate_p.h b/src/corelib/time/qtimezoneprivate_p.h
+index af1ff741b2a..9ce590faa1e 100644
+--- a/src/corelib/time/qtimezoneprivate_p.h
++++ b/src/corelib/time/qtimezoneprivate_p.h
+@@ -204,8 +204,6 @@ protected:
+ };
+ Q_DECLARE_TYPEINFO(QTimeZonePrivate::Data, Q_RELOCATABLE_TYPE);
+ 
+-template<> QTimeZonePrivate *QSharedDataPointer<QTimeZonePrivate>::clone();
+-
+ class Q_AUTOTEST_EXPORT QUtcTimeZonePrivate final : public QTimeZonePrivate
+ {
+     bool operator=(const QUtcTimeZonePrivate &) const = delete;
+-- 
+2.51.2
+

@@ -1,0 +1,87 @@
+From ad8a13739ec0eaf84b0b46d69b1aa88c509af1b0 Mon Sep 17 00:00:00 2001
+From: Ahmad Samir <a.samirh78@gmail.com>
+Date: Tue, 7 Oct 2025 22:01:03 +0300
+Subject: [PATCH 348/553] tst_QXmlStream: port away from QPair
+
+Drive-by, use _L1 string literal. Use multi-arg L1::arg() instead of
+.arg().arg().
+
+Pick-to: 6.8 6.5
+Task-number: QTBUG-115841
+Change-Id: I41ea7cd1b2f8d0facad827b79ffbf9f22e4453f6
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit f9d9417483ae7fa55ba083aff34cbe51fbc868dc)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../qxmlstream/tst_qxmlstream.cpp             | 20 +++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/tests/auto/corelib/serialization/qxmlstream/tst_qxmlstream.cpp b/tests/auto/corelib/serialization/qxmlstream/tst_qxmlstream.cpp
+index 263050be991..a070d81b8ad 100644
+--- a/tests/auto/corelib/serialization/qxmlstream/tst_qxmlstream.cpp
++++ b/tests/auto/corelib/serialization/qxmlstream/tst_qxmlstream.cpp
+@@ -236,7 +236,7 @@ public:
+      * The first string is the test ID, the second is
+      * a description of what went wrong.
+      */
+-    typedef QPair<QString, QString> GeneralFailure;
++    using GeneralFailure = std::pair<QString, QString>;
+ 
+     /**
+      * The string is the test ID.
+@@ -377,7 +377,7 @@ public:
+             QFile inputFile(inputFilePath);
+             if(!inputFile.open(QIODevice::ReadOnly))
+             {
+-                failures.append(qMakePair(id, QLatin1String("Failed to open input file ") + inputFilePath));
++                failures.append({id, "Failed to open input file "_L1 + inputFilePath});
+                 return true;
+             }
+ 
+@@ -385,8 +385,8 @@ public:
+             {
+                 if(isWellformed(&inputFile, ParseSinglePass))
+                 {
+-                     failures.append(qMakePair(id, QLatin1String("Failed to flag ") + inputFilePath
+-                                                   + QLatin1String(" as not well-formed.")));
++                    failures.append({id,
++                                    "Failed to flag %1 as not well-formed."_L1.arg(inputFilePath)});
+ 
+                      /* Exit, the incremental test will fail as well, no need to flood the output. */
+                      return true;
+@@ -396,8 +396,8 @@ public:
+ 
+                 if(isWellformed(&inputFile, ParseIncrementally))
+                 {
+-                     failures.append(qMakePair(id, QLatin1String("Failed to flag ") + inputFilePath
+-                                                   + QLatin1String(" as not well-formed with incremental parsing.")));
++                     failures.append({id, "Failed to flag %1 as not well-formed with incremental "
++                                          "parsing."_L1.arg(inputFilePath)});
+                 }
+                 else
+                     successes.append(id);
+@@ -420,7 +420,7 @@ public:
+ 
+                     if(!expectedFile.open(QIODevice::ReadOnly))
+                     {
+-                        failures.append(qMakePair(id, QLatin1String("Failed to open baseline ") + expectedFilePath));
++                        failures.append({id, "Failed to open baseline "_L1 + expectedFilePath});
+                         return true;
+                     }
+ 
+@@ -439,9 +439,9 @@ public:
+                     input = makeCanonical(inputFilePath, docType, hasError, (incremental = true));
+ 
+                 if(hasError)
+-                    failures.append(qMakePair(id, QString::fromLatin1("Failed to parse %1%2")
+-                                              .arg(incremental?"(incremental run only) ":"")
+-                                              .arg(inputFilePath)));
++                    failures.append({id, "Failed to parse %1%2"_L1
++                                         .arg(incremental ? "(incremental run only) " : "",
++                                              inputFilePath)});
+ 
+                 if(!expectedFilePath.isEmpty() && input != expected)
+                 {
+-- 
+2.51.2
+

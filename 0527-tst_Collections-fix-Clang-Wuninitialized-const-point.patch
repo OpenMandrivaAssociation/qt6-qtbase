@@ -1,0 +1,50 @@
+From dac574c69339542ddeb2c1ff200faa23383a0a8b Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Tue, 28 Oct 2025 16:11:13 +0100
+Subject: [PATCH 527/553] tst_Collections: fix Clang
+ -Wuninitialized-const-pointer
+
+Says Clang:
+  tst_collections.cpp:661:22: warning: variable 'i' is uninitialized when passed as a const pointer argument here [-Wuninitialized-const-pointer]
+    661 |         list.append(&i);
+        |                      ^
+
+Fix by initializing the variables. The test does not depend on the
+`i`s to be uninitialized, so this will change nothing, except execute
+a bit slower and throw no warning.
+
+Amends the start of the public history.
+
+Pick-to: 6.8 6.5
+Change-Id: I8e8b36be484eefc6a18cf9b2d9a0c504b324aef8
+Reviewed-by: Ahmad Samir <a.samirh78@gmail.com>
+(cherry picked from commit 56c6a74c21ac7e263e028be1a199f95116015683)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ tests/auto/corelib/tools/collections/tst_collections.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/auto/corelib/tools/collections/tst_collections.cpp b/tests/auto/corelib/tools/collections/tst_collections.cpp
+index 463f600e36d..cbe04ae39f7 100644
+--- a/tests/auto/corelib/tools/collections/tst_collections.cpp
++++ b/tests/auto/corelib/tools/collections/tst_collections.cpp
+@@ -650,14 +650,14 @@ QT_WARNING_POP
+     {
+         QList<int *> list;
+         QVERIFY(list.value(0) == 0);
+-        int i;
++        int i = 42;
+         list.append(&i);
+         QVERIFY(list.value(0) == &i);
+     }
+     {
+         QList<const int *> list;
+         QVERIFY(list.value(0) == 0);
+-        int i;
++        int i = 42;
+         list.append(&i);
+         QVERIFY(list.value(0) == &i);
+     }
+-- 
+2.51.2
+

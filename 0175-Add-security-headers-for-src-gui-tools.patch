@@ -1,0 +1,422 @@
+From 7c30b744ffddaa2a238f00d8814b0e85e594ec46 Mon Sep 17 00:00:00 2001
+From: Paul Olav Tvete <paul.tvete@qt.io>
+Date: Mon, 15 Sep 2025 13:38:08 +0200
+Subject: [PATCH 175/553] Add security headers for src/gui/tools/
+
+As defined in QUIP 23, security critical files should be marked with
+Qt-Security score:critical. This change also marks all non-critical
+files as significant (the default) to make it clear that all files
+have been considered.
+
+Fixes: QTBUG-134618
+Pick-to: 6.9 6.8
+Change-Id: Iecdc4ffd745116a9a8674acfd5d36b5948dcbaa3
+Reviewed-by: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
+(cherry picked from commit 64fe7d29760487b6f8b0510c20da3da065ed66bd)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/gui/util/qabstractlayoutstyleinfo.cpp         | 1 +
+ src/gui/util/qabstractlayoutstyleinfo_p.h         | 1 +
+ src/gui/util/qastchandler_p.h                     | 1 +
+ src/gui/util/qdesktopservices.cpp                 | 1 +
+ src/gui/util/qdesktopservices.h                   | 1 +
+ src/gui/util/qedidparser.cpp                      | 1 +
+ src/gui/util/qedidparser_p.h                      | 1 +
+ src/gui/util/qedidvendortable_p.h                 | 1 +
+ src/gui/util/qgraphicsframecapture.cpp            | 1 +
+ src/gui/util/qgraphicsframecapture_p.h            | 1 +
+ src/gui/util/qgraphicsframecapture_p_p.h          | 1 +
+ src/gui/util/qgraphicsframecapturemetal.mm        | 1 +
+ src/gui/util/qgraphicsframecapturemetal_p_p.h     | 1 +
+ src/gui/util/qgraphicsframecapturerenderdoc.cpp   | 1 +
+ src/gui/util/qgraphicsframecapturerenderdoc_p_p.h | 1 +
+ src/gui/util/qgridlayoutengine.cpp                | 1 +
+ src/gui/util/qgridlayoutengine_p.h                | 1 +
+ src/gui/util/qhexstring_p.h                       | 1 +
+ src/gui/util/qktxhandler_p.h                      | 1 +
+ src/gui/util/qlayoutpolicy.cpp                    | 1 +
+ src/gui/util/qlayoutpolicy_p.h                    | 1 +
+ src/gui/util/qpkmhandler_p.h                      | 1 +
+ src/gui/util/qtexturefiledata_p.h                 | 1 +
+ src/gui/util/qtexturefilehandler_p.h              | 1 +
+ src/gui/util/qtexturefilereader.cpp               | 1 +
+ src/gui/util/qtexturefilereader_p.h               | 1 +
+ src/gui/util/qundogroup.cpp                       | 1 +
+ src/gui/util/qundogroup.h                         | 1 +
+ src/gui/util/qundostack.cpp                       | 1 +
+ src/gui/util/qundostack.h                         | 1 +
+ src/gui/util/qundostack_p.h                       | 1 +
+ src/gui/util/qvalidator.cpp                       | 1 +
+ src/gui/util/qvalidator.h                         | 1 +
+ 33 files changed, 33 insertions(+)
+
+diff --git a/src/gui/util/qabstractlayoutstyleinfo.cpp b/src/gui/util/qabstractlayoutstyleinfo.cpp
+index 51d569f8140..1fe8702239a 100644
+--- a/src/gui/util/qabstractlayoutstyleinfo.cpp
++++ b/src/gui/util/qabstractlayoutstyleinfo.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qabstractlayoutstyleinfo_p.h"
+ 
+diff --git a/src/gui/util/qabstractlayoutstyleinfo_p.h b/src/gui/util/qabstractlayoutstyleinfo_p.h
+index 42578c58ca6..e625c311ec9 100644
+--- a/src/gui/util/qabstractlayoutstyleinfo_p.h
++++ b/src/gui/util/qabstractlayoutstyleinfo_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QABSTRACTLAYOUTSTYLEINFO_P_H
+ #define QABSTRACTLAYOUTSTYLEINFO_P_H
+diff --git a/src/gui/util/qastchandler_p.h b/src/gui/util/qastchandler_p.h
+index 5dd7f7a5248..4080110046b 100644
+--- a/src/gui/util/qastchandler_p.h
++++ b/src/gui/util/qastchandler_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2019 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QASTCHANDLER_H
+ #define QASTCHANDLER_H
+diff --git a/src/gui/util/qdesktopservices.cpp b/src/gui/util/qdesktopservices.cpp
+index 6f0e42ed57e..03e034bb25f 100644
+--- a/src/gui/util/qdesktopservices.cpp
++++ b/src/gui/util/qdesktopservices.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qdesktopservices.h"
+ 
+diff --git a/src/gui/util/qdesktopservices.h b/src/gui/util/qdesktopservices.h
+index 476b84691e6..5dbdbcf25ab 100644
+--- a/src/gui/util/qdesktopservices.h
++++ b/src/gui/util/qdesktopservices.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QDESKTOPSERVICES_H
+ #define QDESKTOPSERVICES_H
+diff --git a/src/gui/util/qedidparser.cpp b/src/gui/util/qedidparser.cpp
+index 9feac3977d3..3989ceebdf3 100644
+--- a/src/gui/util/qedidparser.cpp
++++ b/src/gui/util/qedidparser.cpp
+@@ -1,6 +1,7 @@
+ // Copyright (C) 2017 Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
+ // Copyright (C) 2021 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com, author Giuseppe D'Angelo <giuseppe.dangelo@kdab.com>
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:critical reason:data-parser
+ 
+ #include <QtCore/QFile>
+ #include <QtCore/QByteArrayView>
+diff --git a/src/gui/util/qedidparser_p.h b/src/gui/util/qedidparser_p.h
+index 99352b03b05..fa5b48c0537 100644
+--- a/src/gui/util/qedidparser_p.h
++++ b/src/gui/util/qedidparser_p.h
+@@ -1,6 +1,7 @@
+ // Copyright (C) 2017 Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
+ // Copyright (C) 2021 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com, author Giuseppe D'Angelo <giuseppe.dangelo@kdab.com>
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QEDIDPARSER_P_H
+ #define QEDIDPARSER_P_H
+diff --git a/src/gui/util/qedidvendortable_p.h b/src/gui/util/qedidvendortable_p.h
+index f8317c6500d..caf2552baed 100644
+--- a/src/gui/util/qedidvendortable_p.h
++++ b/src/gui/util/qedidvendortable_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2017 Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ /*
+  * This lookup table was generated from https://github.com/vcrhonek/hwdata/raw/master/pnp.ids
+diff --git a/src/gui/util/qgraphicsframecapture.cpp b/src/gui/util/qgraphicsframecapture.cpp
+index e49fb83008a..30ea28ce219 100644
+--- a/src/gui/util/qgraphicsframecapture.cpp
++++ b/src/gui/util/qgraphicsframecapture.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2023 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qgraphicsframecapture_p.h"
+ #if (defined (Q_OS_WIN) || defined(Q_OS_LINUX)) && QT_CONFIG(library)
+diff --git a/src/gui/util/qgraphicsframecapture_p.h b/src/gui/util/qgraphicsframecapture_p.h
+index fef37d2869f..96c68e6b6ad 100644
+--- a/src/gui/util/qgraphicsframecapture_p.h
++++ b/src/gui/util/qgraphicsframecapture_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2023 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QGRAPHICSFRAMECAPTURE_P_H
+ #define QGRAPHICSFRAMECAPTURE_P_H
+diff --git a/src/gui/util/qgraphicsframecapture_p_p.h b/src/gui/util/qgraphicsframecapture_p_p.h
+index f8dbd2ca1dd..6206a0f65e2 100644
+--- a/src/gui/util/qgraphicsframecapture_p_p.h
++++ b/src/gui/util/qgraphicsframecapture_p_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2023 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QGRAPHICSFRAMECAPTURE_P_P_H
+ #define QGRAPHICSFRAMECAPTURE_P_P_H
+diff --git a/src/gui/util/qgraphicsframecapturemetal.mm b/src/gui/util/qgraphicsframecapturemetal.mm
+index fcf71dd7f6f..259872e485a 100644
+--- a/src/gui/util/qgraphicsframecapturemetal.mm
++++ b/src/gui/util/qgraphicsframecapturemetal.mm
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2023 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qgraphicsframecapturemetal_p_p.h"
+ #include <QtCore/qurl.h>
+diff --git a/src/gui/util/qgraphicsframecapturemetal_p_p.h b/src/gui/util/qgraphicsframecapturemetal_p_p.h
+index 2f3c3517d68..f2ff5bda472 100644
+--- a/src/gui/util/qgraphicsframecapturemetal_p_p.h
++++ b/src/gui/util/qgraphicsframecapturemetal_p_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2023 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QGRAPHICSFRAMEDECAPTUREMETAL_P_P_H
+ #define QGRAPHICSFRAMEDECAPTUREMETAL_P_P_H
+diff --git a/src/gui/util/qgraphicsframecapturerenderdoc.cpp b/src/gui/util/qgraphicsframecapturerenderdoc.cpp
+index 88ba9d839fb..7a4272f587d 100644
+--- a/src/gui/util/qgraphicsframecapturerenderdoc.cpp
++++ b/src/gui/util/qgraphicsframecapturerenderdoc.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2023 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qgraphicsframecapturerenderdoc_p_p.h"
+ #include <QtCore/qcoreapplication.h>
+diff --git a/src/gui/util/qgraphicsframecapturerenderdoc_p_p.h b/src/gui/util/qgraphicsframecapturerenderdoc_p_p.h
+index c0d92ea733d..c9c1061ce6e 100644
+--- a/src/gui/util/qgraphicsframecapturerenderdoc_p_p.h
++++ b/src/gui/util/qgraphicsframecapturerenderdoc_p_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2023 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QGRAPHICSFRAMECAPTURERENDERDOC_P_P_H
+ #define QGRAPHICSFRAMECAPTURERENDERDOC_P_P_H
+diff --git a/src/gui/util/qgridlayoutengine.cpp b/src/gui/util/qgridlayoutengine.cpp
+index e8a6b56ae20..fa878527282 100644
+--- a/src/gui/util/qgridlayoutengine.cpp
++++ b/src/gui/util/qgridlayoutengine.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qglobal.h"
+ 
+diff --git a/src/gui/util/qgridlayoutengine_p.h b/src/gui/util/qgridlayoutengine_p.h
+index 159e4a5a25a..a7ad841d83d 100644
+--- a/src/gui/util/qgridlayoutengine_p.h
++++ b/src/gui/util/qgridlayoutengine_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QGRIDLAYOUTENGINE_P_H
+ #define QGRIDLAYOUTENGINE_P_H
+diff --git a/src/gui/util/qhexstring_p.h b/src/gui/util/qhexstring_p.h
+index 2b42e6c43ea..e857475fc1a 100644
+--- a/src/gui/util/qhexstring_p.h
++++ b/src/gui/util/qhexstring_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QtGui/private/qtguiglobal_p.h>
+ #include <QtCore/qpoint.h>
+diff --git a/src/gui/util/qktxhandler_p.h b/src/gui/util/qktxhandler_p.h
+index 3a0b8fcf7e7..7e31321d269 100644
+--- a/src/gui/util/qktxhandler_p.h
++++ b/src/gui/util/qktxhandler_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2017 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QKTXHANDLER_H
+ #define QKTXHANDLER_H
+diff --git a/src/gui/util/qlayoutpolicy.cpp b/src/gui/util/qlayoutpolicy.cpp
+index 3e6cb27c1b7..4d81a426835 100644
+--- a/src/gui/util/qlayoutpolicy.cpp
++++ b/src/gui/util/qlayoutpolicy.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:trivial-parsing-only
+ 
+ #include "qlayoutpolicy_p.h"
+ #include <QtCore/qdebug.h>
+diff --git a/src/gui/util/qlayoutpolicy_p.h b/src/gui/util/qlayoutpolicy_p.h
+index bbdabd0c7b0..e19127fd7fa 100644
+--- a/src/gui/util/qlayoutpolicy_p.h
++++ b/src/gui/util/qlayoutpolicy_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QLAYOUTPOLICY_H
+ #define QLAYOUTPOLICY_H
+diff --git a/src/gui/util/qpkmhandler_p.h b/src/gui/util/qpkmhandler_p.h
+index a773b44fb2f..c843e9b41d9 100644
+--- a/src/gui/util/qpkmhandler_p.h
++++ b/src/gui/util/qpkmhandler_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2017 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QPKMHANDLER_H
+ #define QPKMHANDLER_H
+diff --git a/src/gui/util/qtexturefiledata_p.h b/src/gui/util/qtexturefiledata_p.h
+index e4e94653ff0..e799157783e 100644
+--- a/src/gui/util/qtexturefiledata_p.h
++++ b/src/gui/util/qtexturefiledata_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2021 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QTEXTUREFILEDATA_P_H
+ #define QTEXTUREFILEDATA_P_H
+diff --git a/src/gui/util/qtexturefilehandler_p.h b/src/gui/util/qtexturefilehandler_p.h
+index 9fb3130f0bb..2dab81669f7 100644
+--- a/src/gui/util/qtexturefilehandler_p.h
++++ b/src/gui/util/qtexturefilehandler_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2017 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QTEXTUREFILEHANDLER_P_H
+ #define QTEXTUREFILEHANDLER_P_H
+diff --git a/src/gui/util/qtexturefilereader.cpp b/src/gui/util/qtexturefilereader.cpp
+index 596c30d2f72..d06458917ad 100644
+--- a/src/gui/util/qtexturefilereader.cpp
++++ b/src/gui/util/qtexturefilereader.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:no-parsing
+ 
+ #include "qtexturefilereader_p.h"
+ 
+diff --git a/src/gui/util/qtexturefilereader_p.h b/src/gui/util/qtexturefilereader_p.h
+index 5f7b31ee323..2e051065597 100644
+--- a/src/gui/util/qtexturefilereader_p.h
++++ b/src/gui/util/qtexturefilereader_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2018 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QTEXTUREFILEREADER_H
+ #define QTEXTUREFILEREADER_H
+diff --git a/src/gui/util/qundogroup.cpp b/src/gui/util/qundogroup.cpp
+index db5d009ca6d..85c9251dd01 100644
+--- a/src/gui/util/qundogroup.cpp
++++ b/src/gui/util/qundogroup.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include "qundogroup.h"
+ #include "qundostack.h"
+diff --git a/src/gui/util/qundogroup.h b/src/gui/util/qundogroup.h
+index e92f4f46b0e..7097080ad24 100644
+--- a/src/gui/util/qundogroup.h
++++ b/src/gui/util/qundogroup.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QUNDOGROUP_H
+ #define QUNDOGROUP_H
+diff --git a/src/gui/util/qundostack.cpp b/src/gui/util/qundostack.cpp
+index 403833d421a..fdd5b07a8d4 100644
+--- a/src/gui/util/qundostack.cpp
++++ b/src/gui/util/qundostack.cpp
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #include <QtCore/qdebug.h>
+ #include "qundostack.h"
+diff --git a/src/gui/util/qundostack.h b/src/gui/util/qundostack.h
+index 7b184855094..0a995cbd89e 100644
+--- a/src/gui/util/qundostack.h
++++ b/src/gui/util/qundostack.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QUNDOSTACK_H
+ #define QUNDOSTACK_H
+diff --git a/src/gui/util/qundostack_p.h b/src/gui/util/qundostack_p.h
+index d655d5fdf56..d418fa48268 100644
+--- a/src/gui/util/qundostack_p.h
++++ b/src/gui/util/qundostack_p.h
+@@ -1,5 +1,6 @@
+ // Copyright (C) 2020 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QUNDOSTACK_P_H
+ #define QUNDOSTACK_P_H
+diff --git a/src/gui/util/qvalidator.cpp b/src/gui/util/qvalidator.cpp
+index 884b0ccfc6d..e27e10c2f90 100644
+--- a/src/gui/util/qvalidator.cpp
++++ b/src/gui/util/qvalidator.cpp
+@@ -1,6 +1,7 @@
+ // Copyright (C) 2021 The Qt Company Ltd.
+ // Copyright (C) 2012 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com, author Giuseppe D'Angelo <giuseppe.dangelo@kdab.com>
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:critical reason:data-parser
+ 
+ #include <qdebug.h>
+ 
+diff --git a/src/gui/util/qvalidator.h b/src/gui/util/qvalidator.h
+index cd757c612dd..b899806eee5 100644
+--- a/src/gui/util/qvalidator.h
++++ b/src/gui/util/qvalidator.h
+@@ -1,6 +1,7 @@
+ // Copyright (C) 2016 The Qt Company Ltd.
+ // Copyright (C) 2012 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com, author Giuseppe D'Angelo <giuseppe.dangelo@kdab.com>
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
++// Qt-Security score:significant reason:default
+ 
+ #ifndef QVALIDATOR_H
+ #define QVALIDATOR_H
+-- 
+2.51.2
+

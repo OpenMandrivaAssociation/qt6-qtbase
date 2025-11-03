@@ -1,0 +1,35 @@
+From 372ea93f593144296a562397fe4c784c5a4a84e1 Mon Sep 17 00:00:00 2001
+From: Jie Liu <liujie01@kylinos.cn>
+Date: Thu, 29 May 2025 19:26:20 +0800
+Subject: [PATCH 265/553] initialize 'ch' to avoid uninitialized variable
+ warning
+
+Amends commit 2edd9286cf386675be76032424248e60216f6331.
+
+Pick-to: 6.8
+Task-number: QTBUG-130278
+Change-Id: Ia351822ebee14884ef9727b8ed4b580131281c21
+Reviewed-by: Edward Welbourne <edward.welbourne@qt.io>
+Reviewed-by: Liang Qi <liang.qi@qt.io>
+(cherry picked from commit 5a4a3b3f3a97c31633953f8913a2d87fe619e869)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/time/qtimezoneprivate.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/corelib/time/qtimezoneprivate.cpp b/src/corelib/time/qtimezoneprivate.cpp
+index ffafb3a95f5..fa45d05766b 100644
+--- a/src/corelib/time/qtimezoneprivate.cpp
++++ b/src/corelib/time/qtimezoneprivate.cpp
+@@ -838,7 +838,7 @@ findUtcOffsetPrefix(QStringView text, const QLocale &locale)
+     QStringIterator iter(offset);
+     qsizetype hourEnd = 0, hmMid = 0, minEnd = 0;
+     int digits = 0;
+-    char32_t ch;
++    char32_t ch = 0;
+     while (iter.hasNext()) {
+         ch = iter.next();
+         if (!QChar::isDigit(ch))
+-- 
+2.51.2
+

@@ -1,0 +1,73 @@
+From 5376f425e9f11bf76794b4ed91c534a937090136 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tor=20Arne=20Vestb=C3=B8?= <tor.arne.vestbo@qt.io>
+Date: Mon, 6 Oct 2025 12:53:30 +0200
+Subject: [PATCH 305/553] macOS: Apply icon tint color without intermediate
+ drawing step
+
+As part of 9f392c09a1d30e48494b4df0e2f5f531c7e4ec4b we moved from
+requesting hierarchical icons to automatic rendering mode, as the
+hierarchical mode with a single tint color produced a different look
+than the default look of the system, which was primarily monochrome.
+We did so by drawing the image in an intermediate step with the tint.
+
+But there is a better way. If we first create a symbol configuration
+with a single palette color, which produces a configuration with palette
+rendering mode (which we don't want, as that also has a different look),
+and then apply a configuration with an explicit request for monochrome
+icons, we get the tint with the exact same look as the system.
+
+This keeps the NSImage as a symbol image internally for as long as
+possible, instead of flattening it down to a pixmap during configure.
+
+Pick-to: 6.8
+Change-Id: Ifad9b452b54cb6862396eb0fa6df9f447397a405
+Reviewed-by: Volker Hilsheimer <volker.hilsheimer@qt.io>
+(cherry picked from commit 7c996f4d66e7c2fac0bcb6d8508e49c12464e463)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/gui/platform/darwin/qappleiconengine.mm | 29 +++++++++------------
+ 1 file changed, 13 insertions(+), 16 deletions(-)
+
+diff --git a/src/gui/platform/darwin/qappleiconengine.mm b/src/gui/platform/darwin/qappleiconengine.mm
+index 7745cfb6ce5..786fc38ea55 100644
+--- a/src/gui/platform/darwin/qappleiconengine.mm
++++ b/src/gui/platform/darwin/qappleiconengine.mm
+@@ -364,22 +364,19 @@ auto *configuredImage(const NSImage *image, const QColor &color)
+                                                weight:NSFontWeightRegular
+                                                scale:NSImageSymbolScaleLarge];
+ 
+-    NSImage *configuredImage = [image imageWithSymbolConfiguration:config];
+-
+-    auto *primaryColor = [NSColor colorWithSRGBRed:color.redF()
+-                                             green:color.greenF()
+-                                              blue:color.blueF()
+-                                             alpha:color.alphaF()];
+-
+-    NSImage *tintedImage = [NSImage imageWithSize:configuredImage.size flipped:NO
+-        drawingHandler:^BOOL(NSRect) {
+-            [primaryColor set];
+-            NSRect imageRect = {NSZeroPoint, configuredImage.size};
+-            [configuredImage drawInRect:imageRect];
+-            NSRectFillUsingOperation(imageRect, NSCompositingOperationSourceIn);
+-            return YES;
+-        }];
+-    return tintedImage;
++    // Apply tint color first, which switches the configuration to palette mode
++    config = [config configurationByApplyingConfiguration:
++        [NSImageSymbolConfiguration configurationWithPaletteColors:@[
++            [NSColor colorWithSRGBRed:color.redF() green:color.greenF()
++                blue:color.blueF() alpha:color.alphaF()]
++        ]]];
++
++    // Then switch back to monochrome, as palette mode gives a different look
++    // than monochrome, even with a single color.
++    config = [config configurationByApplyingConfiguration:
++        [NSImageSymbolConfiguration configurationPreferringMonochrome]];
++
++    return [image imageWithSymbolConfiguration:config];
+ }
+ #elif defined(QT_PLATFORM_UIKIT)
+ auto *configuredImage(const UIImage *image, const QColor &color)
+-- 
+2.51.2
+

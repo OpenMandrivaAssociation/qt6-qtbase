@@ -1,0 +1,56 @@
+From 85ac313e2423c4d4aaccde03ba9e996adb32ec3f Mon Sep 17 00:00:00 2001
+From: Christian Ehrlicher <ch.ehrlicher@gmx.de>
+Date: Sun, 28 Sep 2025 17:29:11 +0200
+Subject: [PATCH 548/553] Windows11Style: draw indicator for current selected
+ item in treeview
+
+The selected item in a treeview is highlighted with a small blue
+vertical line (as it's already done for QListView) according the style.
+
+Pick-to: 6.9
+Task-number: QTBUG-140494
+Change-Id: I3e16086966e2118d091e1992953c400293cfcf54
+Reviewed-by: Wladimir Leuschner <wladimir.leuschner@qt.io>
+Reviewed-by: Volker Hilsheimer <volker.hilsheimer@qt.io>
+(cherry picked from commit 0982fc73c49cc21bb9e6925312116060b1bd0b39)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../styles/modernwindows/qwindows11style.cpp      | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/src/plugins/styles/modernwindows/qwindows11style.cpp b/src/plugins/styles/modernwindows/qwindows11style.cpp
+index bb5fa07044b..59398c841cc 100644
+--- a/src/plugins/styles/modernwindows/qwindows11style.cpp
++++ b/src/plugins/styles/modernwindows/qwindows11style.cpp
+@@ -1046,6 +1046,18 @@ void QWindows11Style::drawPrimitive(PrimitiveElement element, const QStyleOption
+                 painter->setBrush(vopt->palette.base());
+             painter->drawRect(rect);
+ 
++            if (option->state & State_Selected && !highContrastTheme) {
++                // keep in sync with CE_ItemViewItem QListView indicator painting
++                const auto col = option->palette.accent().color();
++                painter->setBrush(col);
++                painter->setPen(col);
++                const auto xPos = isRtl ? rect.right() - 4.5f : rect.left() + 3.5f;
++                const auto yOfs = rect.height() / 4.;
++                QRectF r(QPointF(xPos, rect.y() + yOfs),
++                         QPointF(xPos + 1, rect.y() + rect.height() - yOfs));
++                painter->drawRoundedRect(r, 1, 1);
++            }
++
+             const bool isTreeDecoration = vopt->features.testFlag(
+                     QStyleOptionViewItem::IsDecorationForRootColumn);
+             if (isTreeDecoration && vopt->state.testAnyFlags(State_Selected | State_MouseOver) &&
+@@ -2284,6 +2296,9 @@ int QWindows11Style::pixelMetric(PixelMetric metric, const QStyleOption *option,
+     case PM_ButtonShiftVertical:
+         res = 0;
+         break;
++    case PM_TreeViewIndentation:
++        res = 30;
++        break;
+     default:
+         res = QWindowsVistaStyle::pixelMetric(metric, option, widget);
+     }
+-- 
+2.51.2
+

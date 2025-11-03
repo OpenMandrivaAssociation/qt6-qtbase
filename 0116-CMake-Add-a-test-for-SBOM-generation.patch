@@ -1,0 +1,402 @@
+From 8219d1a777dab408b4c778625816fa3cff020407 Mon Sep 17 00:00:00 2001
+From: Alexandru Croitor <alexandru.croitor@qt.io>
+Date: Thu, 14 Aug 2025 16:54:56 +0200
+Subject: [PATCH 116/553] CMake: Add a test for SBOM generation
+
+Add a RunCMake test that exercises some of the basic SBOM API
+as it would be used in a user project.
+
+The 'minimal' case specifies the minimum arguments required to create
+an SBOM project, whereas the 'full' case specifies as many options as
+possible to _qt_internal_sbom_begin_project().
+
+Add various target types and custom files.
+
+Pick-to: 6.9 6.8
+Change-Id: Idcf9a3c7a06ae7a632bce256f009f9c7e217ed30
+Reviewed-by: Joerg Bornemann <joerg.bornemann@qt.io>
+(cherry picked from commit 8f46da87b0c32cb200900f6a648bc673cbeaae43)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ coin/instructions/prepare_building_env.yaml   |  2 +
+ tests/auto/cmake/RunCMake/CMakeLists.txt      |  8 +++
+ tests/auto/cmake/RunCMake/Sbom/CMakeLists.txt |  3 +
+ .../cmake/RunCMake/Sbom/RunCMakeTest.cmake    | 49 +++++++++++++++
+ .../cmake/RunCMake/Sbom/common_targets.cmake  | 61 +++++++++++++++++++
+ .../RunCMake/Sbom/custom_files/CMakeLists.txt | 50 +++++++++++++++
+ .../Sbom/custom_files/sources/custom1.txt     |  1 +
+ .../custom_files/sources/custom1_source.txt   |  1 +
+ .../Sbom/custom_files/sources/res1.txt        |  1 +
+ .../Sbom/custom_files/sources/res1_source.txt |  1 +
+ tests/auto/cmake/RunCMake/Sbom/full.cmake     | 24 ++++++++
+ tests/auto/cmake/RunCMake/Sbom/minimal.cmake  | 17 ++++++
+ .../RunCMake/Sbom/sources/core_helper.cpp     |  4 ++
+ .../RunCMake/Sbom/sources/gui_helper.cpp      |  9 +++
+ .../auto/cmake/RunCMake/Sbom/sources/main.cpp |  9 +++
+ .../RunCMake/Sbom/sources/utils_helper.cpp    |  4 ++
+ 16 files changed, 244 insertions(+)
+ create mode 100644 tests/auto/cmake/RunCMake/Sbom/CMakeLists.txt
+ create mode 100644 tests/auto/cmake/RunCMake/Sbom/RunCMakeTest.cmake
+ create mode 100644 tests/auto/cmake/RunCMake/Sbom/common_targets.cmake
+ create mode 100644 tests/auto/cmake/RunCMake/Sbom/custom_files/CMakeLists.txt
+ create mode 100644 tests/auto/cmake/RunCMake/Sbom/custom_files/sources/custom1.txt
+ create mode 100644 tests/auto/cmake/RunCMake/Sbom/custom_files/sources/custom1_source.txt
+ create mode 100644 tests/auto/cmake/RunCMake/Sbom/custom_files/sources/res1.txt
+ create mode 100644 tests/auto/cmake/RunCMake/Sbom/custom_files/sources/res1_source.txt
+ create mode 100644 tests/auto/cmake/RunCMake/Sbom/full.cmake
+ create mode 100644 tests/auto/cmake/RunCMake/Sbom/minimal.cmake
+ create mode 100644 tests/auto/cmake/RunCMake/Sbom/sources/core_helper.cpp
+ create mode 100644 tests/auto/cmake/RunCMake/Sbom/sources/gui_helper.cpp
+ create mode 100644 tests/auto/cmake/RunCMake/Sbom/sources/main.cpp
+ create mode 100644 tests/auto/cmake/RunCMake/Sbom/sources/utils_helper.cpp
+
+diff --git a/coin/instructions/prepare_building_env.yaml b/coin/instructions/prepare_building_env.yaml
+index 5a23f794f92..88f7dba7999 100644
+--- a/coin/instructions/prepare_building_env.yaml
++++ b/coin/instructions/prepare_building_env.yaml
+@@ -540,6 +540,8 @@ instructions:
+ 
+   # Always pass the location of the python intrepreter meant to be used for SBOM generation,
+   # because the Qt default has changed to always generate an SBOM.
++  # Don't forget to adjust tests/auto/cmake/RunCMake/Sbom/RunCMakeTest.cmake
++  # in case of changing / removing these args.
+   - type: EnvironmentVariable
+     variableName: SBOM_PYTHON_ARGS
+     variableValue: >-
+diff --git a/tests/auto/cmake/RunCMake/CMakeLists.txt b/tests/auto/cmake/RunCMake/CMakeLists.txt
+index 7c04526717a..aab1894c6b3 100644
+--- a/tests/auto/cmake/RunCMake/CMakeLists.txt
++++ b/tests/auto/cmake/RunCMake/CMakeLists.txt
+@@ -20,3 +20,11 @@ qt_internal_add_RunCMake_test(Qt6DirConfiguration ${extra_run_cmake_args})
+ if(APPLE AND TARGET Qt::Gui)
+     qt_internal_add_RunCMake_test(AppleFrameworkDeduplication)
+ endif()
++
++if(TARGET Qt6::Platform)
++    get_target_property(sbom_spdx_id Qt6::Platform _qt_sbom_spdx_id)
++    # If the id is present and non-empty, that means we built Qt with sbom support.
++    if(sbom_spdx_id)
++        qt_internal_add_RunCMake_test(Sbom ${extra_run_cmake_args})
++    endif()
++endif()
+diff --git a/tests/auto/cmake/RunCMake/Sbom/CMakeLists.txt b/tests/auto/cmake/RunCMake/Sbom/CMakeLists.txt
+new file mode 100644
+index 00000000000..d0ef37d817f
+--- /dev/null
++++ b/tests/auto/cmake/RunCMake/Sbom/CMakeLists.txt
+@@ -0,0 +1,3 @@
++cmake_minimum_required(VERSION 3.16)
++project(${RunCMake_TEST} LANGUAGES CXX)
++include(${RunCMake_TEST}.cmake)
+diff --git a/tests/auto/cmake/RunCMake/Sbom/RunCMakeTest.cmake b/tests/auto/cmake/RunCMake/Sbom/RunCMakeTest.cmake
+new file mode 100644
+index 00000000000..d6766edf3c1
+--- /dev/null
++++ b/tests/auto/cmake/RunCMake/Sbom/RunCMakeTest.cmake
+@@ -0,0 +1,49 @@
++include(QtRunCMake)
++
++function(run_cmake_and_build case)
++    # Set common build directory for configure and build
++    set(RunCMake_TEST_BINARY_DIR ${RunCMake_BINARY_DIR}/${case}-build)
++    set(options
++        "-DQt6_DIR=${Qt6_DIR}"
++        "-DCMAKE_INSTALL_PREFIX=${RunCMake_TEST_BINARY_DIR}/installed"
++    )
++
++    set(maybe_sbom_env_args "$ENV{SBOM_COMMON_ARGS}")
++
++    if(maybe_sbom_env_args MATCHES "QT_INTERNAL_SBOM_DEFAULT_CHECKS=ON")
++        list(APPEND options "-DQT_INTERNAL_SBOM_DEFAULT_CHECKS=ON")
++    endif()
++
++    if(maybe_sbom_env_args MATCHES "QT_INTERNAL_SBOM_AUDIT=ON")
++        list(APPEND options "-DQT_INTERNAL_SBOM_AUDIT=ON")
++    endif()
++
++    if(maybe_sbom_env_args MATCHES "QT_INTERNAL_SBOM_AUDIT_NO_ERROR=ON")
++        list(APPEND options "-DQT_INTERNAL_SBOM_AUDIT_NO_ERROR=ON")
++    endif()
++
++    # Need to pass the python interpreter paths, to avoid sbom2doc not found errors.
++    # This mirrors what coin/instructions/prepare_building_env.yaml does.
++    set(maybe_python3_path "$ENV{PYTHON3_PATH}")
++    if(maybe_python3_path)
++        list(APPEND options "-DQT_SBOM_PYTHON_INTERP=${maybe_python3_path}")
++    endif()
++
++    set(maybe_sbom_python_apps_path "$ENV{SBOM_PYTHON_APPS_PATH}")
++    if(maybe_sbom_python_apps_path)
++        list(APPEND options "-DQT_SBOM_PYTHON_APPS_PATH=${maybe_sbom_python_apps_path}")
++    endif()
++
++    run_cmake_with_options(${case} ${options})
++
++    # Do not remove the current RunCMake_TEST_BINARY_DIR
++    set(RunCMake_TEST_NO_CLEAN 1)
++    # Merge output, because some of the spdx tooling outputs to stderr even when everything is
++    # fine.
++    set(RunCMake_TEST_OUTPUT_MERGE 1)
++    run_cmake_command(${case}-build ${CMAKE_COMMAND} --build .)
++    run_cmake_command(${case}-install ${CMAKE_COMMAND} --install .)
++endfunction()
++
++run_cmake_and_build(minimal)
++run_cmake_and_build(full)
+diff --git a/tests/auto/cmake/RunCMake/Sbom/common_targets.cmake b/tests/auto/cmake/RunCMake/Sbom/common_targets.cmake
+new file mode 100644
+index 00000000000..0c6b35596c9
+--- /dev/null
++++ b/tests/auto/cmake/RunCMake/Sbom/common_targets.cmake
+@@ -0,0 +1,61 @@
++add_library(core_helper STATIC)
++target_sources(core_helper PRIVATE sources/core_helper.cpp)
++install(TARGETS core_helper
++    ARCHIVE DESTINATION lib
++)
++_qt_internal_add_sbom(core_helper
++    TYPE "LIBRARY"
++    RUNTIME_PATH bin
++    ARCHIVE_PATH lib
++    LIBRARY_PATH lib
++)
++
++add_library(utils_helper STATIC)
++target_sources(utils_helper PRIVATE sources/utils_helper.cpp)
++install(TARGETS utils_helper
++    ARCHIVE DESTINATION lib
++)
++_qt_internal_add_sbom(utils_helper
++    TYPE "LIBRARY"
++    RUNTIME_PATH bin
++    ARCHIVE_PATH lib
++    LIBRARY_PATH lib
++)
++
++add_library(gui_helper SHARED)
++target_sources(gui_helper PRIVATE sources/gui_helper.cpp)
++target_link_libraries(gui_helper PRIVATE core_helper Qt6::Core)
++install(TARGETS gui_helper
++    LIBRARY DESTINATION lib
++    RUNTIME DESTINATION bin
++)
++_qt_internal_add_sbom(gui_helper
++    TYPE "LIBRARY"
++    RUNTIME_PATH bin
++    ARCHIVE_PATH lib
++    LIBRARY_PATH lib
++)
++
++add_executable(app)
++target_sources(app PRIVATE sources/main.cpp)
++target_link_libraries(app PRIVATE gui_helper utils_helper)
++install(TARGETS app
++    BUNDLE DESTINATION bin
++)
++_qt_internal_add_sbom(app
++    TYPE "EXECUTABLE"
++    RUNTIME_PATH bin
++)
++
++find_package(ZLIB)
++if(ZLIB_FOUND)
++    _qt_internal_add_sbom(ZLIB::ZLIB
++        TYPE SYSTEM_LIBRARY
++    )
++    _qt_internal_extend_sbom_dependencies(app
++        SBOM_DEPENDENCIES ZLIB::ZLIB
++    )
++endif()
++
++add_subdirectory(custom_files)
++
+diff --git a/tests/auto/cmake/RunCMake/Sbom/custom_files/CMakeLists.txt b/tests/auto/cmake/RunCMake/Sbom/custom_files/CMakeLists.txt
+new file mode 100644
+index 00000000000..0cc91d511de
+--- /dev/null
++++ b/tests/auto/cmake/RunCMake/Sbom/custom_files/CMakeLists.txt
+@@ -0,0 +1,50 @@
++set(resource_files
++    sources/res1.txt
++)
++set(resources_source_files
++    sources/res1_source.txt
++)
++set(resource_install_path "resources")
++
++_qt_internal_add_sbom(ResourceFiles
++    TYPE RESOURCES
++)
++_qt_internal_sbom_add_files(ResourceFiles
++    FILES "${resource_files}"
++    SOURCE_FILES "${resource_source_files}"
++    FILE_TYPE "RESOURCE"
++    INSTALL_PATH "${resource_install_path}"
++    INSTALL_PATH_DEBUG "${resource_install_path}/debug"
++    INSTALL_PATH_RELEASE "${resource_install_path}/release"
++)
++
++install(FILES
++    ${resource_files}
++    DESTINATION "${resource_install_path}"
++)
++
++set(custom_files
++    sources/custom1.txt
++)
++set(custom_source_files
++    sources/custom1_source.txt
++)
++set(custom_install_path "custom")
++
++_qt_internal_add_sbom(CustomFiles
++    TYPE CUSTOM
++)
++
++_qt_internal_sbom_add_files(CustomFiles
++    FILES "${custom_files}"
++    SOURCE_FILES "${custom_source_files}"
++    FILE_TYPE "CUSTOM"
++    INSTALL_PATH "${custom_install_path}"
++    INSTALL_PATH_DEBUG "${custom_install_path}/debug"
++    INSTALL_PATH_RELEASE "${custom_install_path}/release"
++)
++
++install(FILES
++    ${custom_files}
++    DESTINATION "${custom_install_path}"
++)
+diff --git a/tests/auto/cmake/RunCMake/Sbom/custom_files/sources/custom1.txt b/tests/auto/cmake/RunCMake/Sbom/custom_files/sources/custom1.txt
+new file mode 100644
+index 00000000000..108946cd739
+--- /dev/null
++++ b/tests/auto/cmake/RunCMake/Sbom/custom_files/sources/custom1.txt
+@@ -0,0 +1 @@
++custom1
+diff --git a/tests/auto/cmake/RunCMake/Sbom/custom_files/sources/custom1_source.txt b/tests/auto/cmake/RunCMake/Sbom/custom_files/sources/custom1_source.txt
+new file mode 100644
+index 00000000000..565d304ba58
+--- /dev/null
++++ b/tests/auto/cmake/RunCMake/Sbom/custom_files/sources/custom1_source.txt
+@@ -0,0 +1 @@
++custom1_source
+diff --git a/tests/auto/cmake/RunCMake/Sbom/custom_files/sources/res1.txt b/tests/auto/cmake/RunCMake/Sbom/custom_files/sources/res1.txt
+new file mode 100644
+index 00000000000..6487c56ba69
+--- /dev/null
++++ b/tests/auto/cmake/RunCMake/Sbom/custom_files/sources/res1.txt
+@@ -0,0 +1 @@
++res1
+diff --git a/tests/auto/cmake/RunCMake/Sbom/custom_files/sources/res1_source.txt b/tests/auto/cmake/RunCMake/Sbom/custom_files/sources/res1_source.txt
+new file mode 100644
+index 00000000000..95fcc9074c2
+--- /dev/null
++++ b/tests/auto/cmake/RunCMake/Sbom/custom_files/sources/res1_source.txt
+@@ -0,0 +1 @@
++res1_source
+diff --git a/tests/auto/cmake/RunCMake/Sbom/full.cmake b/tests/auto/cmake/RunCMake/Sbom/full.cmake
+new file mode 100644
+index 00000000000..9cbbb4eb0d5
+--- /dev/null
++++ b/tests/auto/cmake/RunCMake/Sbom/full.cmake
+@@ -0,0 +1,24 @@
++# Needed to make the sbom functions available.
++find_package(Qt6 REQUIRED Core)
++
++_qt_internal_setup_sbom(
++    GENERATE_SBOM_DEFAULT "TRUE"
++)
++
++_qt_internal_sbom_begin_project(
++    SBOM_PROJECT_NAME "${PROJECT_NAME}Project"
++    SUPPLIER "QtProjectTest"
++    SUPPLIER_URL "https://qt-project.org/SbomTest"
++    LICENSE_EXPRESSION "LGPL-3.0-only"
++    COPYRIGHTS "2025 The Qt Company Ltd."
++    INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}"
++    INSTALL_SBOM_DIR "sbom"
++    DOWNLOAD_LOCATION "https://download.qt.io/sbom"
++    CPE "cpe:2.3:a:qt:qtprojecttest:1.0.0:*:*:*:*:*:*:*"
++    VERSION "1.0.0"
++)
++
++include(common_targets.cmake)
++
++_qt_internal_sbom_end_project()
++
+diff --git a/tests/auto/cmake/RunCMake/Sbom/minimal.cmake b/tests/auto/cmake/RunCMake/Sbom/minimal.cmake
+new file mode 100644
+index 00000000000..4422314b2d5
+--- /dev/null
++++ b/tests/auto/cmake/RunCMake/Sbom/minimal.cmake
+@@ -0,0 +1,17 @@
++# Needed to make the sbom functions available.
++find_package(Qt6 REQUIRED Core)
++
++_qt_internal_setup_sbom(
++    GENERATE_SBOM_DEFAULT "TRUE"
++)
++
++_qt_internal_sbom_begin_project(
++    SUPPLIER "QtProjectTest"
++    SUPPLIER_URL "https://qt-project.org/SbomTest"
++    VERSION "1.0.0"
++)
++
++include(common_targets.cmake)
++
++_qt_internal_sbom_end_project()
++
+diff --git a/tests/auto/cmake/RunCMake/Sbom/sources/core_helper.cpp b/tests/auto/cmake/RunCMake/Sbom/sources/core_helper.cpp
+new file mode 100644
+index 00000000000..6f273352ace
+--- /dev/null
++++ b/tests/auto/cmake/RunCMake/Sbom/sources/core_helper.cpp
+@@ -0,0 +1,4 @@
++// Copyright (C) 2025 The Qt Company Ltd.
++// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
++
++int core_helper_func() { return 0; };
+diff --git a/tests/auto/cmake/RunCMake/Sbom/sources/gui_helper.cpp b/tests/auto/cmake/RunCMake/Sbom/sources/gui_helper.cpp
+new file mode 100644
+index 00000000000..e8a7abf46c8
+--- /dev/null
++++ b/tests/auto/cmake/RunCMake/Sbom/sources/gui_helper.cpp
+@@ -0,0 +1,9 @@
++// Copyright (C) 2025 The Qt Company Ltd.
++// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
++
++#include <QtCore/QtGlobal>
++
++int core_helper_func();
++
++// Exported function needed to create .lib on Windows.
++Q_DECL_EXPORT int gui_helper_func() { return core_helper_func() + 1; }
+diff --git a/tests/auto/cmake/RunCMake/Sbom/sources/main.cpp b/tests/auto/cmake/RunCMake/Sbom/sources/main.cpp
+new file mode 100644
+index 00000000000..6a264ad5d01
+--- /dev/null
++++ b/tests/auto/cmake/RunCMake/Sbom/sources/main.cpp
+@@ -0,0 +1,9 @@
++// Copyright (C) 2025 The Qt Company Ltd.
++// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
++
++int gui_helper_func();
++int utils_helper_func();
++
++int main(int argc, char **argv) {
++    return utils_helper_func() + gui_helper_func();
++}
+diff --git a/tests/auto/cmake/RunCMake/Sbom/sources/utils_helper.cpp b/tests/auto/cmake/RunCMake/Sbom/sources/utils_helper.cpp
+new file mode 100644
+index 00000000000..0ed6bf3e081
+--- /dev/null
++++ b/tests/auto/cmake/RunCMake/Sbom/sources/utils_helper.cpp
+@@ -0,0 +1,4 @@
++// Copyright (C) 2025 The Qt Company Ltd.
++// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
++
++int utils_helper_func() { return 0; };
+-- 
+2.51.2
+

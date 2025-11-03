@@ -1,0 +1,54 @@
+From 57aa92fa00e366f8bd78608a372978580c2d809a Mon Sep 17 00:00:00 2001
+From: Igor Khanin <igor@khanin.biz>
+Date: Mon, 6 Oct 2025 17:36:13 +0300
+Subject: [PATCH 308/553] Wayland: handle delayed CSD creation following
+ decoration negotiation
+
+When window decoration negotiation takes place such that it results in
+the zxdg_toplevel_decoration_v1.configure event telling that the client
+should do CSDs coming slightly before or together with the first
+xdg_toplevel.configure event - the decorations are created during the
+handling of the latter. But that processing relies on geometry data
+from before creation of the decorations, which is stale.
+
+Handle this by moving the call to QWaylandWindow::windowContentGeometry
+to be after the call to handleWindowStatesChanged, since the latter can
+cause changes to the gemoetry of the window.
+
+Fixes: QTBUG-140847
+Change-Id: I5157f7d7f2fd4f45aaf7c8209cded565bd7cd21e
+Reviewed-by: Ilya Fedin <fedin-ilja2010@ya.ru>
+Reviewed-by: David Edmundson <davidedmundson@kde.org>
+(cherry picked from commit 8fdf90174797bf1a67ac2d91aedee7a18400489f)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/plugins/platforms/wayland/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp b/src/plugins/platforms/wayland/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp
+index 39bed549975..b1f453dfcda 100644
+--- a/src/plugins/platforms/wayland/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp
++++ b/src/plugins/platforms/wayland/plugins/shellintegration/xdg-shell/qwaylandxdgshell.cpp
+@@ -59,9 +59,6 @@ QWaylandXdgSurface::Toplevel::~Toplevel()
+ 
+ void QWaylandXdgSurface::Toplevel::applyConfigure()
+ {
+-    if (!(m_applied.states & (Qt::WindowMaximized|Qt::WindowFullScreen)))
+-        m_normalSize = m_xdgSurface->m_window->windowContentGeometry().size();
+-
+     if ((m_pending.states & Qt::WindowActive) && !(m_applied.states & Qt::WindowActive)
+         && !m_xdgSurface->m_window->display()->isKeyboardAvailable())
+         m_xdgSurface->m_window->display()->handleWindowActivated(m_xdgSurface->m_window);
+@@ -73,6 +70,9 @@ void QWaylandXdgSurface::Toplevel::applyConfigure()
+     m_xdgSurface->m_window->handleToplevelWindowTilingStatesChanged(m_toplevelStates);
+     m_xdgSurface->m_window->handleWindowStatesChanged(m_pending.states);
+ 
++    if (!(m_applied.states & (Qt::WindowMaximized|Qt::WindowFullScreen)))
++        m_normalSize = m_xdgSurface->m_window->windowContentGeometry().size();
++
+     // If the width or height is zero, the client should decide the size on its own.
+     QSize surfaceSize;
+ 
+-- 
+2.51.2
+

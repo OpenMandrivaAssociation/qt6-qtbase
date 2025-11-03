@@ -1,0 +1,175 @@
+From 1338a855ff2a3f03e43511b874afe757844b8fe9 Mon Sep 17 00:00:00 2001
+From: Alexei Cazacov <alexei.cazacov@qt.io>
+Date: Wed, 3 Sep 2025 15:50:47 +0300
+Subject: [PATCH 075/553] Doc: Document the specific headers for the Qt
+ Concurrent module
+
+This commit makes the Image Scaling example use the optimized header
+and updates documentation to include optimized header inclusion for
+QtConcurrent functions.
+
+Fixes: QTBUG-114663
+Pick-to: 6.9 6.8
+Change-Id: I50e4137ea3bc22bf88a3c9e4856043ba3d02f06e
+Reviewed-by: Ivan Solovev <ivan.solovev@qt.io>
+(cherry picked from commit eba48b0c21d467237aee347a5906b5b2623e777d)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../qtconcurrent/imagescaling/imagescaling.h  |  2 +-
+ src/concurrent/qtconcurrentfilter.cpp         | 14 ++++++
+ src/concurrent/qtconcurrentmap.cpp            | 46 +++++++++++++++++++
+ src/concurrent/qtconcurrentrun.cpp            | 12 +++++
+ src/concurrent/qtconcurrenttask.qdoc          | 12 +++++
+ 5 files changed, 85 insertions(+), 1 deletion(-)
+
+diff --git a/examples/qtconcurrent/imagescaling/imagescaling.h b/examples/qtconcurrent/imagescaling/imagescaling.h
+index bc25161a85e..09f62e39e4c 100644
+--- a/examples/qtconcurrent/imagescaling/imagescaling.h
++++ b/examples/qtconcurrent/imagescaling/imagescaling.h
+@@ -4,7 +4,7 @@
+ #define IMAGESCALING_H
+ 
+ #include <QtWidgets>
+-#include <QtConcurrent>
++#include <QtConcurrentRun>
+ #include <QNetworkAccessManager>
+ #include <optional>
+ 
+diff --git a/src/concurrent/qtconcurrentfilter.cpp b/src/concurrent/qtconcurrentfilter.cpp
+index 63342606798..bba439498d2 100644
+--- a/src/concurrent/qtconcurrentfilter.cpp
++++ b/src/concurrent/qtconcurrentfilter.cpp
+@@ -26,6 +26,20 @@
+     Note that the result types above are not QFuture objects, but real result
+     types (in this case, QStringList and QSet<QString>).
+ 
++    \section1 Optimize includes
++
++    If you include the \c <QtConcurrent> header, the entire Qt Concurrent
++    module with the entire Qt Core module will be included, which may increase
++    compilation times and binary sizes. To use the
++    \l {QtConcurrent::filter}{QtConcurrent::filter()},
++    \l {QtConcurrent::filtered}{QtConcurrent::filtered()}, and
++    \l {QtConcurrent::filteredReduced}{QtConcurrent::filteredReduced()}
++    functions, you can include a more specific header:
++
++    \code
++    #include <QtConcurrentFilter>
++    \endcode
++
+     \section1 Concurrent Filter
+ 
+     QtConcurrent::filtered() takes an input sequence and a filter function.
+diff --git a/src/concurrent/qtconcurrentmap.cpp b/src/concurrent/qtconcurrentmap.cpp
+index 4af0258240a..2cf45367546 100644
+--- a/src/concurrent/qtconcurrentmap.cpp
++++ b/src/concurrent/qtconcurrentmap.cpp
+@@ -13,6 +13,38 @@
+     See the \l {Qt Concurrent} module documentation for an overview of available
+     functions, or see below for detailed information on each function.
+ 
++    \section1 Optimize includes
++
++    If you include the \c <QtConcurrent> header, the entire Qt Concurrent
++    module with the entire Qt Core module will be included, which may increase
++    compilation times and binary sizes. To use individual functions from the
++    QtConcurrent namespace, you can include more specific headers.
++
++    The table below lists the functions in the QtConcurrent namespace and
++    their corresponding headers:
++
++    \table
++    \header
++        \li Function
++        \li Header
++    \row
++        \li \l {QtConcurrent::run}{QtConcurrent::run()}
++        \li \c <QtConcurrentRun>
++    \row
++        \li \l {QtConcurrent::task}{QtConcurrent::task()}
++        \li \c <QtConcurrentTask>
++    \row
++        \li \l {QtConcurrent::filter}{QtConcurrent::filter()},
++            \l {QtConcurrent::filtered}{QtConcurrent::filtered()},
++            \l {QtConcurrent::filteredReduced}{QtConcurrent::filteredReduced()}
++        \li \c <QtConcurrentFilter>
++    \row
++        \li \l {QtConcurrent::map}{QtConcurrent::map()},
++            \l {QtConcurrent::mapped}{QtConcurrent::mapped()},
++            \l {QtConcurrent::mappedReduced}{QtConcurrent::mappedReduced()}
++        \li \c <QtConcurrentMap>
++    \endtable
++
+     \inheaderfile QtConcurrent
+     \ingroup thread
+ */
+@@ -130,6 +162,20 @@
+     Note that the result types above are not QFuture objects, but real result
+     types (in this case, QList<QImage> and QImage).
+ 
++    \section1 Optimize includes
++
++    If you include the \c <QtConcurrent> header, the entire Qt Concurrent
++    module with the entire Qt Core module will be included, which may increase
++    compilation times and binary sizes. To use the
++    \l {QtConcurrent::map}{QtConcurrent::map()},
++    \l {QtConcurrent::mapped}{QtConcurrent::mapped()}, and
++    \l {QtConcurrent::mappedReduced}{QtConcurrent::mappedReduced()} functions,
++    you can include a more specific header:
++
++    \code
++    #include <QtConcurrentMap>
++    \endcode
++
+     \section1 Concurrent Map
+ 
+     QtConcurrent::mapped() takes an input sequence and a map function. This map
+diff --git a/src/concurrent/qtconcurrentrun.cpp b/src/concurrent/qtconcurrentrun.cpp
+index 513699cdc5d..4217fbf8185 100644
+--- a/src/concurrent/qtconcurrentrun.cpp
++++ b/src/concurrent/qtconcurrentrun.cpp
+@@ -23,6 +23,18 @@
+ 
+     This function is a part of the Qt Concurrent framework.
+ 
++    \section1 Optimize includes
++
++    If you include the \c <QtConcurrent> header, the entire Qt Concurrent
++    module with the entire Qt Core module will be included, which may increase
++    compilation times and binary sizes. To use the
++    \l {QtConcurrent::run}{QtConcurrent::run()} function, you can include a
++    more specific header:
++
++    \code
++    #include <QtConcurrentRun>
++    \endcode
++
+     \section1 Concurrent Run (basic mode)
+ 
+     The function passed to QtConcurrent::run() may report the result
+diff --git a/src/concurrent/qtconcurrenttask.qdoc b/src/concurrent/qtconcurrenttask.qdoc
+index d3828b59c24..baff115e73c 100644
+--- a/src/concurrent/qtconcurrenttask.qdoc
++++ b/src/concurrent/qtconcurrenttask.qdoc
+@@ -18,6 +18,18 @@
+ 
+     This function is a part of the \l {Qt Concurrent} framework.
+ 
++    \section1 Optimize includes
++
++    If you include the \c <QtConcurrent> header, the entire Qt Concurrent
++    module with the entire Qt Core module will be included, which may increase
++    compilation times and binary sizes. To use the
++    \l {QtConcurrent::task}{QtConcurrent::task()} function, you can include a
++    more specific header:
++
++    \code
++    #include <QtConcurrentTask>
++    \endcode
++
+     \section1 Fluent interface
+ 
+     The QtConcurrent::task returns an instance of an auxiliary class called
+-- 
+2.51.2
+

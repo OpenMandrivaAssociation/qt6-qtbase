@@ -1,0 +1,98 @@
+From 922e19195580df27c90541f1cf420a710f5e45f8 Mon Sep 17 00:00:00 2001
+From: Ahmad Samir <a.samirh78@gmail.com>
+Date: Thu, 2 Oct 2025 14:32:56 +0300
+Subject: [PATCH 315/553] corelib: fix clang narrowing conversion warnings
+ -Wshorten-64-to-32
+
+qlogging.cpp: ::backtrace() takes an int.
+
+QLoggingSettingsParser: fgets() takes an int.
+
+QFileSystemEntry: filePath() would never exceed PATH_MAX on Unix; and on
+windows even with the extended long path option it should fit in an int:
+https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation
+
+Pick-to: 6.8 6.5
+Change-Id: I288f4adc71740e077ed0c11de4e38f6fddc00455
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit 0f77938ede82e60acc88e0575db09f250d749f14)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/global/qlogging.cpp               | 3 ++-
+ src/corelib/global/qtenvironmentvariables.cpp | 2 +-
+ src/corelib/io/qfilesystementry.cpp           | 3 ++-
+ src/corelib/io/qloggingregistry.cpp           | 3 ++-
+ src/corelib/kernel/qobjectcleanuphandler.cpp  | 2 +-
+ 5 files changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/src/corelib/global/qlogging.cpp b/src/corelib/global/qlogging.cpp
+index 440ced7a1e9..1f29fb48a70 100644
+--- a/src/corelib/global/qlogging.cpp
++++ b/src/corelib/global/qlogging.cpp
+@@ -1445,7 +1445,8 @@ Q_NEVER_INLINE void QInternalMessageLogContext::populateBacktrace(int frameCount
+ {
+     assert(frameCount >= 0);
+     BacktraceStorage &result = backtrace.emplace(TypicalBacktraceFrameCount + frameCount);
+-    int n = ::backtrace(result.data(), result.size());
++    Q_ASSERT(frameCount == int(frameCount));
++    int n = ::backtrace(result.data(), int(result.size()));
+     if (n <= 0)
+         result.clear();
+     else
+diff --git a/src/corelib/global/qtenvironmentvariables.cpp b/src/corelib/global/qtenvironmentvariables.cpp
+index 6898e78ca0f..0126025114c 100644
+--- a/src/corelib/global/qtenvironmentvariables.cpp
++++ b/src/corelib/global/qtenvironmentvariables.cpp
+@@ -181,7 +181,7 @@ int qEnvironmentVariableIntValue(const char *varName, bool *ok) noexcept
+         value = std::nullopt;
+     if (ok)
+         *ok = bool(value);
+-    return value.value_or(0);
++    return int(value.value_or(0));
+ }
+ QT_WARNING_POP
+ 
+diff --git a/src/corelib/io/qfilesystementry.cpp b/src/corelib/io/qfilesystementry.cpp
+index 8012a3b8c8b..4e4bb10a520 100644
+--- a/src/corelib/io/qfilesystementry.cpp
++++ b/src/corelib/io/qfilesystementry.cpp
+@@ -339,7 +339,8 @@ void QFileSystemEntry::findFileNameSeparators() const
+             stop = lastSeparator;
+         }
+ 
+-        int i = m_filePath.size() - 1;
++        Q_ASSERT(m_filePath.size() == int(m_filePath.size()));
++        int i = int(m_filePath.size() - 1);
+         for (; i >= stop; --i) {
+             if (m_filePath.at(i).unicode() == '.') {
+                 firstDotInFileName = lastDotInFileName = i;
+diff --git a/src/corelib/io/qloggingregistry.cpp b/src/corelib/io/qloggingregistry.cpp
+index e6e710377b8..74d39d3a973 100644
+--- a/src/corelib/io/qloggingregistry.cpp
++++ b/src/corelib/io/qloggingregistry.cpp
+@@ -175,7 +175,8 @@ void QLoggingSettingsParser::setContent(FILE *stream)
+ 
+         // fgets() always writes the terminating null into the buffer, so we'll
+         // allow it to write to the QByteArray's null (thus the off by 1).
+-        char *s = fgets(buffer.begin(), buffer.size() + 1, stream);
++        Q_ASSERT(buffer.size() + 1 == int(buffer.size() + 1));
++        char *s = fgets(buffer.begin(), int(buffer.size() + 1), stream);
+         if (!s)
+             return QByteArrayView{};
+ 
+diff --git a/src/corelib/kernel/qobjectcleanuphandler.cpp b/src/corelib/kernel/qobjectcleanuphandler.cpp
+index f46afc2f071..48210ede8ea 100644
+--- a/src/corelib/kernel/qobjectcleanuphandler.cpp
++++ b/src/corelib/kernel/qobjectcleanuphandler.cpp
+@@ -73,7 +73,7 @@ QObject *QObjectCleanupHandler::add(QObject *object)
+ */
+ void QObjectCleanupHandler::remove(QObject *object)
+ {
+-    int index;
++    qsizetype index;
+     if ((index = cleanupObjects.indexOf(object)) != -1) {
+         cleanupObjects.removeAt(index);
+         disconnect(object, SIGNAL(destroyed(QObject*)), this, SLOT(objectDestroyed(QObject*)));
+-- 
+2.51.2
+

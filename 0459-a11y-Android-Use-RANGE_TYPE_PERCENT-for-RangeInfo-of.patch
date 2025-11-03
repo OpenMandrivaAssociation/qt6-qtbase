@@ -1,0 +1,46 @@
+From c9e63088946a5b1a8c530c83bf679e444e712d46 Mon Sep 17 00:00:00 2001
+From: Julian Greilich <j.greilich@gmx.de>
+Date: Wed, 17 Sep 2025 16:44:34 +0200
+Subject: [PATCH 459/553] a11y Android: Use RANGE_TYPE_PERCENT for RangeInfo of
+ ProgressBar
+
+This way the current value is announced as "xy percent".
+
+Task-number: QTBUG-139712
+Pick-to: 6.8
+Change-Id: I796e942a799c78f4fc144e77bf9d18b9c1cb0ea3
+Reviewed-by: Assam Boudjelthia <assam.boudjelthia@qt.io>
+(cherry picked from commit 9b6057fc8d7c5320e764a020b0d5ded967d46094)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../platforms/android/androidjniaccessibility.cpp   | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/src/plugins/platforms/android/androidjniaccessibility.cpp b/src/plugins/platforms/android/androidjniaccessibility.cpp
+index a1edf49da12..50eb3293c50 100644
+--- a/src/plugins/platforms/android/androidjniaccessibility.cpp
++++ b/src/plugins/platforms/android/androidjniaccessibility.cpp
+@@ -725,9 +725,18 @@ namespace QtAndroidAccessibility
+                 break;
+             }
+ 
++            float min = info.minValue.toFloat();
++            float max = info.maxValue.toFloat();
++            float current = info.currentValue.toFloat();
++            if (info.role == QAccessible::ProgressBar) {
++                rangeType = 2; // RANGE_TYPE_PERCENT
++                current = 100 * (current - min) / (max - min);
++                min = 0.0f;
++                max = 100.0f;
++            }
++
+             QJniObject rangeInfo("android/view/accessibility/AccessibilityNodeInfo$RangeInfo",
+-                                 "(IFFF)V", rangeType, info.minValue.toFloat(),
+-                                 info.maxValue.toFloat(), info.currentValue.toFloat());
++                                 "(IFFF)V", rangeType, min, max, current);
+ 
+             if (rangeInfo.isValid()) {
+                 env->CallVoidMethod(node, m_setRangeInfoMethodID, rangeInfo.object());
+-- 
+2.51.2
+

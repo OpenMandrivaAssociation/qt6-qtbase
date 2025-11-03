@@ -1,0 +1,40 @@
+From b14771e50f3f0159870553d6dd01deb85afcc86b Mon Sep 17 00:00:00 2001
+From: Liang Qi <liang.qi@qt.io>
+Date: Mon, 23 Jun 2025 12:45:22 +0200
+Subject: [PATCH 019/553] Wayland: skip
+ tst_QWindow::modalWindowEnterEventOnHide_QTBUG35109()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+because QCursor::setPos() doesn't work on this platform due to
+security reason.
+
+Perhaps things will change after pointer_warp_v1 protocal was
+implemented in both compositor and qt wayland client side.
+
+Task-number: QTBUG-137020
+Change-Id: I322c6abd0de0871ecef6b1b4fd5498a573e1232f
+Reviewed-by: Tor Arne Vestbø <tor.arne.vestbo@qt.io>
+(cherry picked from commit bb2829703c1efd85c37d0715e6a53cc65bc432a3)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ tests/auto/gui/kernel/qwindow/tst_qwindow.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/auto/gui/kernel/qwindow/tst_qwindow.cpp b/tests/auto/gui/kernel/qwindow/tst_qwindow.cpp
+index c498efa66fe..7a92176e715 100644
+--- a/tests/auto/gui/kernel/qwindow/tst_qwindow.cpp
++++ b/tests/auto/gui/kernel/qwindow/tst_qwindow.cpp
+@@ -2582,7 +2582,7 @@ void tst_QWindow::modalWindowEnterEventOnHide_QTBUG35109()
+     if (isPlatformOffscreenOrMinimal())
+         QSKIP("Can't test window focusing on offscreen/minimal");
+ 
+-    if (isPlatformEglFS())
++    if (isPlatformEglFS() || isPlatformWayland())
+         QSKIP("QCursor::setPos() is not supported on this platform");
+ 
+     const QPoint center = QGuiApplication::primaryScreen()->availableGeometry().center();
+-- 
+2.51.2
+

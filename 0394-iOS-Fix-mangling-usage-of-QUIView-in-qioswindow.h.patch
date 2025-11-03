@@ -1,0 +1,50 @@
+From 31cef5e00611b4241cd5cc9cfc2160a862c71a30 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Nils=20Petter=20Ska=CC=8Alerud?=
+ <nils.petter.skalerud@qt.io>
+Date: Tue, 14 Oct 2025 11:44:48 +0200
+Subject: [PATCH 394/553] iOS: Fix mangling usage of QUIView in qioswindow.h
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This file prevents compiling Qt with a custom namespace, because it
+declares a function that returns a QT_MANGLE_NAMESPACE(QUIView).
+However, the QUIView class is not defined with a mangled namespace.
+
+As a drive-by, we remove some unused class forward declarations that
+also interfere with custom namespaces.
+
+Change-Id: Ie15e08e2857ca89a8a48d50d3ef9aa0d540d4788
+Reviewed-by: Tor Arne Vestbø <tor.arne.vestbo@qt.io>
+(cherry picked from commit ff3cf30eed313fc9274c90946a45c1881754f7e7)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/plugins/platforms/ios/qioswindow.h | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/src/plugins/platforms/ios/qioswindow.h b/src/plugins/platforms/ios/qioswindow.h
+index 86bcc111d35..62fbf97b542 100644
+--- a/src/plugins/platforms/ios/qioswindow.h
++++ b/src/plugins/platforms/ios/qioswindow.h
+@@ -9,9 +9,6 @@
+ 
+ #import <UIKit/UIKit.h>
+ 
+-class QIOSContext;
+-class QIOSWindow;
+-
+ @class QUIView;
+ 
+ QT_BEGIN_NAMESPACE
+@@ -83,7 +80,7 @@ private:
+ QDebug operator<<(QDebug debug, const QIOSWindow *window);
+ #endif
+ 
+-QT_MANGLE_NAMESPACE(QUIView) *quiview_cast(UIView *view);
++QUIView *quiview_cast(UIView *view);
+ 
+ QT_END_NAMESPACE
+ 
+-- 
+2.51.2
+

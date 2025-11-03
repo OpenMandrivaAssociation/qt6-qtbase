@@ -1,0 +1,35 @@
+From 299a60f31c9cc93929b73efc5c04c993f3dec2dc Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?M=C3=A5rten=20Nordheim?= <marten.nordheim@qt.io>
+Date: Mon, 22 Sep 2025 17:34:25 +0200
+Subject: [PATCH 222/553] Http2: Remove :version header handling
+
+The :version header was a SPDY/3 pseudo header that did
+not survive the jump to HTTP/2, and no one really realized
+it until now.
+
+Pick-to: 6.9 6.8 6.5
+Change-Id: Ia7b38befbaa2d7265ae6c8794dfac8711d71e2e6
+Reviewed-by: Edward Welbourne <edward.welbourne@qt.io>
+(cherry picked from commit 1992f15502074350b3a0d4512c3e9d1f3a9290d7)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/network/access/qhttp2protocolhandler.cpp | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/src/network/access/qhttp2protocolhandler.cpp b/src/network/access/qhttp2protocolhandler.cpp
+index 137ab125c20..3452d0a448e 100644
+--- a/src/network/access/qhttp2protocolhandler.cpp
++++ b/src/network/access/qhttp2protocolhandler.cpp
+@@ -337,9 +337,6 @@ void QHttp2ProtocolHandler::handleHeadersReceived(const HPack::HttpHeader &heade
+             httpReply->setStatusCode(statusCode);
+             m_channel->lastStatus = statusCode; // Mostly useless for http/2, needed for auth
+             httpReply->setReasonPhrase(QString::fromLatin1(value.mid(4)));
+-        } else if (name == ":version") {
+-            httpReply->setMajorVersion(value.at(5) - '0');
+-            httpReply->setMinorVersion(value.at(7) - '0');
+         } else if (name == "content-length") {
+             bool ok = false;
+             const qlonglong length = value.toLongLong(&ok);
+-- 
+2.51.2
+

@@ -1,0 +1,118 @@
+From 57c7e7d470879da170ed603fee6f1ecb9f39c09e Mon Sep 17 00:00:00 2001
+From: Volker Hilsheimer <volker.hilsheimer@qt.io>
+Date: Wed, 10 Sep 2025 13:50:07 +0200
+Subject: [PATCH 066/553] QRM: don't flag items as editable if we don't
+ implement setData
+
+Check for isMutable in the flags() implementation before checking type
+specific attributes. We bail out of setData() and setItemData()
+immediately if isMutable() returns false, so this produces a consistent
+behavior.
+
+Explicitly verify in the test that the ItemIsEditable flag is only set
+when it should be.
+
+Pick-to: 6.10.0
+Change-Id: I0bb4ebcf5870b59fec12f84861d772be5d68735b
+Reviewed-by: Artem Dyomin <artem.dyomin@qt.io>
+(cherry picked from commit a4ae63f7c10e0ff07a90b9d0a4aa619688d12179)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/itemmodels/qrangemodel_impl.h     | 55 ++++++++++---------
+ .../qrangemodel/tst_qrangemodel.cpp           |  3 +
+ 2 files changed, 31 insertions(+), 27 deletions(-)
+
+diff --git a/src/corelib/itemmodels/qrangemodel_impl.h b/src/corelib/itemmodels/qrangemodel_impl.h
+index 57171dc8038..59376def54c 100644
+--- a/src/corelib/itemmodels/qrangemodel_impl.h
++++ b/src/corelib/itemmodels/qrangemodel_impl.h
+@@ -1144,33 +1144,34 @@ public:
+ 
+         Qt::ItemFlags f = Structure::defaultFlags();
+ 
+-        if constexpr (row_traits::hasMetaObject) {
+-            if (index.column() < row_traits::fixed_size()) {
+-                const QMetaObject mo = wrapped_row_type::staticMetaObject;
+-                const QMetaProperty prop = mo.property(index.column() + mo.propertyOffset());
+-                if (prop.isWritable())
+-                    f |= Qt::ItemIsEditable;
+-            }
+-        } else if constexpr (static_column_count <= 0) {
+-            if constexpr (isMutable())
+-                f |= Qt::ItemIsEditable;
+-        } else if constexpr (std::is_reference_v<row_reference> && !std::is_const_v<row_reference>) {
+-            // we want to know if the elements in the tuple are const; they'd always be, if
+-            // we didn't remove the const of the range first.
+-            const_row_reference row = rowData(index);
+-            row_reference mutableRow = const_cast<row_reference>(row);
+-            if (QRangeModelDetails::isValid(mutableRow)) {
+-                QRangeModelImplBase::for_element_at(mutableRow, index.column(), [&f](auto &&ref){
+-                    using target_type = decltype(ref);
+-                    if constexpr (std::is_const_v<std::remove_reference_t<target_type>>)
+-                        f &= ~Qt::ItemIsEditable;
+-                    else if constexpr (std::is_lvalue_reference_v<target_type>)
++        if constexpr (isMutable()) {
++            if constexpr (row_traits::hasMetaObject) {
++                if (index.column() < row_traits::fixed_size()) {
++                    const QMetaObject mo = wrapped_row_type::staticMetaObject;
++                    const QMetaProperty prop = mo.property(index.column() + mo.propertyOffset());
++                    if (prop.isWritable())
+                         f |= Qt::ItemIsEditable;
+-                });
+-            } else {
+-                // If there's no usable value stored in the row, then we can't
+-                // do anything with this item.
+-                f &= ~Qt::ItemIsEditable;
++                }
++            } else if constexpr (static_column_count <= 0) {
++                f |= Qt::ItemIsEditable;
++            } else if constexpr (std::is_reference_v<row_reference> && !std::is_const_v<row_reference>) {
++                // we want to know if the elements in the tuple are const; they'd always be, if
++                // we didn't remove the const of the range first.
++                const_row_reference row = rowData(index);
++                row_reference mutableRow = const_cast<row_reference>(row);
++                if (QRangeModelDetails::isValid(mutableRow)) {
++                    QRangeModelImplBase::for_element_at(mutableRow, index.column(), [&f](auto &&ref){
++                        using target_type = decltype(ref);
++                        if constexpr (std::is_const_v<std::remove_reference_t<target_type>>)
++                            f &= ~Qt::ItemIsEditable;
++                        else if constexpr (std::is_lvalue_reference_v<target_type>)
++                            f |= Qt::ItemIsEditable;
++                    });
++                } else {
++                    // If there's no usable value stored in the row, then we can't
++                    // do anything with this item.
++                    f &= ~Qt::ItemIsEditable;
++                }
+             }
+         }
+         return f;
+@@ -2313,7 +2314,7 @@ protected:
+     {
+         if constexpr (tree_traits::has_deleteRow) {
+             for (auto it = begin; it != end; ++it) {
+-                if constexpr (is_mutable_impl) {
++                if constexpr (Base::isMutable()) {
+                     decltype(auto) children = this->protocol().childRows(QRangeModelDetails::refTo(*it));
+                     if (QRangeModelDetails::isValid(children)) {
+                         deleteRemovedRows(QRangeModelDetails::begin(children),
+diff --git a/tests/auto/corelib/itemmodels/qrangemodel/tst_qrangemodel.cpp b/tests/auto/corelib/itemmodels/qrangemodel/tst_qrangemodel.cpp
+index 6d151e7a148..be684232ecb 100644
+--- a/tests/auto/corelib/itemmodels/qrangemodel/tst_qrangemodel.cpp
++++ b/tests/auto/corelib/itemmodels/qrangemodel/tst_qrangemodel.cpp
+@@ -1399,9 +1399,12 @@ void tst_QRangeModel::tree()
+     QFETCH(const int, expectedRootRowCount);
+     QFETCH(const int, expectedColumnCount);
+     QFETCH(QList<int>, rowsWithChildren);
++    QFETCH(ChangeActions, changeActions);
+ 
+     QCOMPARE(model->rowCount(), expectedRootRowCount);
+     QCOMPARE(model->columnCount(), expectedColumnCount);
++    QCOMPARE(model->flags(model->index(0, 0)).testFlag(Qt::ItemIsEditable),
++             !!(changeActions & ChangeAction::SetData));
+ 
+     for (int row = 0; row < model->rowCount(); ++row) {
+         const bool expectedChildren = rowsWithChildren.contains(row);
+-- 
+2.51.2
+

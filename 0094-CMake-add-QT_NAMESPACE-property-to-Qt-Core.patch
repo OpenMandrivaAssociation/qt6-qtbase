@@ -1,0 +1,102 @@
+From 8ebf9b85025aa73449dd0c07bdce731ccaf3e728 Mon Sep 17 00:00:00 2001
+From: Tim Blechmann <tim.blechmann@qt.io>
+Date: Mon, 25 Aug 2025 19:11:35 +0800
+Subject: [PATCH 094/553] CMake: add QT_NAMESPACE property to Qt::Core
+
+User projects sometimes may want to query the namespace of namespaced
+Qt.
+We therefore attach a new property QT_NAMESPACE that can be read by user
+projects.
+
+Change-Id: I541bd3eba41f1f5371faebf99f3cdb12698a9f25
+Reviewed-by: Alexandru Croitor <alexandru.croitor@qt.io>
+(cherry picked from commit 959866f198abd1049e582aacc2cbcc96964da121)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/corelib/CMakeLists.txt                    |  3 +++
+ tests/auto/cmake/CMakeLists.txt               |  1 +
+ .../test_read_qt_namespace/CMakeLists.txt     | 21 +++++++++++++++++++
+ .../cmake/test_read_qt_namespace/main.cpp     | 17 +++++++++++++++
+ 4 files changed, 42 insertions(+)
+ create mode 100644 tests/auto/cmake/test_read_qt_namespace/CMakeLists.txt
+ create mode 100644 tests/auto/cmake/test_read_qt_namespace/main.cpp
+
+diff --git a/src/corelib/CMakeLists.txt b/src/corelib/CMakeLists.txt
+index 36fbfede3df..3847fb84c5e 100644
+--- a/src/corelib/CMakeLists.txt
++++ b/src/corelib/CMakeLists.txt
+@@ -398,6 +398,9 @@ if (NOT QT_NAMESPACE STREQUAL "")
+     target_compile_definitions(Core PUBLIC ${core_namespace_defs})
+     set_target_properties(Core PROPERTIES _qt_namespace "${QT_NAMESPACE}")
+     set_property(TARGET Core APPEND PROPERTY EXPORT_PROPERTIES _qt_namespace)
++
++    set_target_properties(Core PROPERTIES QT_NAMESPACE "${QT_NAMESPACE}")
++    set_property(TARGET Core APPEND PROPERTY EXPORT_PROPERTIES QT_NAMESPACE)
+ endif()
+ 
+ qt_generate_qconfig_cpp(global/qconfig.cpp.in global/qconfig.cpp)
+diff --git a/tests/auto/cmake/CMakeLists.txt b/tests/auto/cmake/CMakeLists.txt
+index 4028fc2c1bb..e9603f806ae 100644
+--- a/tests/auto/cmake/CMakeLists.txt
++++ b/tests/auto/cmake/CMakeLists.txt
+@@ -227,6 +227,7 @@ _qt_internal_test_expect_pass(test_wrap_cpp_moc)
+ _qt_internal_test_expect_pass(test_wrap_cpp_moc_target)
+ _qt_internal_test_expect_pass(test_platform_defs_include)
+ _qt_internal_test_expect_pass(test_qtmainwin_library)
++_qt_internal_test_expect_pass(test_read_qt_namespace)
+ 
+ if (CMAKE_GENERATOR STREQUAL Ninja AND UNIX AND NOT WIN32)
+     _qt_internal_test_expect_pass(test_QFINDTESTDATA
+diff --git a/tests/auto/cmake/test_read_qt_namespace/CMakeLists.txt b/tests/auto/cmake/test_read_qt_namespace/CMakeLists.txt
+new file mode 100644
+index 00000000000..cb9b67927e6
+--- /dev/null
++++ b/tests/auto/cmake/test_read_qt_namespace/CMakeLists.txt
+@@ -0,0 +1,21 @@
++# Copyright (C) 2025 The Qt Company Ltd.
++# SPDX-License-Identifier: BSD-3-Clause
++
++cmake_minimum_required(VERSION 3.16)
++project(qt_namespace_property LANGUAGES CXX)
++
++find_package(Qt6 REQUIRED COMPONENTS Core)
++
++get_property(namespace_property
++    TARGET Qt::Core
++    PROPERTY QT_NAMESPACE
++)
++
++add_executable(test main.cpp)
++target_link_libraries(test PRIVATE Qt::Core)
++
++if(namespace_property)
++    target_compile_definitions(test PRIVATE QT_NAMESPACE_FROM_PROPERTY=${namespace_property})
++else()
++    target_compile_definitions(test PRIVATE QT_NO_NAMESPACE)
++endif()
+diff --git a/tests/auto/cmake/test_read_qt_namespace/main.cpp b/tests/auto/cmake/test_read_qt_namespace/main.cpp
+new file mode 100644
+index 00000000000..c58f554116a
+--- /dev/null
++++ b/tests/auto/cmake/test_read_qt_namespace/main.cpp
+@@ -0,0 +1,17 @@
++// Copyright (C) 2025 The Qt Company Ltd.
++// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
++
++#include <string_view>
++#include <QtCore/QtCore>
++
++#ifdef QT_NO_NAMESPACE
++#  ifdef QT_NAMESPACE
++static_assert(false);
++#  endif // QT_NAMESPACE
++#else
++static_assert(std::string_view(QT_STRINGIFY(QT_NAMESPACE))
++           == std::string_view(QT_STRINGIFY(QT_NAMESPACE_FROM_PROPERTY)));
++#endif
++
++int main()
++{}
+-- 
+2.51.2
+

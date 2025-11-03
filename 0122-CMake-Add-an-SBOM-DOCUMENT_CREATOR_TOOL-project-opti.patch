@@ -1,0 +1,104 @@
+From 718517a5b5392bd1280cbecf9f92ced0a55d7e24 Mon Sep 17 00:00:00 2001
+From: Alexandru Croitor <alexandru.croitor@qt.io>
+Date: Wed, 10 Sep 2025 11:36:50 +0200
+Subject: [PATCH 122/553] CMake: Add an SBOM DOCUMENT_CREATOR_TOOL project
+ option
+
+The new option replaces the hardcoded "Creator: Tool: Qt Build System"
+line in the SPDX document.
+
+The option value should not include the "Creator: Tool: " prefix.
+
+If not set, the old hardcoded value is used.
+
+Pick-to: 6.9 6.8
+Task-number: QTBUG-134894
+Change-Id: I1a8ca736b377839e5032a0c507ebeb03dfcee74d
+Reviewed-by: Joerg Bornemann <joerg.bornemann@qt.io>
+(cherry picked from commit 1b37932de0f6fb0be6043bdea9f50d4aeffca188)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ cmake/QtPublicSbomGenerationHelpers.cmake | 15 +++++++++++++--
+ cmake/QtPublicSbomHelpers.cmake           |  6 ++++++
+ tests/auto/cmake/RunCMake/Sbom/full.cmake |  1 +
+ 3 files changed, 20 insertions(+), 2 deletions(-)
+
+diff --git a/cmake/QtPublicSbomGenerationHelpers.cmake b/cmake/QtPublicSbomGenerationHelpers.cmake
+index 1e8f18c29f9..89179e77a1b 100644
+--- a/cmake/QtPublicSbomGenerationHelpers.cmake
++++ b/cmake/QtPublicSbomGenerationHelpers.cmake
+@@ -67,6 +67,7 @@ function(_qt_internal_sbom_begin_project_generate)
+         SUPPLIER_URL
+         NAMESPACE
+         CPE
++        DOCUMENT_CREATOR_TOOL
+         OUT_VAR_PROJECT_SPDX_ID
+     )
+     set(multi_args "")
+@@ -105,6 +106,17 @@ function(_qt_internal_sbom_begin_project_generate)
+     _qt_internal_sbom_set_default_option_value(NAMESPACE
+         "${arg_SUPPLIER}/spdxdocs/${arg_PROJECT}-${QT_SBOM_GIT_VERSION}")
+ 
++    _qt_internal_sbom_set_default_option_value(DOCUMENT_CREATOR_TOOL "Qt Build System")
++    if(arg_DOCUMENT_CREATOR_TOOL)
++        string(PREPEND arg_DOCUMENT_CREATOR_TOOL "Creator: Tool: ")
++    endif()
++
++    set(document_fields "")
++    if(arg_DOCUMENT_CREATOR_TOOL)
++        set(document_fields "${document_fields}
++${arg_DOCUMENT_CREATOR_TOOL}")
++    endif()
++
+     set(fields "")
+     if(arg_CPE)
+         set(fields "${fields}
+@@ -160,8 +172,7 @@ DataLicense: CC0-1.0
+ SPDXID: SPDXRef-DOCUMENT
+ DocumentName: ${doc_name}
+ DocumentNamespace: ${arg_NAMESPACE}
+-Creator: Organization: ${arg_SUPPLIER}
+-Creator: Tool: Qt Build System
++Creator: Organization: ${arg_SUPPLIER}${document_fields}
+ CreatorComment: <text>This SPDX document was created from CMake ${CMAKE_VERSION}, using the qt
+ build system from https://code.qt.io/cgit/qt/qtbase.git/tree/cmake/QtPublicSbomHelpers.cmake</text>
+ Created: ${current_utc}\${QT_SBOM_EXTERNAL_DOC_REFS}
+diff --git a/cmake/QtPublicSbomHelpers.cmake b/cmake/QtPublicSbomHelpers.cmake
+index 17f313e1cc9..c5d54ed199e 100644
+--- a/cmake/QtPublicSbomHelpers.cmake
++++ b/cmake/QtPublicSbomHelpers.cmake
+@@ -43,6 +43,7 @@ function(_qt_internal_sbom_begin_project)
+         SBOM_PROJECT_NAME
+         QT_REPO_PROJECT_NAME
+         CPE
++        DOCUMENT_CREATOR_TOOL
+     )
+     set(multi_args
+         COPYRIGHTS
+@@ -227,6 +228,11 @@ function(_qt_internal_sbom_begin_project)
+         list(APPEND begin_project_generate_args DOWNLOAD_LOCATION "${download_location}")
+     endif()
+ 
++    if(arg_DOCUMENT_CREATOR_TOOL)
++        list(APPEND begin_project_generate_args
++            DOCUMENT_CREATOR_TOOL "${arg_DOCUMENT_CREATOR_TOOL}")
++    endif()
++
+     set(project_comment "")
+ 
+     if(arg___QT_INTERNAL_HANDLE_QT_REPO)
+diff --git a/tests/auto/cmake/RunCMake/Sbom/full.cmake b/tests/auto/cmake/RunCMake/Sbom/full.cmake
+index 9cbbb4eb0d5..35dd2a2bdfb 100644
+--- a/tests/auto/cmake/RunCMake/Sbom/full.cmake
++++ b/tests/auto/cmake/RunCMake/Sbom/full.cmake
+@@ -16,6 +16,7 @@ _qt_internal_sbom_begin_project(
+     DOWNLOAD_LOCATION "https://download.qt.io/sbom"
+     CPE "cpe:2.3:a:qt:qtprojecttest:1.0.0:*:*:*:*:*:*:*"
+     VERSION "1.0.0"
++    DOCUMENT_CREATOR_TOOL "Test Build System Tool"
+ )
+ 
+ include(common_targets.cmake)
+-- 
+2.51.2
+

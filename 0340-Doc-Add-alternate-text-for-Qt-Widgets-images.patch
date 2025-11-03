@@ -1,0 +1,3406 @@
+From 64449a35bcd41f2f3265863b0a5e2581f68a4f04 Mon Sep 17 00:00:00 2001
+From: Jerome Pasion <jerome.pasion@qt.io>
+Date: Wed, 30 Apr 2025 16:13:39 +0200
+Subject: [PATCH 340/553] Doc: Add alternate text for Qt Widgets images
+
+Alternate text (alt text) improves the documentation experience for
+screen readers and for other accessibility tools.
+
+Pick-to: 6.9
+Task-number: QTBUG-135124
+Change-Id: Ic481c1468548d197a69c9e19703c5773226fbd39
+Reviewed-by: Alexei Cazacov <alexei.cazacov@qt.io>
+(cherry picked from commit 87806f5cad6e4ce75a899598c15c126995682562)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ .../desktop/systray/doc/src/systray.qdoc      |  4 +-
+ examples/widgets/doc/src/addressbook.qdoc     | 16 ++---
+ examples/widgets/doc/src/affine.qdoc          |  2 +-
+ examples/widgets/doc/src/analogclock.qdoc     |  4 +-
+ examples/widgets/doc/src/basicdrawing.qdoc    |  1 +
+ examples/widgets/doc/src/calculator.qdoc      |  4 +-
+ examples/widgets/doc/src/calendarwidget.qdoc  |  3 +-
+ examples/widgets/doc/src/chip.qdoc            |  1 +
+ .../doc/src/collidingmice-example.qdoc        |  1 +
+ .../widgets/doc/src/combowidgetmapper.qdoc    |  2 +
+ examples/widgets/doc/src/completer.qdoc       |  3 +
+ examples/widgets/doc/src/composition.qdoc     |  1 +
+ examples/widgets/doc/src/cuberhiwidget.qdoc   |  1 +
+ examples/widgets/doc/src/deform.qdoc          |  1 +
+ examples/widgets/doc/src/diagramscene.qdoc    |  1 +
+ examples/widgets/doc/src/dragdroprobot.qdoc   |  1 +
+ examples/widgets/doc/src/draggableicons.qdoc  |  1 +
+ examples/widgets/doc/src/draggabletext.qdoc   |  1 +
+ examples/widgets/doc/src/easing.qdoc          |  1 +
+ .../widgets/doc/src/editabletreemodel.qdoc    |  5 ++
+ examples/widgets/doc/src/elasticnodes.qdoc    |  1 +
+ examples/widgets/doc/src/fetchmore.qdoc       |  1 +
+ examples/widgets/doc/src/frozencolumn.qdoc    |  5 +-
+ examples/widgets/doc/src/gradients.qdoc       |  1 +
+ .../src/graphicsview-simpleanchorlayout.qdoc  |  2 +
+ .../widgets/doc/src/imagecomposition.qdoc     |  1 +
+ examples/widgets/doc/src/licensewizard.qdoc   |  4 +-
+ examples/widgets/doc/src/lineedits.qdoc       |  3 +-
+ examples/widgets/doc/src/menus.qdoc           |  1 +
+ examples/widgets/doc/src/orderform.qdoc       |  2 +
+ examples/widgets/doc/src/painterpaths.qdoc    |  1 +
+ examples/widgets/doc/src/pathstroke.qdoc      |  1 +
+ .../widgets/doc/src/regularexpression.qdoc    |  1 +
+ examples/widgets/doc/src/screenshot.qdoc      |  1 +
+ examples/widgets/doc/src/shapedclock.qdoc     |  4 +-
+ examples/widgets/doc/src/shortcuteditor.qdoc  |  2 +
+ examples/widgets/doc/src/simplerhiwidget.qdoc |  1 +
+ examples/widgets/doc/src/simpletreemodel.qdoc |  2 +
+ examples/widgets/doc/src/sliders.qdoc         |  3 +-
+ examples/widgets/doc/src/spinboxes.qdoc       |  2 +-
+ examples/widgets/doc/src/spreadsheet.qdoc     |  1 +
+ examples/widgets/doc/src/standarddialogs.qdoc |  2 +-
+ .../widgets/doc/src/syntaxhighlighter.qdoc    |  1 +
+ examples/widgets/doc/src/tabdialog.qdoc       |  2 +-
+ examples/widgets/doc/src/tablet.qdoc          |  2 +-
+ examples/widgets/doc/src/transformations.qdoc |  1 +
+ .../widgets/doc/src/treemodelcompleter.qdoc   |  1 +
+ examples/widgets/doc/src/trivialwizard.qdoc   |  7 ++-
+ examples/widgets/doc/src/windowflags.qdoc     |  7 ++-
+ .../imagegestures/doc/src/imagegestures.qdoc  |  2 +-
+ .../doc/src/customcompleter.qdoc              |  3 +-
+ .../touch/knobs/doc/src/touch-knobs.qdoc      |  2 +-
+ .../tutorials/notepad/gettingstartedqt.qdoc   |  8 +--
+ src/widgets/dialogs/qerrormessage.cpp         |  2 +-
+ src/widgets/dialogs/qfiledialog.cpp           |  4 +-
+ src/widgets/dialogs/qmessagebox.cpp           | 14 +++--
+ src/widgets/dialogs/qwizard.cpp               | 22 +++----
+ src/widgets/doc/qtwidgets.qdocconf            |  3 +
+ src/widgets/doc/src/graphicsview.qdoc         |  5 +-
+ .../doc/src/model-view-programming.qdoc       | 25 +++++---
+ src/widgets/doc/src/modelview.qdoc            | 32 ++++++----
+ src/widgets/doc/src/qtwidgets-examples.qdoc   | 11 +++-
+ src/widgets/doc/src/qtwidgets-index.qdoc      | 17 +++---
+ .../doc/src/widgets-and-layouts/gallery.qdoc  |  6 ++
+ .../doc/src/widgets-and-layouts/layout.qdoc   |  8 ++-
+ .../doc/src/widgets-and-layouts/styles.qdoc   | 56 +++++++++++++-----
+ .../src/widgets-and-layouts/stylesheet.qdoc   | 59 +++++++++----------
+ .../doc/src/widgets-and-layouts/widgets.qdoc  | 15 +++--
+ src/widgets/doc/src/widgets-tutorial.qdoc     |  4 ++
+ .../src/windows-and-dialogs/mainwindow.qdoc   |  4 +-
+ src/widgets/effects/qgraphicseffect.cpp       | 10 ++++
+ .../graphicsview/qgraphicsanchorlayout.cpp    |  4 +-
+ src/widgets/graphicsview/qgraphicsitem.cpp    | 14 ++++-
+ .../graphicsview/qgraphicsproxywidget.cpp     |  1 +
+ src/widgets/graphicsview/qgraphicsview.cpp    |  2 +-
+ .../itemviews/qabstractitemdelegate.cpp       |  2 +-
+ src/widgets/itemviews/qcolumnview.cpp         |  2 +-
+ src/widgets/itemviews/qlistview.cpp           |  2 +-
+ src/widgets/itemviews/qlistwidget.cpp         |  2 +-
+ src/widgets/itemviews/qtableview.cpp          |  3 +-
+ src/widgets/itemviews/qtablewidget.cpp        |  2 +-
+ src/widgets/itemviews/qtreeview.cpp           |  1 +
+ src/widgets/itemviews/qtreewidget.cpp         |  2 +-
+ src/widgets/kernel/qboxlayout.cpp             | 10 ++--
+ src/widgets/kernel/qformlayout.cpp            |  4 ++
+ src/widgets/kernel/qgesture.cpp               |  6 +-
+ src/widgets/kernel/qrhiwidget.cpp             |  2 +-
+ src/widgets/kernel/qwhatsthis.cpp             |  2 +-
+ src/widgets/kernel/qwidget.cpp                |  8 ++-
+ src/widgets/styles/qstyle.cpp                 |  5 +-
+ src/widgets/styles/qstyleoption.cpp           |  1 +
+ src/widgets/styles/qwindowsstyle.cpp          |  2 +-
+ src/widgets/util/qundoview.cpp                |  2 +-
+ src/widgets/widgets/qabstractspinbox.cpp      |  2 +
+ src/widgets/widgets/qcalendarwidget.cpp       |  5 ++
+ src/widgets/widgets/qcheckbox.cpp             |  4 +-
+ src/widgets/widgets/qcombobox.cpp             |  2 +
+ src/widgets/widgets/qdatetimeedit.cpp         |  6 +-
+ src/widgets/widgets/qdial.cpp                 |  2 +-
+ src/widgets/widgets/qdialogbuttonbox.cpp      | 40 +++++++++----
+ src/widgets/widgets/qdockwidget.cpp           |  1 +
+ src/widgets/widgets/qgroupbox.cpp             |  2 +-
+ src/widgets/widgets/qlabel.cpp                |  4 +-
+ src/widgets/widgets/qlcdnumber.cpp            |  2 +-
+ src/widgets/widgets/qlineedit.cpp             |  2 +-
+ src/widgets/widgets/qmainwindow.cpp           |  1 +
+ src/widgets/widgets/qmdiarea.cpp              |  2 +
+ src/widgets/widgets/qmdisubwindow.cpp         |  1 +
+ src/widgets/widgets/qmenu.cpp                 |  2 +-
+ src/widgets/widgets/qprogressbar.cpp          |  2 +-
+ src/widgets/widgets/qpushbutton.cpp           |  4 +-
+ src/widgets/widgets/qradiobutton.cpp          |  2 +-
+ src/widgets/widgets/qscrollarea.cpp           |  4 ++
+ src/widgets/widgets/qscrollbar.cpp            |  4 ++
+ src/widgets/widgets/qsizegrip.cpp             |  6 +-
+ src/widgets/widgets/qslider.cpp               |  2 +-
+ src/widgets/widgets/qspinbox.cpp              |  4 +-
+ src/widgets/widgets/qtabbar.cpp               |  4 +-
+ src/widgets/widgets/qtabwidget.cpp            |  2 +-
+ src/widgets/widgets/qtoolbutton.cpp           |  7 +--
+ 120 files changed, 425 insertions(+), 202 deletions(-)
+
+diff --git a/examples/widgets/desktop/systray/doc/src/systray.qdoc b/examples/widgets/desktop/systray/doc/src/systray.qdoc
+index b0dff58e313..7caefd2f4f5 100644
+--- a/examples/widgets/desktop/systray/doc/src/systray.qdoc
++++ b/examples/widgets/desktop/systray/doc/src/systray.qdoc
+@@ -9,7 +9,7 @@
+     \brief The System Tray Icon example shows how to add an icon with a menu
+     and popup messages to a desktop environment's system tray.
+ 
+-    \borderedimage systemtray-example.png
++    \image systemtray-example.png {System tray popup about a network issue}
+     \caption Screenshot of the System Tray Icon
+ 
+     Modern operating systems usually provide a special area on the
+@@ -20,7 +20,7 @@
+     the main application window (i.e., an editor for the system tray
+     icon) and the associated icon.
+ 
+-    \borderedimage systemtray-editor.png
++    \image systemtray-editor.png {System tray editor for editing various settings such as popup title, duration, and message}
+ 
+     The editor allows the user to choose the preferred icon as well as
+     set the balloon message's type and duration. The user can also
+diff --git a/examples/widgets/doc/src/addressbook.qdoc b/examples/widgets/doc/src/addressbook.qdoc
+index 8f2512298b4..58d7e010fdb 100644
+--- a/examples/widgets/doc/src/addressbook.qdoc
++++ b/examples/widgets/doc/src/addressbook.qdoc
+@@ -9,7 +9,7 @@
+     \brief The address book example shows how to use proxy models to display
+     different views onto data from a single model.
+ 
+-    \image addressbook-example.png Screenshot of the Address Book example
++    \image addressbook-example.png {Address book showing contacts and addresses}
+ 
+     This example provides an address book that allows contacts to be
+     grouped alphabetically into 9 groups: ABC, DEF, GHI, ... , VW,
+@@ -25,7 +25,7 @@
+     \c AddDialog. The \c MainWindow class uses \c AddressWidget as
+     its central widget and provides \uicontrol File and \uicontrol Tools menus.
+ 
+-    \image addressbook-classes.png Diagram for Address Book example
++    \image addressbook-classes.png {Address book main classes and elements}
+ 
+     The \c AddressWidget class is a QTabWidget subclass that is used
+     to manipulate the 10 tabs displayed in the example: the 9
+@@ -205,7 +205,7 @@
+     QTabWidget with the relevant label, obtained from the QStringList
+     of groups.
+ 
+-    \image addressbook-signals.png Signals and Slots Connections
++    \image addressbook-signals.png {Address book signals and slots connections}
+ 
+     We provide two \c addEntry() functions: One which is intended to be
+     used to accept user input, and the other which performs the actual
+@@ -253,7 +253,7 @@
+ 
+     \snippet itemviews/addressbook/addresswidget.cpp 4b
+ 
+-    \image addressbook-editdialog.png Screenshot of Dialog to Edit a Contact
++    \image addressbook-editdialog.png {Dialog for editing name and address}
+ 
+     Entries are removed using the \c removeEntry() function.
+     The selected row is removed by accessing it through the
+@@ -287,7 +287,7 @@
+     disappears according to the contents of the address book, as
+     mentioned in \c{AddressWidget}'s implementation.
+ 
+-    \image addressbook-newaddresstab.png Screenshot of NewAddressTab
++    \image addressbook-newaddresstab.png {Tab for adding new contacts}
+ 
+     The \c NewAddressTab class extends QWidget and contains a QLabel
+     and QPushButton.
+@@ -311,7 +311,7 @@
+ 
+     \snippet itemviews/addressbook/newaddresstab.cpp 1
+ 
+-    \image signals-n-slots-aw-nat.png
++    \image signals-n-slots-aw-nat.png {Function calls for adding a new contact}
+ 
+ 
+     \section1 AddDialog Class Definition
+@@ -322,7 +322,7 @@
+ 
+     \snippet itemviews/addressbook/adddialog.h 0
+ 
+-    \image addressbook-adddialog.png
++    \image addressbook-adddialog.png {Dialog for adding a new name and address}
+ 
+ 
+     \section1 AddDialog Class Implementation
+@@ -346,7 +346,9 @@
+ 
+     \table
+     \row \li \inlineimage addressbook-filemenu.png
++             {Open, Save, and Exit items in File menu}
+          \li \inlineimage addressbook-toolsmenu.png
++             {Add Entry, Edit Entry, and Remove Entry in Tools menu}
+     \endtable
+ 
+     \snippet itemviews/addressbook/mainwindow.h 0
+diff --git a/examples/widgets/doc/src/affine.qdoc b/examples/widgets/doc/src/affine.qdoc
+index 2ec3a4fc4d9..47aeaac5e13 100644
+--- a/examples/widgets/doc/src/affine.qdoc
++++ b/examples/widgets/doc/src/affine.qdoc
+@@ -11,7 +11,7 @@
+     \brief In this example we show Qt's ability to perform affine transformations
+     on painting operations.
+ 
+-    \image affine-demo.png
++    \image affine-demo.png {Demonstration of affine transformations on an image}
+ 
+     Transformations can be performed on any kind of graphics drawn using QPainter.
+     The transformations used to display the vector graphics, images, and text can be adjusted
+diff --git a/examples/widgets/doc/src/analogclock.qdoc b/examples/widgets/doc/src/analogclock.qdoc
+index aeaddd4b936..78a6b1d7d78 100644
+--- a/examples/widgets/doc/src/analogclock.qdoc
++++ b/examples/widgets/doc/src/analogclock.qdoc
+@@ -11,7 +11,8 @@
+     \brief The Analog Clock example shows how to draw the contents of a
+     custom widget.
+ 
+-    \borderedimage analogclock-example.png
++    \image analogclock-example.png
++           {Analog clock with hour, minute, and seconds hands}
+     \caption Screenshot of the Analog Clock example
+ 
+     This example also demonstrates how the transformation and scaling
+@@ -93,6 +94,7 @@
+     manual calculations just to draw the contents of a custom widget.
+ 
+     \image analogclock-viewport.png
++           {Shows widget coordinate system and origin on clock face}
+ 
+     We set the pen to be Qt::NoPen because we don't want any outline,
+     and we use a solid brush with the color appropriate for
+diff --git a/examples/widgets/doc/src/basicdrawing.qdoc b/examples/widgets/doc/src/basicdrawing.qdoc
+index bbdd19ff22c..9d046a87b79 100644
+--- a/examples/widgets/doc/src/basicdrawing.qdoc
++++ b/examples/widgets/doc/src/basicdrawing.qdoc
+@@ -20,6 +20,7 @@
+     but it can in addition do view and world transformation.
+ 
+     \image basicdrawing-example.png
++           {Window with various options for changing the drawing}
+ 
+     The example provides a render area, displaying the currently
+     active shape, and lets the user manipulate the rendered shape and
+diff --git a/examples/widgets/doc/src/calculator.qdoc b/examples/widgets/doc/src/calculator.qdoc
+index c59d3cd1619..31e6c6e99ea 100644
+--- a/examples/widgets/doc/src/calculator.qdoc
++++ b/examples/widgets/doc/src/calculator.qdoc
+@@ -11,7 +11,7 @@
+     functionality of a calculator widget, and how to use QGridLayout
+     to place child widgets in a grid.
+ 
+-    \borderedimage calculator-example.png
++    \image calculator-example.png {Basic calculator application}
+     \caption Screenshot of the Calculator example
+ 
+     The example consists of two classes:
+@@ -352,7 +352,7 @@
+     QSizePolicy::Expanding in the constructor and if we didn't
+     reimplement QWidget::sizeHint().
+ 
+-    \borderedimage calculator-ugly.png
++    \image calculator-ugly.png {Calculator with misaligned buttons}
+     \caption The Calculator example with default size policies and size hints
+ 
+ */
+diff --git a/examples/widgets/doc/src/calendarwidget.qdoc b/examples/widgets/doc/src/calendarwidget.qdoc
+index 01c6df6926d..840f2c9001a 100644
+--- a/examples/widgets/doc/src/calendarwidget.qdoc
++++ b/examples/widgets/doc/src/calendarwidget.qdoc
+@@ -9,7 +9,8 @@
+     \ingroup examples-layout
+     \brief The Calendar Widget example shows use of QCalendarWidget.
+ 
+-    \borderedimage calendarwidgetexample.png
++    \image calendarwidgetexample.png
++           {Calendar widget showing various calendar settings}
+ 
+     QCalendarWidget displays one calendar month
+     at a time and lets the user select a date.
+diff --git a/examples/widgets/doc/src/chip.qdoc b/examples/widgets/doc/src/chip.qdoc
+index 2c69c10f39f..498ff786449 100644
+--- a/examples/widgets/doc/src/chip.qdoc
++++ b/examples/widgets/doc/src/chip.qdoc
+@@ -13,4 +13,5 @@
+     views independently, and you can select and move items around the scene.
+ 
+     \image chip-demo.png
++           {Application showing computer chips and graphics options}
+ */
+diff --git a/examples/widgets/doc/src/collidingmice-example.qdoc b/examples/widgets/doc/src/collidingmice-example.qdoc
+index a1b8e0e1412..b34232283a7 100644
+--- a/examples/widgets/doc/src/collidingmice-example.qdoc
++++ b/examples/widgets/doc/src/collidingmice-example.qdoc
+@@ -13,6 +13,7 @@
+     items.
+ 
+     \image collidingmice-example.png
++           {Application running with mice and cheese graphics}
+ 
+     Graphics View provides the QGraphicsScene class for managing and
+     interacting with a large number of custom-made 2D graphical items
+diff --git a/examples/widgets/doc/src/combowidgetmapper.qdoc b/examples/widgets/doc/src/combowidgetmapper.qdoc
+index aae546005c1..c06e21c066d 100644
+--- a/examples/widgets/doc/src/combowidgetmapper.qdoc
++++ b/examples/widgets/doc/src/combowidgetmapper.qdoc
+@@ -10,6 +10,7 @@
+     map information from a model to specific widgets on a form.
+ 
+     \image combowidgetmapper-example.png
++           {Application with various fields such as Name, Address, and Type}
+ 
+     We create a \c Window class with an almost identical user interface,
+     except that, instead of providing a spin box so that each person's age
+@@ -78,6 +79,7 @@
+     delegate is used.
+ 
+     \image widgetmapper-combo-mapping.png
++    {Mapping of the model to the view using a delegate}
+ 
+     We show the implementation of the \c{updateButtons()} slot for
+     completeness:
+diff --git a/examples/widgets/doc/src/completer.qdoc b/examples/widgets/doc/src/completer.qdoc
+index f3e4fe8f0e5..1ae2576acc3 100644
+--- a/examples/widgets/doc/src/completer.qdoc
++++ b/examples/widgets/doc/src/completer.qdoc
+@@ -11,6 +11,7 @@
+     for an input widget based on data provided by a model.
+ 
+     \image completer-example.png
++           {Application showing various options and settings}
+ 
+     This example uses a custom item model, \c FileSystemModel, and a QCompleter object.
+     QCompleter is a class that provides completions based on an item model. The
+@@ -184,6 +185,7 @@
+     The screenshot below shows the Completer with the country list model.
+ 
+     \image completer-example-country.png
++           {Application showing the country list model contents}
+ 
+     If \c case is 3, we attempt to complete words. This is done using a
+     QStringListModel that contains data extracted from \e{words.txt}. The
+@@ -193,6 +195,7 @@
+     The screenshot below shows the Completer with the word list model.
+ 
+     \image completer-example-word.png
++           {Application showing the word list model contents}
+ 
+     Once the model type is selected, we call the \c changeMode() function and
+     the \c changeCase() function and set the wrap option accordingly. The
+diff --git a/examples/widgets/doc/src/composition.qdoc b/examples/widgets/doc/src/composition.qdoc
+index a8adcd25496..a3543f73429 100644
+--- a/examples/widgets/doc/src/composition.qdoc
++++ b/examples/widgets/doc/src/composition.qdoc
+@@ -11,6 +11,7 @@
+     \brief This demo shows some of the more advanced composition modes supported by Qt.
+ 
+     \image composition-demo.png
++           {Application that applies composition modes to image layers}
+ 
+     The two most common forms of composition are \b{Source} and \b{SourceOver}.
+     \b{Source} is used to draw opaque objects onto a paint device. In this mode,
+diff --git a/examples/widgets/doc/src/cuberhiwidget.qdoc b/examples/widgets/doc/src/cuberhiwidget.qdoc
+index a3c05ad800e..697c987afd4 100644
+--- a/examples/widgets/doc/src/cuberhiwidget.qdoc
++++ b/examples/widgets/doc/src/cuberhiwidget.qdoc
+@@ -9,6 +9,7 @@
+     \brief Shows how to render a textured cube and integrate with QPainter and widgets, using QRhi Qt's 3D API and shading language abstraction layer.
+ 
+     \image cuberhiwidget-example.jpg
++           {Application showing complex rendering overlays}
+     \caption Screenshot of the Cube RHI Widget example
+ 
+     This example builds on the \l{Simple RHI Widget Example}. While the simple
+diff --git a/examples/widgets/doc/src/deform.qdoc b/examples/widgets/doc/src/deform.qdoc
+index f33522fa3b5..82a3f60d682 100644
+--- a/examples/widgets/doc/src/deform.qdoc
++++ b/examples/widgets/doc/src/deform.qdoc
+@@ -12,6 +12,7 @@
+     using a \c QPainterPath.
+ 
+     \image deform-demo.png
++           {Application showing various vector deformation settings}
+ 
+     We define a vector deformation field in the shape of a lens and apply
+     this to all points in a path. This means that what is rendered on
+diff --git a/examples/widgets/doc/src/diagramscene.qdoc b/examples/widgets/doc/src/diagramscene.qdoc
+index 6f307ef97c1..70dc5cf2dfb 100644
+--- a/examples/widgets/doc/src/diagramscene.qdoc
++++ b/examples/widgets/doc/src/diagramscene.qdoc
+@@ -9,6 +9,7 @@
+     \brief Demonstrate how to use the Graphics View framework.
+ 
+     \image diagramscene.png
++           {Application with various flowchart graphics and icons}
+ 
+     The Diagram Scene example is an application in which you can
+     create a flowchart diagram. It is possible to add flowchart shapes
+diff --git a/examples/widgets/doc/src/dragdroprobot.qdoc b/examples/widgets/doc/src/dragdroprobot.qdoc
+index c9ff04574b3..0402e466487 100644
+--- a/examples/widgets/doc/src/dragdroprobot.qdoc
++++ b/examples/widgets/doc/src/dragdroprobot.qdoc
+@@ -13,6 +13,7 @@
+     \l{Animation Framework}.
+ 
+     \image dragdroprobot-example.png
++           {Application of a robot that responds to drag and drop events}
+ 
+     Graphics View provides the QGraphicsScene class for managing and
+     interacting with a large number of custom-made 2D graphical items derived
+diff --git a/examples/widgets/doc/src/draggableicons.qdoc b/examples/widgets/doc/src/draggableicons.qdoc
+index fd4f9e69e33..0f1feacb7fb 100644
+--- a/examples/widgets/doc/src/draggableicons.qdoc
++++ b/examples/widgets/doc/src/draggableicons.qdoc
+@@ -10,6 +10,7 @@
+     in the same application, and between different applications.
+ 
+     \image draggableicons-example.png
++           {Application with icons that respond to drag and drop events}
+ 
+     In many situations where drag and drop is used, the user starts dragging from
+     a particular widget and drops the payload onto another widget. In this example,
+diff --git a/examples/widgets/doc/src/draggabletext.qdoc b/examples/widgets/doc/src/draggabletext.qdoc
+index 6e15e7f9465..3609ed5a1a1 100644
+--- a/examples/widgets/doc/src/draggabletext.qdoc
++++ b/examples/widgets/doc/src/draggabletext.qdoc
+@@ -11,4 +11,5 @@
+     in the same application, and between different applications.
+ 
+     \image draggabletext-example.png
++           {Application with moveable text using drag and drop events}
+ */
+diff --git a/examples/widgets/doc/src/easing.qdoc b/examples/widgets/doc/src/easing.qdoc
+index b1eefeee259..730f5c16da1 100644
+--- a/examples/widgets/doc/src/easing.qdoc
++++ b/examples/widgets/doc/src/easing.qdoc
+@@ -10,6 +10,7 @@
+     control the speed of an animation.
+ 
+     \image easing-example.png
++           {Application that applies different easing curves to an animation}
+ 
+     See \l QEasingCurve for a detailed description on how to use the class's
+     functionalities.
+diff --git a/examples/widgets/doc/src/editabletreemodel.qdoc b/examples/widgets/doc/src/editabletreemodel.qdoc
+index 20136a02f8c..eaba87863e5 100644
+--- a/examples/widgets/doc/src/editabletreemodel.qdoc
++++ b/examples/widgets/doc/src/editabletreemodel.qdoc
+@@ -10,6 +10,7 @@
+     be used with other classes in the model/view framework.
+ 
+     \image itemviews-editabletreemodel.png
++         {Application that show editing of a tree model}
+ 
+     The model supports editable items, custom headers, and the ability to
+     insert and remove rows and columns. With these features, it is also
+@@ -56,6 +57,7 @@
+     \target Relations-between-internal-items
+     \table
+     \row \li \inlineimage itemviews-editabletreemodel-items.png
++             {Diagram of the relationship among root, parent, and child items}
+     \li \b{Relations between internal items}
+ 
+     When designing a data structure for use with a custom model, it is useful
+@@ -100,6 +102,7 @@
+ 
+     \table
+     \row \li \inlineimage itemviews-editabletreemodel-model.png
++             {Diagram of the tree model with row and column indexes}
+     \li \b{Accessing data via the model}
+ 
+     In the case shown in the diagram, the piece of information represented
+@@ -157,6 +160,7 @@
+     exposed by each column in a given row in the model.
+ 
+     \li \inlineimage itemviews-editabletreemodel-values.png
++         {Diagram of a possible data structure using QVariant}
+     \endtable
+ 
+     Since the \c TreeModel implementation has been designed for use with
+@@ -180,6 +184,7 @@
+     \table
+     \row
+     \li \inlineimage itemviews-editabletreemodel-indexes.png
++        {Diagram of accessing the tree model using model indexes}
+     \li \b{Relating items using model indexes}
+ 
+     As with the \l{itemviews/simpletreemodel}{Simple Tree Model} example,
+diff --git a/examples/widgets/doc/src/elasticnodes.qdoc b/examples/widgets/doc/src/elasticnodes.qdoc
+index c25fd680096..a6224b17c2a 100644
+--- a/examples/widgets/doc/src/elasticnodes.qdoc
++++ b/examples/widgets/doc/src/elasticnodes.qdoc
+@@ -15,6 +15,7 @@
+     as you zoom in, the graphics remain crisp.
+ 
+     \image elasticnodes-example.png
++           {Application with a graph of interactive nodes and edges}
+ 
+     Graphics View provides the QGraphicsScene class for managing and
+     interacting with a large number of custom-made 2D graphical items derived
+diff --git a/examples/widgets/doc/src/fetchmore.qdoc b/examples/widgets/doc/src/fetchmore.qdoc
+index d8dae18f33e..192c6a08e43 100644
+--- a/examples/widgets/doc/src/fetchmore.qdoc
++++ b/examples/widgets/doc/src/fetchmore.qdoc
+@@ -10,6 +10,7 @@
+     model on demand.
+ 
+     \image fetchmore-example.png
++           {Application that fetches and adds more items into the view model}
+ 
+     When you have large - or perhaps even infinite - data sets, you
+     will need to add items to the model in batches, and preferably only
+diff --git a/examples/widgets/doc/src/frozencolumn.qdoc b/examples/widgets/doc/src/frozencolumn.qdoc
+index c213ba1779d..05590b0b265 100644
+--- a/examples/widgets/doc/src/frozencolumn.qdoc
++++ b/examples/widgets/doc/src/frozencolumn.qdoc
+@@ -8,7 +8,8 @@
+     \ingroup examples-itemviews
+     \brief This example demonstrates how to freeze a column within a QTableView.
+ 
+-    \image frozencolumn-example.png "Screenshot of the example"
++    \image frozencolumn-example.png
++           {Application showing a frozen column in a table}
+ 
+     We use Qt's model/view framework to implement a table with its first
+     column frozen. This technique can be applied to several columns or rows,
+@@ -22,7 +23,7 @@
+     the coming sections.
+ 
+     \image frozencolumn-tableview.png
+-
++           {The layout of the table view, headers, and scrollbars}
+ 
+     \section1 FreezeTableWidget Class Definition
+ 
+diff --git a/examples/widgets/doc/src/gradients.qdoc b/examples/widgets/doc/src/gradients.qdoc
+index e2ad68db1ae..3003fce0448 100644
+--- a/examples/widgets/doc/src/gradients.qdoc
++++ b/examples/widgets/doc/src/gradients.qdoc
+@@ -12,6 +12,7 @@
+     be used in Qt.
+ 
+     \image gradients-demo.png
++           {Application with different settings for applying gradients}
+ 
+     There are three types of gradients:
+ 
+diff --git a/examples/widgets/doc/src/graphicsview-simpleanchorlayout.qdoc b/examples/widgets/doc/src/graphicsview-simpleanchorlayout.qdoc
+index ce5fe8934a2..72954e427f0 100644
+--- a/examples/widgets/doc/src/graphicsview-simpleanchorlayout.qdoc
++++ b/examples/widgets/doc/src/graphicsview-simpleanchorlayout.qdoc
+@@ -12,6 +12,8 @@
+     QGraphicsAnchorLayout class.
+ 
+     \image graphicssimpleanchorlayout-example.png
++           {Application using anchor layouts to place widgets}
++
+ 
+     The example starts by creating a QGraphicsScene (\c scene), 3 widgets
+     (\c a, \c b, and \c c), and a QGraphicsAnchorlayout (\c layout).
+diff --git a/examples/widgets/doc/src/imagecomposition.qdoc b/examples/widgets/doc/src/imagecomposition.qdoc
+index 9eec57ca889..077238fe2a4 100644
+--- a/examples/widgets/doc/src/imagecomposition.qdoc
++++ b/examples/widgets/doc/src/imagecomposition.qdoc
+@@ -14,6 +14,7 @@
+     in detail in \l{QPainter#Composition Modes}{Composition Modes}.
+ 
+     \image imagecomposition-example.png
++           {Application that combines two images using composition modes}
+ 
+     \section1 Setting Up The Resource File
+ 
+diff --git a/examples/widgets/doc/src/licensewizard.qdoc b/examples/widgets/doc/src/licensewizard.qdoc
+index 8965ef56240..955dd5af4fa 100644
+--- a/examples/widgets/doc/src/licensewizard.qdoc
++++ b/examples/widgets/doc/src/licensewizard.qdoc
+@@ -10,7 +10,7 @@
+     \brief The License Wizard example shows how to implement complex wizards in
+     Qt.
+ 
+-    \image licensewizard-example.png Screenshot of the License Wizard example
++    \image licensewizard-example.png {First wizard page of license wizard}
+ 
+     Most wizards have a linear structure, with page 1 followed by
+     page 2 and so on until the last page. The
+@@ -23,7 +23,7 @@
+     wizard pages; depending on which options are selected, the user
+     can reach different pages.
+ 
+-    \image licensewizard-flow.png The License Wizard pages
++    \image licensewizard-flow.png {Complex wizard page flow chart}
+ 
+     The example consists of the following classes:
+ 
+diff --git a/examples/widgets/doc/src/lineedits.qdoc b/examples/widgets/doc/src/lineedits.qdoc
+index 7065a5f4256..2f078564a20 100644
+--- a/examples/widgets/doc/src/lineedits.qdoc
++++ b/examples/widgets/doc/src/lineedits.qdoc
+@@ -11,7 +11,8 @@
+     on the input and output supplied by the user.
+ 
+ 
+-    \borderedimage lineedits-example.png
++    \image lineedits-example.png
++           {Application with various types and uses of line edits}
+ 
+     The example consists of a single \c Window class, containing a selection of
+     line edits with different input constraints and display properties that can be
+diff --git a/examples/widgets/doc/src/menus.qdoc b/examples/widgets/doc/src/menus.qdoc
+index b78d3946917..e6de6a78df8 100644
+--- a/examples/widgets/doc/src/menus.qdoc
++++ b/examples/widgets/doc/src/menus.qdoc
+@@ -18,6 +18,7 @@
+     special keyboard key or by right-clicking.
+ 
+     \image menus-example.png
++           {Application with the Edit menu open}
+ 
+     A menu consists of a list of \e action items. In applications,
+     many common commands can be invoked via menus, toolbar buttons as
+diff --git a/examples/widgets/doc/src/orderform.qdoc b/examples/widgets/doc/src/orderform.qdoc
+index 7ae89dfda8e..97570bcec9d 100644
+--- a/examples/widgets/doc/src/orderform.qdoc
++++ b/examples/widgets/doc/src/orderform.qdoc
+@@ -17,6 +17,7 @@
+     to a QTabWidget for easy access.
+ 
+     \image orderform-example.png
++           {Application showing a completed order form for a customer}
+ 
+     \section1 DetailsDialog Definition
+ 
+@@ -42,6 +43,7 @@
+     The screenshot below shows the \c DetailsDialog we intend to create.
+ 
+     \image orderform-example-detailsdialog.png
++           {Dialog for entering customer order information}
+ 
+     \section1 DetailsDialog Implementation
+ 
+diff --git a/examples/widgets/doc/src/painterpaths.qdoc b/examples/widgets/doc/src/painterpaths.qdoc
+index 305a7608e59..dcc95c7290e 100644
+--- a/examples/widgets/doc/src/painterpaths.qdoc
++++ b/examples/widgets/doc/src/painterpaths.qdoc
+@@ -10,6 +10,7 @@
+     to build complex shapes for rendering.
+ 
+     \image painterpaths-example.png
++           {Application showing various shapes and graphical options}
+ 
+     The QPainterPath class provides a container for painting
+     operations, enabling graphical shapes to be constructed and
+diff --git a/examples/widgets/doc/src/pathstroke.qdoc b/examples/widgets/doc/src/pathstroke.qdoc
+index bc4001ebb5e..6c714b8cb5d 100644
+--- a/examples/widgets/doc/src/pathstroke.qdoc
++++ b/examples/widgets/doc/src/pathstroke.qdoc
+@@ -13,6 +13,7 @@
+     used in Qt.
+ 
+     \image pathstroke-demo.png
++           {Application showing an adjustable curve and curve style options}
+ 
+     Qt defines cap styles for how the end points are treated and join
+     styles for how path segments are joined together. A standard set of
+diff --git a/examples/widgets/doc/src/regularexpression.qdoc b/examples/widgets/doc/src/regularexpression.qdoc
+index f6f1e876893..4a3a57e4e6f 100644
+--- a/examples/widgets/doc/src/regularexpression.qdoc
++++ b/examples/widgets/doc/src/regularexpression.qdoc
+@@ -18,5 +18,6 @@
+     and partial/incremental matching.
+ 
+     \image regularexpression-example.png
++           {Application with various fields for testing regular expressions}
+ */
+ 
+diff --git a/examples/widgets/doc/src/screenshot.qdoc b/examples/widgets/doc/src/screenshot.qdoc
+index 2e2b3123ef7..84ef1712e26 100644
+--- a/examples/widgets/doc/src/screenshot.qdoc
++++ b/examples/widgets/doc/src/screenshot.qdoc
+@@ -16,6 +16,7 @@
+     that an application resizes smoothly and without data loss.
+ 
+     \image screenshot-example.png
++           {Application with options for taking desktop screenshots}
+ 
+     With the application the users can take a screenshot of their
+     desktop. They are provided with a couple of options:
+diff --git a/examples/widgets/doc/src/shapedclock.qdoc b/examples/widgets/doc/src/shapedclock.qdoc
+index 4bcd04683c5..46bc5561cb8 100644
+--- a/examples/widgets/doc/src/shapedclock.qdoc
++++ b/examples/widgets/doc/src/shapedclock.qdoc
+@@ -9,7 +9,8 @@
+     \brief The example shows how to make a round window with a translucent
+     background.
+ 
+-    \borderedimage shapedclock-example.png
++    \image shapedclock-example.png
++           {Translucent clock overlaid on text}
+ 
+     Widgets that set their background to be translucent will be transparent for all
+     unpainted pixels, and the background will shine through pixels painted with an
+@@ -68,6 +69,7 @@
+     on the event, we accept it by calling its \l{QEvent::accept()}{accept()} function.
+ 
+     \image shapedclock-dragging.png
++           {The drag position relative to the clock face}
+ 
+     The \c mouseMoveEvent() handler is called if the mouse is moved over the widget.
+ 
+diff --git a/examples/widgets/doc/src/shortcuteditor.qdoc b/examples/widgets/doc/src/shortcuteditor.qdoc
+index b17835ba168..b9de1178520 100644
+--- a/examples/widgets/doc/src/shortcuteditor.qdoc
++++ b/examples/widgets/doc/src/shortcuteditor.qdoc
+@@ -12,6 +12,7 @@
+     Programming} overview.
+ 
+     \image shortcuteditor-example.png
++           {List of actions and their assigned keyboard shortcuts}
+ 
+     Qt's model/view architecture provides a standard way for views to
+     manipulate information in a data source, using an abstract model
+@@ -31,6 +32,7 @@
+ 
+     \table
+     \row \li \inlineimage treemodel-structure.svg
++                          {Structure of the shortcut model in rows}
+     \li \b{Shortcut Editor Structure}
+ 
+     The data is stored internally in the model using ShortcutEditorModelItem
+diff --git a/examples/widgets/doc/src/simplerhiwidget.qdoc b/examples/widgets/doc/src/simplerhiwidget.qdoc
+index 81ada91178a..bf2bb871a07 100644
+--- a/examples/widgets/doc/src/simplerhiwidget.qdoc
++++ b/examples/widgets/doc/src/simplerhiwidget.qdoc
+@@ -9,6 +9,7 @@
+     \brief Shows how to render a triangle using QRhi, Qt's 3D API and shading language abstraction layer.
+ 
+     \image simplerhiwidget-example.jpg
++           {Colored triangle on a green background}
+     \caption Screenshot of the Simple RHI Widget example
+ 
+     This example is, in many ways, the counterpart of the \l{RHI Window
+diff --git a/examples/widgets/doc/src/simpletreemodel.qdoc b/examples/widgets/doc/src/simpletreemodel.qdoc
+index be4889adbe9..ee09a140e0b 100644
+--- a/examples/widgets/doc/src/simpletreemodel.qdoc
++++ b/examples/widgets/doc/src/simpletreemodel.qdoc
+@@ -16,6 +16,7 @@
+     \l{Model/View Programming} overview.
+ 
+     \image simpletreemodel-example.png
++           {Documentation structure with chapter titles and brief descriptions}
+ 
+     Qt's model/view architecture provides a standard way for views to
+     manipulate information in a data source, using an abstract model
+@@ -41,6 +42,7 @@
+     \target SimpleTreeModelStructure
+     \table
+     \row \li \inlineimage treemodel-structure.svg
++                          {Tree structure with root and tree items}
+     \li \b{Simple Tree Model Structure}
+ 
+     The data is stored internally in the model using \c TreeItem objects that
+diff --git a/examples/widgets/doc/src/sliders.qdoc b/examples/widgets/doc/src/sliders.qdoc
+index 9bfb4abdc44..b0fcac4c280 100644
+--- a/examples/widgets/doc/src/sliders.qdoc
++++ b/examples/widgets/doc/src/sliders.qdoc
+@@ -21,7 +21,8 @@
+     synchronize the behavior of two or more widgets, and how to override
+     \l{QWidget::}{resizeEvent()} to implement a responsive layout.
+ 
+-    \borderedimage sliders-example.png
++    \image sliders-example.png
++           {Gallery of different sliders, scroll bars, and dials}
+     \caption Screenshot of the Sliders example
+ 
+     The Sliders example consists of two classes:
+diff --git a/examples/widgets/doc/src/spinboxes.qdoc b/examples/widgets/doc/src/spinboxes.qdoc
+index eb42696c48e..8379cd48766 100644
+--- a/examples/widgets/doc/src/spinboxes.qdoc
++++ b/examples/widgets/doc/src/spinboxes.qdoc
+@@ -10,7 +10,7 @@
+     spin boxes available in Qt, from a simple QSpinBox widget to more complex
+     editors like the QDateTimeEdit widget.
+ 
+-    \borderedimage spinboxes-example.png
++    \image spinboxes-example.png {Gallery of different types of spin boxes}
+ 
+     The example consists of a single \c Window class that is used to display the
+     different spin box-based widgets available with Qt.
+diff --git a/examples/widgets/doc/src/spreadsheet.qdoc b/examples/widgets/doc/src/spreadsheet.qdoc
+index 02d5e0a957b..39f8d144967 100644
+--- a/examples/widgets/doc/src/spreadsheet.qdoc
++++ b/examples/widgets/doc/src/spreadsheet.qdoc
+@@ -13,4 +13,5 @@
+     types of data in distinctive colors.
+ 
+     \image spreadsheet-demo.png
++           {Spreadsheet application with cells, rows, and columns}
+ */
+diff --git a/examples/widgets/doc/src/standarddialogs.qdoc b/examples/widgets/doc/src/standarddialogs.qdoc
+index 396f1d1044a..70b33f79795 100644
+--- a/examples/widgets/doc/src/standarddialogs.qdoc
++++ b/examples/widgets/doc/src/standarddialogs.qdoc
+@@ -9,5 +9,5 @@
+ 
+     \brief The Standard Dialogs example shows the standard dialogs that are provided by Qt.
+ 
+-    \image standarddialogs-example.png
++    \image standarddialogs-example.png {Dialog requesting for integer input}
+ */
+diff --git a/examples/widgets/doc/src/syntaxhighlighter.qdoc b/examples/widgets/doc/src/syntaxhighlighter.qdoc
+index 17bcc1fa06d..26f11c67e59 100644
+--- a/examples/widgets/doc/src/syntaxhighlighter.qdoc
++++ b/examples/widgets/doc/src/syntaxhighlighter.qdoc
+@@ -13,6 +13,7 @@
+     highlighting by subclassing the QSyntaxHighlighter class.
+ 
+     \image syntaxhighlighter-example.png
++           {Text editor with syntax highlighting}
+ 
+     The Syntax Highlighter application displays C++ files with custom
+     syntax highlighting.
+diff --git a/examples/widgets/doc/src/tabdialog.qdoc b/examples/widgets/doc/src/tabdialog.qdoc
+index fb45bbae046..54e0e5f91d5 100644
+--- a/examples/widgets/doc/src/tabdialog.qdoc
++++ b/examples/widgets/doc/src/tabdialog.qdoc
+@@ -16,7 +16,7 @@
+     dialog, information can be split into different categories, while
+     remaining accessible.
+ 
+-    \image tabdialog-example.png
++    \image tabdialog-example.png {File information on different tabs}
+ 
+     The Tab Dialog example consists of a single \c TabDialog class that
+     provides three tabs, each containing information about a particular
+diff --git a/examples/widgets/doc/src/tablet.qdoc b/examples/widgets/doc/src/tablet.qdoc
+index 9d49d8dec82..a18eb3249e7 100644
+--- a/examples/widgets/doc/src/tablet.qdoc
++++ b/examples/widgets/doc/src/tablet.qdoc
+@@ -8,7 +8,7 @@
+     \ingroup examples-widgets
+     \brief This example shows how to use a Wacom tablet in Qt applications.
+ 
+-    \image tabletexample.png
++    \image tabletexample.png {Application displaying a drawing area}
+ 
+     When you use a tablet with Qt applications, \l{QTabletEvent}s are
+     generated. You need to reimplement the \l{QWidget::}{tabletEvent()} event
+diff --git a/examples/widgets/doc/src/transformations.qdoc b/examples/widgets/doc/src/transformations.qdoc
+index f8a29407c83..e9f3b452397 100644
+--- a/examples/widgets/doc/src/transformations.qdoc
++++ b/examples/widgets/doc/src/transformations.qdoc
+@@ -14,6 +14,7 @@
+     it shows how the order of transformations affect the result.
+ 
+     \image transformations-example.png
++           {Application displaying different customizable text transformations}
+ 
+     The application allows the user to manipulate the rendering of a
+     shape by changing the translation, rotation and scale of
+diff --git a/examples/widgets/doc/src/treemodelcompleter.qdoc b/examples/widgets/doc/src/treemodelcompleter.qdoc
+index ae7c18f442e..a0a1ba4d58f 100644
+--- a/examples/widgets/doc/src/treemodelcompleter.qdoc
++++ b/examples/widgets/doc/src/treemodelcompleter.qdoc
+@@ -12,6 +12,7 @@
+     to access Child, GrandChild and GrandGrandChild level objects.
+ 
+     \image treemodelcompleter-example.png
++    {Visualization of a tree model and various options for the completer}
+ 
+     Similar to the \l{Completer Example}, we provide QComboBox objects to
+     enable selection for completion mode and case sensitivity, as well as
+diff --git a/examples/widgets/doc/src/trivialwizard.qdoc b/examples/widgets/doc/src/trivialwizard.qdoc
+index 75d007f3881..ea9145dcda7 100644
+--- a/examples/widgets/doc/src/trivialwizard.qdoc
++++ b/examples/widgets/doc/src/trivialwizard.qdoc
+@@ -12,10 +12,11 @@
+     of QWizard.
+ 
+     \image trivialwizard-example-flow.png
++    {Flow from introduction, to registration, and to the conclusion page}
+ 
+     \section1 Introduction Page
+ 
+-    \image trivialwizard-example-introduction.png
++    \image trivialwizard-example-introduction.png {Introduction wizard page}
+ 
+     The introduction page is created with the \c createIntroPage()
+     function where a QWizardPage is created and its title is set to
+@@ -27,7 +28,7 @@
+ 
+     \section1 Registration Page
+ 
+-    \image trivialwizard-example-registration.png
++    \image trivialwizard-example-registration.png {Registration wizard page}
+ 
+     The registration page is created with the \c createRegistrationPage()
+     function. QLineEdit objects are used to allow the user to input a name
+@@ -38,7 +39,7 @@
+ 
+     \section1 Conclusion Page
+ 
+-    \image trivialwizard-example-conclusion.png
++    \image trivialwizard-example-conclusion.png {Conclusion wizard page}
+ 
+     The conclusion page is created in the \c createConclusionPage()
+     function. This function's content is similar to \c createIntroPage(). A
+diff --git a/examples/widgets/doc/src/windowflags.qdoc b/examples/widgets/doc/src/windowflags.qdoc
+index 10b04967282..31f936fa977 100644
+--- a/examples/widgets/doc/src/windowflags.qdoc
++++ b/examples/widgets/doc/src/windowflags.qdoc
+@@ -18,7 +18,7 @@
+     A widget's flags are stored in a Qt::WindowFlags type which stores
+     an OR combination of the flags.
+ 
+-    \borderedimage windowflags-example.png
++    \image windowflags-example.png {Controller window and preview window}
+     \caption Screenshot of the Window Flags example
+ 
+     The example consists of two classes:
+@@ -57,7 +57,8 @@
+     an associated \c PreviewWindow to show the effect of the currently
+     chosen window flags.
+ 
+-    \image windowflags_controllerwindow.png Screenshot of the Controller Window
++    \image windowflags_controllerwindow.png
++           {Controller window with the different flag types and hints}
+ 
+     \section1 ControllerWindow Class Implementation
+ 
+@@ -163,7 +164,7 @@
+     the text editor, and the QWidget::setWindowFlags() function to
+     display the names of the window flags.
+ 
+-    \image windowflags_previewwindow.png Screenshot of the Preview Window
++    \image windowflags_previewwindow.png {Preview window showing window flags}
+ 
+     \section1 PreviewWindow Class Implementation
+ 
+diff --git a/examples/widgets/gestures/imagegestures/doc/src/imagegestures.qdoc b/examples/widgets/gestures/imagegestures/doc/src/imagegestures.qdoc
+index 46053566ab9..03b31edabc5 100644
+--- a/examples/widgets/gestures/imagegestures/doc/src/imagegestures.qdoc
++++ b/examples/widgets/gestures/imagegestures/doc/src/imagegestures.qdoc
+@@ -10,7 +10,7 @@
+     This example shows how to enable gestures for a widget and use gesture input
+     to perform actions.
+ 
+-    \image imagegestures-example.png
++    \image imagegestures-example.png {Gesture inputs on an image of a flower}
+ 
+     We use two classes to create the user interface for the application: \c MainWidget
+     and \c ImageWidget. The \c MainWidget class is simply used as a container for the
+diff --git a/examples/widgets/tools/customcompleter/doc/src/customcompleter.qdoc b/examples/widgets/tools/customcompleter/doc/src/customcompleter.qdoc
+index e03ea703a1f..e2d9c2b0305 100644
+--- a/examples/widgets/tools/customcompleter/doc/src/customcompleter.qdoc
++++ b/examples/widgets/tools/customcompleter/doc/src/customcompleter.qdoc
+@@ -15,7 +15,7 @@
+     characters input by the user and the user's choice of word is inserted
+     into the \c TextEdit using QTextCursor.
+ 
+-    \image customcompleter-example.png
++    \image customcompleter-example.png {Text editor with the autocomplete feature}
+ 
+     \section1 Setting Up The Resource File
+ 
+@@ -84,6 +84,7 @@
+     The figure below illustrates this process:
+ 
+     \image customcompleter-insertcompletion.png
++           {Suggested completion string "ACTUAL" when user types "ACT"}
+ 
+     \c{completion.length()} = 6
+ 
+diff --git a/examples/widgets/touch/knobs/doc/src/touch-knobs.qdoc b/examples/widgets/touch/knobs/doc/src/touch-knobs.qdoc
+index fc6daa3732c..d229f54f5c7 100644
+--- a/examples/widgets/touch/knobs/doc/src/touch-knobs.qdoc
++++ b/examples/widgets/touch/knobs/doc/src/touch-knobs.qdoc
+@@ -11,5 +11,5 @@
+     The Touch Knobs example shows how to create custom controls that
+     accept touch input.
+ 
+-    \image touch-knobs-example.png
++    \image touch-knobs-example.png {Two knobs that respond to touch input}
+ */
+diff --git a/examples/widgets/tutorials/notepad/gettingstartedqt.qdoc b/examples/widgets/tutorials/notepad/gettingstartedqt.qdoc
+index 1ed862e6205..d081cbede57 100644
+--- a/examples/widgets/tutorials/notepad/gettingstartedqt.qdoc
++++ b/examples/widgets/tutorials/notepad/gettingstartedqt.qdoc
+@@ -14,7 +14,7 @@
+     file, save it, print it,
+     or reopen and edit it again. You can also set the font to be used.
+ 
+-    \image notepad1.png "Notepad application"
++    \image notepad1.png {Notepad application}
+ 
+     \include examples-run.qdocinc
+ 
+@@ -28,7 +28,7 @@
+     \note The UI text in \QC and the contents of the generated files
+     depend on the \QC version that you use.
+ 
+-    \image notepad2.png "Qt Creator New Project dialog"
++    \image notepad2.png {Qt Creator New Project dialog}
+ 
+     To create the Notepad project, select \uicontrol File >
+     \uicontrol {New Project} > \uicontrol {Application (Qt)} >
+@@ -37,7 +37,7 @@
+     type \e Notepad as the class name and select \uicontrol QMainWindow
+     as the base class.
+ 
+-    \image notepad3.png "Class Information Dialog"
++    \image notepad3.png {Class Information dialog}
+ 
+     The \uicontrol {Qt Widgets Application} wizard creates a project that contains
+     a main source file and a set of files that specify a user interface
+@@ -172,7 +172,7 @@
+ 
+     The UI now looks as follows in \QD:
+ 
+-    \image notepad4.png
++    \image notepad4.png {Widget Editing Mode to create the layout}
+ 
+     You can view the generated XML file in the code editor:
+ 
+diff --git a/src/widgets/dialogs/qerrormessage.cpp b/src/widgets/dialogs/qerrormessage.cpp
+index 1ca521eaf24..7dc0fda95df 100644
+--- a/src/widgets/dialogs/qerrormessage.cpp
++++ b/src/widgets/dialogs/qerrormessage.cpp
+@@ -147,7 +147,7 @@ QSize QErrorMessageTextView::sizeHint() const
+     The \l{dialogs/standarddialogs}{Standard Dialogs} example shows
+     how to use QErrorMessage as well as other built-in Qt dialogs.
+ 
+-    \image qerrormessage.png
++    \image qerrormessage.png {Dialog with a network-related error message}
+ 
+     \sa QMessageBox, QStatusBar::showMessage(), {Standard Dialogs Example}
+ */
+diff --git a/src/widgets/dialogs/qfiledialog.cpp b/src/widgets/dialogs/qfiledialog.cpp
+index 4b3be13e667..d964c9667e6 100644
+--- a/src/widgets/dialogs/qfiledialog.cpp
++++ b/src/widgets/dialogs/qfiledialog.cpp
+@@ -66,7 +66,7 @@ Q_GLOBAL_STATIC(QUrl, lastVisitedDir)
+   The QFileDialog class enables a user to traverse the file system
+   to select one or many files or a directory.
+ 
+-  \image qtquickdialogs-filedialog-gtk.png
++  \image qtquickdialogs-filedialog-gtk.png {Open file dialog}
+ 
+   The easiest way to create a QFileDialog is to use the static functions,
+   such as \l getOpenFileName().
+@@ -395,7 +395,7 @@ QFileDialog::~QFileDialog()
+ 
+     Then the file dialog looks like this:
+ 
+-    \image filedialogurls.png
++    \image filedialogurls.png {Open file dialog with set URLs in sidebar}
+ 
+     \sa sidebarUrls()
+ */
+diff --git a/src/widgets/dialogs/qmessagebox.cpp b/src/widgets/dialogs/qmessagebox.cpp
+index c188aed4202..58c837100c7 100644
+--- a/src/widgets/dialogs/qmessagebox.cpp
++++ b/src/widgets/dialogs/qmessagebox.cpp
+@@ -582,7 +582,7 @@ void QMessageBoxPrivate::helperClicked(QPlatformDialogHelper::StandardButton hel
+     box. The rest of the GUI is blocked until the message box is
+     dismissed.
+ 
+-    \image msgbox1.png
++    \image msgbox1.png {Message box with a simple message and an OK button}
+ 
+     A better approach than just alerting the user to an event is to
+     also ask the user what to do about it.
+@@ -602,6 +602,7 @@ void QMessageBoxPrivate::helperClicked(QPlatformDialogHelper::StandardButton hel
+     \snippet code/src_gui_dialogs_qmessagebox.cpp 6
+ 
+     \image msgbox2.png
++           {Message box with a "Save", "Don't Save", and "Cancel" buttons}
+ 
+     The exec() slot returns the StandardButtons value of the button
+     that was clicked.
+@@ -613,11 +614,12 @@ void QMessageBoxPrivate::helperClicked(QPlatformDialogHelper::StandardButton hel
+     Depending on the platform the \l{QMessageBox::detailedText} {detailed text},
+     may require the user to click a \uicontrol{Show Details...} button to be shown.
+ 
+-    \image msgbox3.png
++    \image msgbox3.png {Save message box with a "Show Details..." button}
+ 
+     Clicking the \uicontrol{Show Details...} button displays the detailed text.
+ 
+     \image msgbox4.png
++           {Save message box showing the detailed text}
+ 
+     \section2 Rich Text and the Text Format Property
+ 
+@@ -649,19 +651,19 @@ void QMessageBoxPrivate::helperClicked(QPlatformDialogHelper::StandardButton hel
+ 
+     \table
+     \row
+-    \li \image qmessagebox-quest.png
++    \li \image qmessagebox-quest.png {Question mark icon}
+     \li \l Question
+     \li For asking a question during normal operations.
+     \row
+-    \li \image qmessagebox-info.png
++    \li \image qmessagebox-info.png {Information icon}
+     \li \l Information
+     \li For reporting information about normal operations.
+     \row
+-    \li \image qmessagebox-warn.png
++    \li \image qmessagebox-warn.png {Warning icon}
+     \li \l Warning
+     \li For reporting non-critical errors.
+     \row
+-    \li \image qmessagebox-crit.png
++    \li \image qmessagebox-crit.png {Critical problem icon}
+     \li \l Critical
+     \li For reporting critical errors.
+     \endtable
+diff --git a/src/widgets/dialogs/qwizard.cpp b/src/widgets/dialogs/qwizard.cpp
+index b4ce09f6aae..44f5185672d 100644
+--- a/src/widgets/dialogs/qwizard.cpp
++++ b/src/widgets/dialogs/qwizard.cpp
+@@ -1790,14 +1790,14 @@ void QWizardAntiFlickerWidget::paintEvent(QPaintEvent *)
+             \li ModernStyle
+             \li MacStyle
+             \li AeroStyle
+-    \row    \li \inlineimage qtwizard-classic1.png
+-            \li \inlineimage qtwizard-modern1.png
+-            \li \inlineimage qtwizard-mac1.png
+-            \li \inlineimage qtwizard-aero1.png
+-    \row    \li \inlineimage qtwizard-classic2.png
+-            \li \inlineimage qtwizard-modern2.png
+-            \li \inlineimage qtwizard-mac2.png
+-            \li \inlineimage qtwizard-aero2.png
++    \row    \li \inlineimage qtwizard-classic1.png {Wizard with ClassicStyle}
++            \li \inlineimage qtwizard-modern1.png {Wizard with ModernStyle}
++            \li \inlineimage qtwizard-mac1.png {Wizard with MacStyle}
++            \li \inlineimage qtwizard-aero1.png {Wizard with AeroStyle}
++    \row    \li \inlineimage qtwizard-classic2.png {Wizard with ClassicStyle}
++            \li \inlineimage qtwizard-modern2.png {Wizard with ModernStyle}
++            \li \inlineimage qtwizard-mac2.png {Wizard with MacStyle}
++            \li \inlineimage qtwizard-aero2.png {Wizard with AeroStyle}
+     \endtable
+ 
+     Note: AeroStyle has effect only on a Windows Vista system with alpha compositing enabled.
+@@ -1841,7 +1841,7 @@ void QWizardAntiFlickerWidget::paintEvent(QPaintEvent *)
+     The diagram belows shows how QWizard renders these attributes,
+     assuming they are all present and ModernStyle is used:
+ 
+-    \image qtwizard-nonmacpage.png
++    \image qtwizard-nonmacpage.png {Attributes on a wizard page}
+ 
+     When a \l{QWizardPage::}{subTitle} is set, QWizard displays it
+     in a header, in which case it also uses the BannerPixmap and the
+@@ -1858,7 +1858,7 @@ void QWizardAntiFlickerWidget::paintEvent(QPaintEvent *)
+     If the wizard's style is MacStyle, the page looks radically
+     different:
+ 
+-    \image qtwizard-macpage.png
++    \image qtwizard-macpage.png {Attributes on a wizard page using MacStyle}
+ 
+     The watermark, banner, and logo pixmaps are ignored by the
+     MacStyle. If the BackgroundPixmap is set, it is used as the
+@@ -1975,7 +1975,7 @@ void QWizardAntiFlickerWidget::paintEvent(QPaintEvent *)
+     It provides several wizard pages; depending on which options are
+     selected, the user can reach different pages.
+ 
+-    \image licensewizard-flow.png
++    \image licensewizard-flow.png {Complex wizard page flow chart}
+ 
+     In complex wizards, pages are identified by IDs. These IDs are
+     typically defined using an enum. For example:
+diff --git a/src/widgets/doc/qtwidgets.qdocconf b/src/widgets/doc/qtwidgets.qdocconf
+index a72b68024c6..047241bef3d 100644
+--- a/src/widgets/doc/qtwidgets.qdocconf
++++ b/src/widgets/doc/qtwidgets.qdocconf
+@@ -97,3 +97,6 @@ manifestmeta.highlighted.names += \
+ 
+ # Enforce zero documentation warnings
+ warninglimit = 0
++
++reportmissingalttextforimages = true
++
+diff --git a/src/widgets/doc/src/graphicsview.qdoc b/src/widgets/doc/src/graphicsview.qdoc
+index c4f06160202..5ad522f4d6d 100644
+--- a/src/widgets/doc/src/graphicsview.qdoc
++++ b/src/widgets/doc/src/graphicsview.qdoc
+@@ -106,7 +106,7 @@
+         scene coordinates: QGraphicsView::mapToScene() and
+         QGraphicsView::mapFromScene().
+ 
+-        \image graphicsview-view.png
++        \image graphicsview-view.png {Grid of computer chips}
+ 
+       \section2 The Item
+ 
+@@ -149,7 +149,7 @@
+         to provide your own collision detection, however, you can reimplement
+         QGraphicsItem::collidesWith().
+ 
+-        \image graphicsview-items.png
++        \image graphicsview-items.png {Various shapes and graphics on a grid}
+ 
+     \section1 Classes in the Graphics View Framework
+ 
+@@ -180,6 +180,7 @@
+       logical coordinates and device coordinates.
+ 
+       \image graphicsview-parentchild.png
++             {Several coordinate system transformation}
+ 
+       \section2 Item Coordinates
+ 
+diff --git a/src/widgets/doc/src/model-view-programming.qdoc b/src/widgets/doc/src/model-view-programming.qdoc
+index 5461619a4de..2c5ee33de0f 100644
+--- a/src/widgets/doc/src/model-view-programming.qdoc
++++ b/src/widgets/doc/src/model-view-programming.qdoc
+@@ -48,6 +48,7 @@
+ 
+     \table
+     \row \li \inlineimage modelview-overview.png
++             {Model, view, and delegate interaction diagram}
+     \li \b{The model/view architecture}
+ 
+     The model communicates with a source of data, providing an \e interface
+@@ -220,6 +221,7 @@
+     items are highlighted in both views.
+ 
+     \image shareddirmodel.png
++    {Tree view and list view to display the same file system model}
+ 
+     We set up a QFileSystemModel so that it is ready for use, and create some
+     views to display the contents of a directory. This shows the simplest
+@@ -274,7 +276,7 @@
+     of data in the model, but they are not restricted in the way that they
+     present this information to the user.
+ 
+-    \image modelview-models.png
++    \image modelview-models.png {List model, table model, and tree model}
+ 
+     Models also notify any attached views about changes to data through the
+     signals and slots mechanism.
+@@ -332,6 +334,7 @@
+ 
+     \table 70%
+     \row \li \inlineimage modelview-tablemodel.png
++              {Structure of the table model using rows and columns}
+     \li \b{Rows and columns}
+ 
+     The diagram shows a representation of a basic table model in which each
+@@ -364,6 +367,7 @@
+ 
+     \table 70%
+     \row \li \inlineimage modelview-treemodel.png
++             {Structure of the tree model with parent, row, and column items}
+     \li \b{Parents, rows, and columns}
+ 
+     The diagram shows a representation of a tree model in which each item is
+@@ -394,7 +398,7 @@
+     \snippet code/doc_src_model-view-programming.cpp 6
+ 
+     \table 70%
+-    \row \li \inlineimage modelview-roles.png
++    \row \li \inlineimage modelview-roles.png {Different roles in a model}
+     \li \b{Item roles}
+ 
+     The role indicates to the model which type of data is being referred to.
+@@ -556,7 +560,7 @@
+     in the form of a table, much like the layout of a spreadsheet
+     application.
+ 
+-    \image standard-views.png
++    \image standard-views.png {List view, tree view, and table view}
+ 
+     The default behavior of the standard views shown above should be
+     sufficient for most applications. They provide basic editing
+@@ -592,7 +596,7 @@
+     interface. When the user tries to edit an item, the view uses a default
+     delegate to provide an editor widget.
+ 
+-    \image stringlistmodel.png
++    \image stringlistmodel.png {List of text using a string list model}
+ 
+     The above image shows how a QListView represents the data in the string
+     list model. Since the model is editable, the view automatically allows
+@@ -615,6 +619,7 @@
+     view being used.
+ 
+     \image sharedmodel-tableviews.png
++           {Two table views share a model, but not share the selection model}
+ 
+     The above image shows two different views onto the same model, each
+     containing a number of selected items. Although the data from the model
+@@ -657,6 +662,7 @@
+     the data and the selected items synchronized.
+ 
+     \image sharedselection-tableviews.png
++           {Two table views with the same selection model}
+ 
+     In the example shown above, two views of the same type were used to
+     display the same model's data. However, if two different types of view
+@@ -718,6 +724,7 @@
+     the model, and this will use the custom delegate for editing.
+ 
+     \image spinboxdelegate-example.webp
++           {Custom spin box delegate for editing}
+ 
+     We subclass the delegate from \l QStyledItemDelegate because we do not want
+     to write custom display functions. However, we must still provide
+@@ -970,6 +977,7 @@
+     of their previous state. The resulting selection is shown by the view.
+ 
+     \image selected-items1.png
++           {Selection model of a table model is highlighted blue}
+ 
+     The selection of items can be modified using various operations that
+     are defined by the selection flags. The selection that results from
+@@ -1056,7 +1064,7 @@
+     The results of this operation are displayed in the table view,
+     providing a convenient way of visualizing what we have achieved:
+ 
+-    \image selected-items2.png
++    \image selected-items2.png {Updated selection model has inverted colors}
+ 
+     By default, the selection commands only operate on the individual
+     items specified by the model indexes. However, the flag used to
+@@ -1081,6 +1089,7 @@
+     the result of these two selections:
+ 
+     \image selected-items3.png
++           {Updating whole columns or rows in the selection model}
+ 
+     The commands performed on the example model have all involved
+     accumulating a selection of items in the model. It is also possible
+@@ -1543,21 +1552,21 @@
+ 
+     \table 70%
+     \row
+-    \li \image selection-single.png
++    \li \image selection-single.png {Selecting a single item}
+     \li \b{Single item selections:}
+     Where the user needs to choose a single item from a widget, the
+     default \c SingleSelection mode is most suitable. In this mode, the
+     current item and the selected item are the same.
+ 
+     \row
+-    \li \image selection-multi.png
++    \li \image selection-multi.png {Selecting multiple items}
+     \li \b{Multi-item selections:}
+     In this mode, the user can toggle the selection state of any item in the
+     widget without changing the existing selection, much like the way
+     non-exclusive checkboxes can be toggled independently.
+ 
+     \row
+-    \li \image selection-extended.png
++    \li \image selection-extended.png {Selecting extended and adjacent items}
+     \li \b{Extended selections:}
+     Widgets that often require many adjacent items to be selected, such
+     as those found in spreadsheets, require the \c ExtendedSelection mode.
+diff --git a/src/widgets/doc/src/modelview.qdoc b/src/widgets/doc/src/modelview.qdoc
+index 7dd7503d299..b2448a2c705 100644
+--- a/src/widgets/doc/src/modelview.qdoc
++++ b/src/widgets/doc/src/modelview.qdoc
+@@ -25,7 +25,7 @@
+     not only easy to grasp, but the many benefits of model/view programming also
+     become clearer.
+ 
+-    \image treeview.png
++    \image treeview.png {Directory and its contents in a tree view}
+ 
+     In the process, we will learn about some basic technologies provided by Qt,
+     such as:
+@@ -66,9 +66,11 @@
+         \row
+             \li  Standard widgets use data that is part of the widget.
+             \li  \image standardwidget.png
++                 {Structure where the "view" is separate from the "data"}
+         \row
+             \li  View classes operate on external data (the model)
+             \li  \image modelview.png
++                 {Structure that uses a "view" and a "model" for the data }
+     \endtable
+ 
+     \section2 1.1 Standard Widgets
+@@ -113,22 +115,27 @@
+                 (for use with external data)
+         \row
+             \li  \inlineimage listview.png
++                 {Directory displaying its contents as a list}
+             \li  \l QListWidget
+             \li  \l QListView
+         \row
+             \li  \inlineimage tableview.png
++                 {Directory displaying its contents as a table}
+             \li  \l QTableWidget
+             \li  \l QTableView
+         \row
+             \li  \inlineimage treeview.png
++                 {Directory displaying its contents as a tree}
+             \li  \l QTreeWidget
+             \li  \l QTreeView
+         \row
+             \li  \inlineimage columnview.png
++                 {Directory displaying its contents as columns}
+             \li
+             \li  \l QColumnView shows a tree as a hierarchy of lists
+         \row
+             \li  \inlineimage modelview-combobox.png
++                 {Combobox showing an entry in the model}
+             \li {2, 1} \l QComboBox can work as both a view class and also
+                       as a traditional widget
+     \endtable
+@@ -146,13 +153,13 @@
+     \l QDataWidgetMapper is a great solution because it maps form widgets to a
+     table row and makes it very easy to build forms for database tables.
+ 
+-    \image widgetmapper.png
++    \image widgetmapper.png {Form with personal and other information}
+ 
+     Another example of an adapter is \l QCompleter. Qt has \l QCompleter for
+     providing auto-completions in Qt widgets such as \l QComboBox and, as shown
+     below, \l QLineEdit. \l QCompleter uses a model as its data source.
+ 
+-    \image qcompleter.png
++    \image qcompleter.png {Completer with suggestions for the characters "Em"}
+ 
+ 
+     \section1 2. A Simple Model/View Application
+@@ -226,7 +233,9 @@
+ 
+     In addition to controlling what text the view displays, the model also
+     controls the text's appearance. When we slightly change the model, we get
+-    the following result: \image readonlytable_role.png
++    the following result:
++
++    \image readonlytable_role.png {Table with custom formatting applied to its cells}
+ 
+     In fact, nothing except for the \l{QAbstractItemModel::}{data()} method
+     needs to be changed to set fonts, background colour, alignment and a
+@@ -291,7 +300,7 @@
+ 
+     \section2 2.3 A Clock inside a Table Cell
+ 
+-    \image clock.png
++    \image clock.png {Table that displays the time in a cell}
+ 
+     We still have a read only table, but this time the content changes every
+     second because we are showing the current time.
+@@ -320,7 +329,7 @@
+     \section2 2.4 Setting up Headers for Columns and Rows
+ 
+     Headers can be hidden via a view method: \c{tableView->verticalHeader()->hide();}
+-    \image modelview-header.png
++    \image modelview-header.png {Table showing the column headers}
+ 
+     The header content, however, is set via the model, so we reimplement the
+     \l{QAbstractItemModel::headerData()}{headerData()} method:
+@@ -387,17 +396,18 @@
+     tree. No changes have to be made to the model. The tree won't have any
+     hierarchies because there aren't any hierarchies in the model itself.
+ 
+-    \image dummy_tree.png
++    \image dummy_tree.png {Tree view displaying table data with no hierarchy}
+ 
+     QListView, QTableView and QTreeView all use a model abstraction, which is a
+     merged list, table and tree. This makes it possible to use several different
+     types of view classes from the same model.
+ 
+     \image list_table_tree.png
++    {Diagram comparing list model, table model, and tree model}
+ 
+     This is how our example model looks so far:
+ 
+-    \image example_model.png
++    \image example_model.png {Diagram of current model structure}
+ 
+     We want to present a real tree. We have wrapped our data in the examples
+     above in order to make a model. This time we use QStandardItemModel, which
+@@ -406,7 +416,7 @@
+     with \l{QStandardItem}s, which are able to hold all the standard properties
+     of items like text, fonts, checkboxes or brushes.
+ 
+-    \image tree_2_with_algorithm.png
++    \image tree_2_with_algorithm.png {Diagram of the model and the view}
+ 
+     (file source: examples/widgets/tutorials/modelview/6_treeview/mainwindow.cpp)
+     \snippet tutorials/modelview/6_treeview/mainwindow.cpp Quoting ModelView Tutorial
+@@ -422,7 +432,7 @@
+     We want to access a selected item's content in order to output it into the
+     window title together with the hierarchy level.
+ 
+-    \image selection2.png
++    \image selection2.png {View of a model with the selected content in blue}
+ 
+     So let's create a couple of items:
+ 
+@@ -498,7 +508,7 @@
+     Let's take a look at an example called \l{Star Delegate Example}{Star
+     Delegate}, in which stars are used to show a rating:
+ 
+-    \image stardelegate.png
++    \image stardelegate.png {Table showing songs and their star ratings}
+ 
+     The view has a \l{QAbstractItemView::}{setItemDelegate()} method that
+     replaces the default delegate and installs a custom delegate.
+diff --git a/src/widgets/doc/src/qtwidgets-examples.qdoc b/src/widgets/doc/src/qtwidgets-examples.qdoc
+index b864402dd5d..45677c471ba 100644
+--- a/src/widgets/doc/src/qtwidgets-examples.qdoc
++++ b/src/widgets/doc/src/qtwidgets-examples.qdoc
+@@ -7,7 +7,7 @@
+     \ingroup all-examples
+     \group examples-widgets
+ 
+-    \image widget-examples.png
++    \image widget-examples.png {Gallery of various widgets}
+ 
+     Qt comes with a large range of standard widgets that users of modern
+     applications have come to expect.
+@@ -28,6 +28,7 @@
+     \group examples-painting
+ 
+     \image painting-examples.png
++           {Application showing different geometric shapes and styles}
+ 
+     Qt's painting system is able to render vector graphics, images,
+     and outline font-based text with sub-pixel accuracy using
+@@ -46,6 +47,7 @@
+     \group examples-richtext
+ 
+     \image richtext-examples.png
++           {Application showing various rich text widgets}
+ 
+     Qt provides powerful document-oriented rich text engine that supports Unicode
+     and right-to-left scripts. Documents can be manipulated using a cursor-based
+@@ -61,6 +63,8 @@
+     \group examples-desktop
+ 
+     \image desktop-examples.png
++           {Application showing widgets for desktop environments}
++
+ 
+     Qt provides features to enable applications to integrate with the user's
+     preferred desktop environment.
+@@ -78,6 +82,7 @@
+     \brief Using Qt's standard dialogs and building and using custom dialogs.
+ 
+     \image dialog-examples.png
++           {Application showing a dialog}
+ 
+     Qt includes standard dialogs for many common operations, such as file
+     selection, printing, and color selection.
+@@ -93,6 +98,7 @@
+     \group examples-itemviews
+ 
+     \image itemviews-examples.png
++           {Application showing a tree model editor}
+ 
+     Qt provides a lot of capabalities to display pre- and user-defined item models
+     in different ways.
+@@ -109,6 +115,7 @@
+     \page examples-graphicsview.html
+ 
+     \image graphicsview-examples.png
++    {Application showing various graphics options and views}
+ 
+     Qt provides powerful graphics engine that supports easy visualization of items, with
+     support for rotation and zooming.
+@@ -134,6 +141,7 @@
+     \brief Building applications around a main window.
+ 
+     \image mainwindow-examples.png
++           {Application showing various widgets in a main window}
+ 
+     All the standard features of application main windows are provided by Qt.
+ 
+@@ -150,6 +158,7 @@
+     \brief Using autocomplete features, regular expressions, and undo framework.
+ 
+     \image completer-example.png
++           {Application showing different completer options and tools}
+ 
+     Qt provides the functionality for autocomplete, Undo/Redo actions, and
+     regular expressions for the Widget-based applications.
+diff --git a/src/widgets/doc/src/qtwidgets-index.qdoc b/src/widgets/doc/src/qtwidgets-index.qdoc
+index 8e36b1e9da5..eb50e4e72b7 100644
+--- a/src/widgets/doc/src/qtwidgets-index.qdoc
++++ b/src/widgets/doc/src/qtwidgets-index.qdoc
+@@ -19,7 +19,8 @@ interfaces
+     should be grouped together. A widget that is not embedded in a
+     parent widget is called a \l{Window and Dialog Widgets} {window}.
+ 
+-    \image parent-child-widgets.png A parent widget containing various child widgets.
++    \image parent-child-widgets.png
++           {Parent widget containing various child widgets}
+ 
+     The QWidget class provides the basic capability to render to the
+     screen and to handle user input events. All UI elements that Qt
+@@ -43,9 +44,9 @@ interfaces
+ 
+     \table
+     \row
+-    \li \image windowsvista-tabwidget.png
+-    \li \image fusion-tabwidget.png
+-    \li \image macos-tabwidget.png
++    \li \image windowsvista-tabwidget.png {Windows style tab widgets}
++    \li \image fusion-tabwidget.png {Fusion desktop style tab widgets}
++    \li \image macos-tabwidget.png {macOS style tab widgets}
+     \endtable
+ 
+     \l{Qt Style Sheets} are a powerful mechanism that lets you customize
+@@ -63,8 +64,8 @@ interfaces
+ 
+     \table
+     \row
+-    \li \image qgridlayout-with-5-children.png
+-    \li \image qformlayout-with-6-children.png
++    \li \image qgridlayout-with-5-children.png {5-children layout}
++    \li \image qformlayout-with-6-children.png {6-children layout}
+     \endtable
+ 
+     \l {Qt Widgets Designer} is a powerful tool for interactively creating and
+@@ -79,7 +80,7 @@ interfaces
+     which use lists and tables are structured to separate the data and view
+     using models, views, and delegates.
+ 
+-    \image fusion-treeview.png
++    \image fusion-treeview.png {File directory using a tree view}
+ 
+     \section1 Graphics View
+ 
+@@ -87,7 +88,7 @@ interfaces
+     number of custom-made 2D graphical items, and a view widget for visualizing
+     the items, with support for zooming and rotation.
+ 
+-    \image graphicsview-items.png
++    \image graphicsview-items.png {Various shapes and graphics on a grid}
+ 
+     \section1 Using the Module
+ 
+diff --git a/src/widgets/doc/src/widgets-and-layouts/gallery.qdoc b/src/widgets/doc/src/widgets-and-layouts/gallery.qdoc
+index 822cf1efff9..7d00a22f04e 100644
+--- a/src/widgets/doc/src/widgets-and-layouts/gallery.qdoc
++++ b/src/widgets/doc/src/widgets-and-layouts/gallery.qdoc
+@@ -16,16 +16,20 @@
+   depending on the active theme.
+ 
+     \image windows-style.png Windows Style
++           {Widget gallery using the "Windows" style}
+     \caption The Windows style ("windows") is provided by QWindowsStyle.
+ 
+     \image windows-vista-style.png Windows Vista Style
++           {Widget gallery using Windows' "Vista" style)
+     \caption The Windows Vista style ("windowsvista") is provided by
+         QWindowsVistaStyle.
+ 
+     \image macos-style.png \macos Style
++           {Widget gallery using "macOS" style)
+     \caption The macOS style ("macOS") is provided by QMacStyle.
+ 
+     \image fusion-style.png Fusion Style
++           {Widget gallery using the "Fusion" style)
+     \caption The Fusion style ("fusion") is provided by QFusionStyle.
+ 
+     The Styles example displays the following widgets:
+@@ -49,9 +53,11 @@
+     Windows 10 and \macos:
+ 
+     \image windows-style2.png
++           {Widget gallery running on Windows 10}
+     \caption Calendar Widget example on Windows 10
+ 
+     \image macos-style2.png
++           {Widget gallery running on macOS}
+     \caption Calendar Widget example on \macos
+ 
+     \list
+diff --git a/src/widgets/doc/src/widgets-and-layouts/layout.qdoc b/src/widgets/doc/src/widgets-and-layouts/layout.qdoc
+index 58180105555..62539b8bac1 100644
+--- a/src/widgets/doc/src/widgets-and-layouts/layout.qdoc
++++ b/src/widgets/doc/src/widgets-and-layouts/layout.qdoc
+@@ -65,18 +65,22 @@
+         \li  A QHBoxLayout lays out widgets in a horizontal row, from left to
+             right (or right to left for right-to-left languages).
+             \image qhboxlayout-with-5-children.png
++                   {Five buttons in horizontal layout}
+ 
+         \li  A QVBoxLayout lays out widgets in a vertical column, from top to
+             bottom.
+             \image qvboxlayout-with-5-children.png
++                   {Five buttons in vertical layout}
+ 
+         \li  A QGridLayout lays out widgets in a two-dimensional grid. Widgets
+             can occupy multiple cells.
+             \image qgridlayout-with-5-children.png
++                   {Five buttons in grid layout}
+ 
+         \li  A QFormLayout lays out widgets in a 2-column descriptive label-
+             field style.
+             \image qformlayout-with-6-children.png
++                    {Three buttons with text fields in form layout}
+     \endlist
+ 
+ 
+@@ -181,12 +185,12 @@
+     If we have three widgets laid out using a QHBoxLayout with no stretch
+     factors set we will get a layout like this:
+ 
+-    \image layout1.png Three widgets in a row
++    \image layout1.png {Three evenly spaced widgets in a row}
+ 
+     If we apply stretch factors to each widget, they will be laid out in
+     proportion (but never less than their minimum size hint), e.g.
+ 
+-    \image layout2.png Three widgets with different stretch factors in a row
++    \image layout2.png {Three stretched widgets in a row}
+ 
+ 
+     \section1 Custom Widgets in Layouts
+diff --git a/src/widgets/doc/src/widgets-and-layouts/styles.qdoc b/src/widgets/doc/src/widgets-and-layouts/styles.qdoc
+index 62e433814be..f8db08c33bf 100644
+--- a/src/widgets/doc/src/widgets-and-layouts/styles.qdoc
++++ b/src/widgets/doc/src/widgets-and-layouts/styles.qdoc
+@@ -121,6 +121,7 @@
+     go through the individual widgets.
+ 
+     \image javastyle/conceptualpushbuttontree.png
++           {Push button style tree and elements}
+ 
+     Widgets are not necessarily drawn by asking the style to draw
+     only one element. Widgets can make several calls to the style to
+@@ -548,7 +549,7 @@
+     We give an image of a checkbox and the style option to match
+     it.
+ 
+-    \image javastyle/checkboxexample.png A Java style checkbox
++    \image javastyle/checkboxexample.png {Checkbox using the Java style}
+ 
+     The above checkbox will have the following state flags in its
+     style option:
+@@ -819,7 +820,8 @@
+     top-down traversal of the tree, you get the sequence in which the
+     elements should be drawn.
+ 
+-    \image javastyle/pushbutton.png The style structure for push buttons
++    \image javastyle/pushbutton.png
++           {Push button style tree and elements}
+ 
+     The layout of the buttons, with regard to element bounds, varies from
+     style to style. This makes it difficult to show conceptual images
+@@ -837,7 +839,7 @@
+     any other purpose. This is also true for similar images for the
+     other widgets.
+ 
+-    \image javastyle/button.png
++    \image javastyle/button.png {Button labeled with its elements}
+ 
+     The Java style, as well as all other styles implemented in Qt,
+     does not use \c PE_FrameButtonBevel. It is usual that a button
+@@ -892,6 +894,7 @@
+     metric names:
+ 
+     \image javastyle/checkbox.png
++           {Check and radio box style tree and elements}
+ 
+     QStyleOptionButton is used as the style option for both check
+     and radio buttons. We first give a table of the states that
+@@ -943,6 +946,7 @@
+     Here is the style structure for QTabWidget and QTabBar:
+ 
+     \image javastyle/tab.png
++           {Tab widget and tab bar style tree and elements}
+ 
+     The dotted lines indicate that the QTabWidget contains a tab bar,
+     but does not draw the tab bar itself. QTabBar only draws its base line
+@@ -954,7 +958,7 @@
+ 
+     Here is a tab widget in the Java style:
+ 
+-    \image javastyle/tabwidget.png
++    \image javastyle/tabwidget.png {Tab widget labeled with its elements}
+ 
+     In the Java style, the tab bar shape and label have the same bounding
+     rectangle as \c CE_TabBarTab. Notice that the tabs overlap with the
+@@ -976,6 +980,7 @@
+     the other tabs (if it is to be bigger).
+ 
+     \image javastyle/windowstabimage.png
++           {Tab bar labeled with its elements}
+ 
+     A table of the states a tab bar can set on its tabs follows:
+ 
+@@ -1068,6 +1073,7 @@
+     Here is the style structure for scrollbars:
+ 
+     \image javastyle/scrollbar.png
++           {Scrollbar style tree and elements}
+ 
+     QScrollBar simply creates its style option and then draws
+     \c CC_ScrollBar. Some styles draw the background of add page and sub
+@@ -1081,6 +1087,7 @@
+     Here is an image of a scrollbar in the Java style:
+ 
+     \image javastyle/scrollbarimage.png
++           {Scrollbar labeled with its elements}
+ 
+     You may notice that the scrollbar is slightly different from
+     Java's, as it has two line up indicators. We have done this to show
+@@ -1158,13 +1165,13 @@
+     draws itself, it creates the style option and calls \c
+     drawComplexControl() with \c CC_Slider:
+ 
+-    \image javastyle/slider.png
++    \image javastyle/slider.png {Slider style tree and elements}
+ 
+     We also show a picture of a slider in the Java style. We show
+     the bounding rectangles of the sub elements, as all drawing is done
+     in \c CC_Slider.
+ 
+-    \image javastyle/sliderimage.png
++    \image javastyle/sliderimage.png {Slider labeled with its elements}
+ 
+     QSlider uses QStyleOptionSlider as all \l{QAbstractSlider}s do. We
+     present a table with the members that affect QSlider:
+@@ -1225,9 +1232,9 @@
+     the indicator backgrounds. You can see an image below the tree
+     showing the sub elements in QSpinBox in the Java style.
+ 
+-    \image javastyle/spinbox.png
++    \image javastyle/spinbox.png {Spin box style tree and elements}
+ 
+-    \image javastyle/spinboximage.png
++    \image javastyle/spinboximage.png {Spin box labeled with its elements}
+ 
+     The QStyleOptionSpinBox, which is the style option for spin
+     boxes. It can set the following states on the spin box:
+@@ -1276,6 +1283,7 @@
+     provide.
+ 
+     \image javastyle/titlebar.png
++           {Title bar style tree and elements}
+ 
+     In an image over a title bar in the Java style, we show the
+     bounding rectangles of the sub elements supported by the Java style
+@@ -1284,6 +1292,7 @@
+     mandatory.
+ 
+     \image javastyle/titlebarimage.png
++           {Title bar labeled with its elements}
+ 
+     The style option for title bars is QStyleOptionTitleBar. Its
+     members are:
+@@ -1322,11 +1331,13 @@
+     field itself is a QLineEdit that is a child of the combo box.
+ 
+     \image javastyle/combobox.png
++           {Combo box style tree and elements}
+ 
+     We show an image over a Java style combo box in which we have
+     outlined its sub elements and sub element rectangles:
+ 
+     \image javastyle/comboboximage.png
++           {Combo box labeled with its elements}
+ 
+     Java combo boxes do not use the focus rect; it changes its
+     background color when it has focus. The \c SC_ComboBoxEdit field is
+@@ -1387,6 +1398,7 @@
+     the following style element tree:
+ 
+     \image javastyle/groupbox.png
++           {Group box style tree and elements}
+ 
+     Qt does not impose restrictions on how the check box is drawn; the
+     Java style draws it with \c CE_IndicatorCheckBox. See \l{Check and
+@@ -1396,6 +1408,7 @@
+     sub control rectangles drawn:
+ 
+     \image javastyle/groupboximage.png
++           {Group box labeled with its elements}
+ 
+     The style option for group boxes is QStyleOptionGroupBox. The
+     following states can be set on it:
+@@ -1468,11 +1481,13 @@
+     only element used by this widget. We start with the style structure:
+ 
+     \image javastyle/progressbar.png
++           {Progress bar style tree and elements}
+ 
+     Here is a progress bar in the common style (the Java style
+     bounding rectangles are equal):
+ 
+     \image javastyle/progressbarimage.png
++           {Progress bar labeled with its elements}
+ 
+     The style option for QProgressBar is QStyleOptionProgressBar.
+     The bar does not set any state flags, but the other members of the
+@@ -1522,6 +1537,7 @@
+     Below is a tree of the widget's style structure:
+ 
+     \image javastyle/toolbutton.png
++           {Tool button style tree and elements}
+ 
+     Note that \c PE_FrameButtonTool and \c PE_IndicatorArrowDown are
+     included in the tree as the Java style draws them, but they can
+@@ -1534,6 +1550,7 @@
+     the sub element bounding rectangles and sub controls.
+ 
+     \image javastyle/toolbuttonimage.png
++           {Tool button labeled with its elements}
+ 
+     Here is the states table for tool buttons:
+ 
+@@ -1616,6 +1633,7 @@
+     Here is the element tree for QToolBar:
+ 
+     \image javastyle/toolbar.png
++           {Tool bar style tree and elements}
+ 
+     The dotted lines indicate that the QToolBar keeps an instance of
+     QToolBarLayout and that QToolBarSeparators are kept by
+@@ -1626,6 +1644,7 @@
+     Here is an image of a toolbar in the Java style:
+ 
+     \image javastyle/toolbarimage.png
++           {Tool bar labeled with its elements}
+ 
+     QToolBarSaparator uses QStyleOption for its style option. It
+     sets the \c State_Horizontal flag if the toolbar it lives in is
+@@ -1679,7 +1698,7 @@
+     calculated for the menu's size hint and when the menu is displayed
+     or resized.
+ 
+-    \image javastyle/menu.png
++    \image javastyle/menu.png {Menu style tree and elements}
+ 
+     The \c CE_MenuScroller and \c CE_MenuTearOff elements are handled by
+     QCommonStyle and are not shown unless the menu is too large to fit
+@@ -1694,6 +1713,7 @@
+     as this is optional and varies from style to style.
+ 
+     \image javastyle/menuimage.png
++           {Menu labeled with its elements}
+ 
+     The style option for menu items is QStyleOptionMenuItem. The
+     following tables describe its state flags and other members.
+@@ -1770,6 +1790,7 @@
+     bar follows:
+ 
+     \image javastyle/menubar.png
++           {Menu bar style tree and elements}
+ 
+     The panel and empty area are drawn after the menu items. The
+     QPainter that the QMenuBar sends to the style has the bounding
+@@ -1779,6 +1800,7 @@
+     menu bar items are calculated.
+ 
+     \image javastyle/menubarimage.png
++           {Menu bar labeled with its elements}
+ 
+     QStyleOptionMenuItem is used for menu bar items. The members that
+     are used by QMenuBar are described in the following table:
+@@ -1816,11 +1838,13 @@
+     \c PE_FrameFocusRect and \c PE_IndicatorItemViewItemCheck.
+ 
+     \image javastyle/header.png
++           {Header style tree and elements}
+ 
+     Here is a QTableWidget showing the bounding rects of a Java
+     header:
+ 
+     \image javastyle/headerimage.png
++           {Header labeled with its elements}
+ 
+     The QHeaderView uses \c CT_HeaderSection, \c PM_HeaderMargin and
+     \c PM_HeaderGripMargin for size and hit test calculations. The
+@@ -1916,6 +1940,7 @@
+     states you must be aware of are represented in the image.
+ 
+     \image javastyle/branchindicatorimage.png
++           {Branch indicator style structure and drawing states}
+ 
+     \section3 Tool Boxes
+ 
+@@ -1928,10 +1953,12 @@
+     boxes looks like this:
+ 
+     \image javastyle/toolbox.png
++           {Tool box style tree and elements}
+ 
+     We show an image of a tool box in the Plastique style:
+ 
+     \image javastyle/toolboximage.png
++           {Tool box labeled with its elements}
+ 
+     All elements have the same bounding rectangles in the
+     Plastique style as well as the other built-in Qt styles.
+@@ -1960,9 +1987,9 @@
+     metric \c PM_SizeGripSize is currently unused by Qt. The element tree
+     for an image in the Plastique style of QSizeGrip follows:
+ 
+-    \image javastyle/sizegrip.png
++    \image javastyle/sizegrip.png {Size grip style tree and elements}
+ 
+-    \image javastyle/sizegripimage.png
++    \image javastyle/sizegripimage.png {Size grip labeled with its elements}
+ 
+     We show the size grip in \l{QMainWindow}'s bottom right
+     corner.
+@@ -1984,12 +2011,13 @@
+ 
+     The \l{QRubberBand}'s style tree consists of two nodes.
+ 
+-    \image javastyle/rubberband.png
++    \image javastyle/rubberband.png {Rubber band style tree and its elements}
+ 
+     We present an image of a Java style window being moved in a
+     QMdiArea with a rubber band:
+ 
+     \image javastyle/rubberbandimage.png
++           {Rubber band labeled with its elements}
+ 
+     The style option for rubber bands is QStyleOptionRubberBand.
+     Its members are:
+@@ -2018,7 +2046,7 @@
+     rectangles of the float and close buttons with
+     \c SE_DockWidgetCloseButton and \c SE_DockWidgetFloatButton.
+ 
+-    \image javastyle/dockwidget.png
++    \image javastyle/dockwidget.png {Dock widget style tree and elements}
+ 
+     The dotted lines indicate that the sender keeps instances of the
+     recipient of the arrow (i.e., it is not a style element to draw).
+@@ -2028,7 +2056,7 @@
+     dock widget in both docked and floating state in the plastique
+     style:
+ 
+-    \image javastyle/dockwidgetimage.png
++    \image javastyle/dockwidgetimage.png {Dock widget labeled with its elements}
+ 
+     The style option is QStyleOptionDockWidget:
+ 
+diff --git a/src/widgets/doc/src/widgets-and-layouts/stylesheet.qdoc b/src/widgets/doc/src/widgets-and-layouts/stylesheet.qdoc
+index df64db9f2cf..841948b671f 100644
+--- a/src/widgets/doc/src/widgets-and-layouts/stylesheet.qdoc
++++ b/src/widgets/doc/src/widgets-and-layouts/stylesheet.qdoc
+@@ -537,6 +537,7 @@
+     and select \uicontrol{Change styleSheet...} to set the style sheet.
+ 
+     \image designer-stylesheet-options.png
++           {Editing a form in Qt Widgets Designer}
+ 
+     In Qt 4.2 and later, \QD also includes a
+     style sheet syntax highlighter and validator. The validator indicates
+@@ -544,11 +545,13 @@
+     Style Sheet} dialog.
+ 
+     \image designer-validator-highlighter.png
++           {Editing and validating a stylesheet}
+ 
+     When you click \uicontrol{OK} or \uicontrol{Apply}, \QD will automatically display
+     the widget with its new stylesheet.
+ 
+     \image designer-stylesheet-usage.png
++           {Preview of a form with the new stylesheet}
+     */
+ 
+ /*!
+@@ -568,6 +571,7 @@
+     The four concentric rectangles appear conceptually as below:
+ 
+     \image stylesheet-boxmodel.png
++           {Diagram of the CSS box model for layout design}
+ 
+     \list
+     \li The margin falls outside the border.
+@@ -3966,7 +3970,7 @@
+ 
+     However, the result is a boring, flat button with no borders:
+ 
+-    \image stylesheet-redbutton1.png A flat red button
++    \image stylesheet-redbutton1.png {Flat red button}
+ 
+     What happened is this:
+ 
+@@ -3985,7 +3989,7 @@
+ 
+     \snippet code/doc_src_stylesheet.qdoc 97
+ 
+-    \image stylesheet-redbutton2.png A red button with a beige border
++    \image stylesheet-redbutton2.png {Red button with a beige border}
+ 
+     Things look already a lot better. But the button looks a bit
+     cramped. Let's specify some spacing between the border and the
+@@ -3995,7 +3999,8 @@
+ 
+     \snippet code/doc_src_stylesheet.qdoc 98
+ 
+-    \image stylesheet-redbutton3.png A red button with a round beige border and big, bold text
++    \image stylesheet-redbutton3.png
++           {Red button with a round beige border and big, bold text}
+ 
+     The only issue remaining is that the button doesn't react when we
+     press it. We can fix this by specifying a slightly different
+@@ -4183,7 +4188,7 @@
+     style sheets. However, if one property or sub-control is customized,
+     all the other properties or sub-controls must be customized as well.
+ 
+-    \image progressBar-stylesheet.png
++    \image progressBar-stylesheet.png {Progress bar showing 30%}
+ 
+     For example, we change the \l{stylesheet-reference.html#border-prop}
+     {border} to grey and the \l{stylesheet-reference.html#chunk-sub}{chunk}
+@@ -4200,7 +4205,7 @@
+     A \l{stylesheet-reference.html#margin-prop}{margin} can be included to
+     obtain more visible chunks.
+ 
+-    \image progressBar2-stylesheet.png
++    \image progressBar2-stylesheet.png {Notched progress bar}
+ 
+     In the screenshot above, we use a
+     \l{stylesheet-reference.html#margin-prop}{margin} of 0.5 pixels.
+@@ -4235,7 +4240,7 @@
+     if one property or sub-control is customized, all the other properties or
+     sub-controls must be customized as well.
+ 
+-    \image stylesheet-scrollbar1.png
++    \image stylesheet-scrollbar1.png {Green stylized scroll bar}
+ 
+     The scroll bar above has been styled in aquamarine with a solid grey
+     border.
+@@ -4259,7 +4264,7 @@
+     \snippet code/doc_src_stylesheet.qdoc 136
+ 
+     The scroll bar using the above stylesheet looks like this:
+-        \image stylesheet-scrollbar2.png
++        \image stylesheet-scrollbar2.png {Colorized scroll bar}
+ 
+ 
+     To customize a vertical scroll bar use a style sheet similar to the following:
+@@ -4308,14 +4313,14 @@
+ 
+     \section2 Customizing QTabWidget and QTabBar
+ 
+-    \image tabWidget-stylesheet1.png
++    \image tabWidget-stylesheet1.png {Image of several tabs}
+ 
+     For the screenshot above, we need a stylesheet as follows:
+ 
+     \snippet code/doc_src_stylesheet.qdoc 145
+ 
+     Often we require the tabs to overlap to look like below:
+-    \image tabWidget-stylesheet2.png
++    \image tabWidget-stylesheet2.png {Image of overlapped tabs}
+ 
+     For a tab widget that looks like above, we make use of
+     \l{https://doc.qt.io/qt-5/stylesheet-customizing.html#the-box-model}
+@@ -4326,7 +4331,7 @@
+     \snippet code/doc_src_stylesheet.qdoc 146
+ 
+     To move the tab bar to the center (as below), we require the following stylesheet:
+-    \image tabWidget-stylesheet3.png
++    \image tabWidget-stylesheet3.png {Several tabs centered in the widget}
+ 
+     \snippet code/doc_src_stylesheet.qdoc 147
+ 
+@@ -4341,7 +4346,7 @@
+     Suppose we'd like our selected item in QTableView to have bubblegum pink
+     fade to white as its background.
+ 
+-    \image tableWidget-stylesheet.png
++    \image tableWidget-stylesheet.png {Table view with custom style}
+ 
+     This is possible with the
+     \l{stylesheet-reference.html#selection-background-color-prop}
+@@ -4423,11 +4428,11 @@
+ 
+     \table
+     \row
+-    \li \inlineimage stylesheet-vline.png
+-    \li \inlineimage stylesheet-branch-more.png
+-    \li \inlineimage stylesheet-branch-end.png
+-    \li \inlineimage stylesheet-branch-closed.png
+-    \li \inlineimage stylesheet-branch-open.png
++    \li \inlineimage stylesheet-vline.png {Vertical line}
++    \li \inlineimage stylesheet-branch-more.png {Junction line for lists}
++    \li \inlineimage stylesheet-branch-end.png {Line for terminating the list}
++    \li \inlineimage stylesheet-branch-closed.png {Arrow pointing right}
++    \li \inlineimage stylesheet-branch-open.png {Arrow pointing down}
+     \row
+     \li vline.png
+     \li branch-more.png
+@@ -4440,7 +4445,7 @@
+ 
+     The resulting tree view looks like this:
+ 
+-    \image stylesheet-treeview.png
++    \image stylesheet-treeview.png {Tree view with styled branches}
+ 
+     \sa {Supported HTML Subset}, QStyle
+ 
+@@ -4474,7 +4479,7 @@
+ 
+     This will produce a button looking like this:
+ 
+-    \image stylesheet-border-image-normal.png
++    \image stylesheet-border-image-normal.png {Button with a background}
+ 
+     The numbers after the url gives the top, right, bottom and left number of
+     pixels, respectively. These numbers correspond to the border and should not
+@@ -4484,18 +4489,12 @@
+     will not. This makes the borders of the button look more natural, like
+     this:
+ 
+-    \table
+-    \row
+-    \li \inlineimage stylesheet-border-image-stretched.png
+-    \row
+-    \li With borders
+-    \endtable
++    \image stylesheet-border-image-stretched.png
++           {Button with specified border sizes}
++    \caption With borders
+ 
+-    \table
+-    \row
+-    \li \inlineimage stylesheet-border-image-wrong.png
+-    \row
+-    \li Without borders
+-    \endtable
++    \image stylesheet-border-image-wrong.png
++           {Button without specified border sizes}
++    \caption Without borders
+ 
+     */
+diff --git a/src/widgets/doc/src/widgets-and-layouts/widgets.qdoc b/src/widgets/doc/src/widgets-and-layouts/widgets.qdoc
+index 79bb32b2d1e..64208c9898d 100644
+--- a/src/widgets/doc/src/widgets-and-layouts/widgets.qdoc
++++ b/src/widgets/doc/src/widgets-and-layouts/widgets.qdoc
+@@ -19,13 +19,13 @@
+ 
+     \table
+     \row
+-    \li \image fusion-label.png
+-    \li \image windowsvista-pushbutton.png
+-    \li \image macos-progressbar.png
++    \li \image fusion-label.png {Label}
++    \li \image windowsvista-pushbutton.png {Cancel button}
++    \li \image macos-progressbar.png {Progress bar}
+     \row
+-    \li \image fusion-combobox.png
+-    \li \image windowsvista-radiobutton.png
+-    \li \image macos-lineedit.png
++    \li \image fusion-combobox.png {Combo box}
++    \li \image windowsvista-radiobutton.png {Radio box}
++    \li \image macos-lineedit.png {Line edit}
+     \endtable
+ 
+     \annotatedlist basicwidgets
+@@ -39,8 +39,11 @@
+       \table
+       \row
+       \li \image fusion-treeview.png
++                 {Directory widget showing the contents using a tree view}
+       \li \image fusion-calendarwidget.png
++                 {Calendar widget showing the month, year, and a selected day}
+       \li \image qundoview.png
++                 {Undo stack showing list of commands}
+       \endtable
+ 
+       \annotatedlist advanced
+diff --git a/src/widgets/doc/src/widgets-tutorial.qdoc b/src/widgets/doc/src/widgets-tutorial.qdoc
+index f6212da636f..c2bf10be59b 100644
+--- a/src/widgets/doc/src/widgets-tutorial.qdoc
++++ b/src/widgets/doc/src/widgets-tutorial.qdoc
+@@ -116,6 +116,7 @@
+     \row
+     \li \snippet tutorials/widgets/toplevel/main.cpp main program
+     \li \inlineimage widgets-tutorial-toplevel.png
++                     {Top-level widget application window}
+     \endtable
+     \enddiv
+ 
+@@ -140,6 +141,7 @@
+     \li \snippet tutorials/widgets/childwidget/main.cpp main program
+     \row
+     \li \inlineimage widgets-tutorial-childwidget.png
++                     {Window with a button as its child}
+     \endtable
+     \enddiv
+ 
+@@ -164,6 +166,7 @@
+     \li \snippet tutorials/widgets/windowlayout/main.cpp main program
+     \row
+     \li \inlineimage widgets-tutorial-windowlayout.png
++        {Label next to a line edit in a horizontal layout}
+     \endtable
+     \enddiv
+ 
+@@ -204,6 +207,7 @@
+     \li \snippet tutorials/widgets/nestedlayouts/main.cpp first part
+        \snippet tutorials/widgets/nestedlayouts/main.cpp last part
+     \li \inlineimage widgets-tutorial-nestedlayouts.png
++        {Widgets for querying and displaying a model using a nested layout}
+     \endtable
+     \enddiv
+ 
+diff --git a/src/widgets/doc/src/windows-and-dialogs/mainwindow.qdoc b/src/widgets/doc/src/windows-and-dialogs/mainwindow.qdoc
+index 57ebc717818..970a3899376 100644
+--- a/src/widgets/doc/src/windows-and-dialogs/mainwindow.qdoc
++++ b/src/widgets/doc/src/windows-and-dialogs/mainwindow.qdoc
+@@ -86,7 +86,8 @@
+     widget's client geometry.
+ 
+     This diagram shows most of the functions in use:
+-    \image geometry.png Geometry diagram
++    \image geometry.png
++           {Window geometry with size dimensions and positions labeled}
+ 
+     \section2 X11 Peculiarities
+ 
+@@ -234,6 +235,7 @@
+     corners of the main window in this layout.
+ 
+     \image mainwindow-docks-example.png
++           {Placement of dock windows relative to a central widget}
+ 
+     Once all the main window components have been set up, the central widget
+     is created and installed by using code similar to the following:
+diff --git a/src/widgets/effects/qgraphicseffect.cpp b/src/widgets/effects/qgraphicseffect.cpp
+index 91a6a0f1146..77a6e38c1fe 100644
+--- a/src/widgets/effects/qgraphicseffect.cpp
++++ b/src/widgets/effects/qgraphicseffect.cpp
+@@ -34,15 +34,21 @@
+     \table
+     \row
+     \li{2,1} \image graphicseffect-plain.png
++             {Image of a fish without any graphical effects}
+     \row
+     \li \image graphicseffect-blur.png
++             {Blur effect on an image of a fish}
+     \li \image graphicseffect-colorize.png
++             {Blue color effect on an image of a fish}
+     \row
+     \li \image graphicseffect-opacity.png
++             {Opacity effect on an image of a fish}
+     \li \image graphicseffect-drop-shadow.png
++             {Drop shadow effect on an image of a fish}
+     \endtable
+ 
+     \image graphicseffect-widget.png
++           {Opacity drop shadow effects applied on an application}
+ 
+     For more information on how to use each effect, refer to the specific
+     effect's documentation.
+@@ -567,6 +573,7 @@ void QGraphicsEffect::sourceChanged(ChangeFlags flags)
+     By default, the color is light blue (QColor(0, 0, 192)).
+ 
+     \image graphicseffect-colorize.png
++           {Blue color effect on an image of a fish}
+ 
+     \sa QGraphicsDropShadowEffect, QGraphicsBlurEffect, QGraphicsOpacityEffect
+ */
+@@ -696,6 +703,7 @@ void QGraphicsColorizeEffect::draw(QPainter *painter)
+     device coordinates.
+ 
+     \image graphicseffect-blur.png
++           {Blur effect on an image of a fish}
+ 
+     \sa QGraphicsDropShadowEffect, QGraphicsColorizeEffect, QGraphicsOpacityEffect
+ */
+@@ -857,6 +865,7 @@ void QGraphicsBlurEffect::draw(QPainter *painter)
+     in device coordinates.
+ 
+     \image graphicseffect-drop-shadow.png
++           {Drop shadow effect on an image of a fish}
+ 
+     \sa QGraphicsBlurEffect, QGraphicsColorizeEffect, QGraphicsOpacityEffect
+ */
+@@ -1047,6 +1056,7 @@ void QGraphicsDropShadowEffect::draw(QPainter *painter)
+     By default, the opacity is 0.7.
+ 
+     \image graphicseffect-opacity.png
++           {Opacity effect on an image of a fish}
+ 
+     \sa QGraphicsDropShadowEffect, QGraphicsBlurEffect, QGraphicsColorizeEffect
+ */
+diff --git a/src/widgets/graphicsview/qgraphicsanchorlayout.cpp b/src/widgets/graphicsview/qgraphicsanchorlayout.cpp
+index 08703b62224..ac027f36446 100644
+--- a/src/widgets/graphicsview/qgraphicsanchorlayout.cpp
++++ b/src/widgets/graphicsview/qgraphicsanchorlayout.cpp
+@@ -21,7 +21,9 @@
+     are removed, all their anchors will be automatically removed.
+ 
+     \div {class="float-left"}
+-    \inlineimage simpleanchorlayout-example.png Using an anchor layout to align simple colored widgets.
++    \inlineimage simpleanchorlayout-example.png
++        {Three widgets using anchor layout to align to the widget edges}
++    \caption Using an anchor layout to align simple colored widgets.
+     \enddiv
+ 
+     Anchors are always set up between edges of an item, where the "center" is also considered to
+diff --git a/src/widgets/graphicsview/qgraphicsitem.cpp b/src/widgets/graphicsview/qgraphicsitem.cpp
+index b47fef8def2..8f0a348231a 100644
+--- a/src/widgets/graphicsview/qgraphicsitem.cpp
++++ b/src/widgets/graphicsview/qgraphicsitem.cpp
+@@ -16,7 +16,7 @@
+     painting implementation and item interaction through its event handlers.
+     QGraphicsItem is part of the \l{Graphics View Framework}
+ 
+-    \image graphicsview-items.png
++    \image graphicsview-items.png {Various shapes and graphics on a grid}
+ 
+     For convenience, Qt provides a set of standard graphics items for the most
+     common shapes. These are:
+@@ -96,6 +96,7 @@
+     transformation to all children.
+ 
+     \image graphicsview-parentchild.png
++           {Several coordinate system transformations}
+ 
+     \section1 Transformations
+ 
+@@ -164,6 +165,7 @@
+     order will be A, then B, then C.
+ 
+     \image graphicsview-zorder.png
++           {Robot with numbered nodes and limbs}
+ 
+     This example shows the stacking order of all limbs of the robot from the
+     \l{graphicsview/dragdroprobot}{Drag and Drop Robot} example. The torso is
+@@ -8076,6 +8078,8 @@ QPainterPath QAbstractGraphicsShapeItem::opaqueArea() const
+     returns the current path.
+ 
+     \image graphicsview-pathitem.png
++           {Path drawn near the origin}
++
+ 
+     QGraphicsPathItem uses the path to provide a reasonable
+     implementation of boundingRect(), shape(), and contains(). The
+@@ -8269,6 +8273,7 @@ QVariant QGraphicsPathItem::extension(const QVariant &variant) const
+     returns the current rectangle.
+ 
+     \image graphicsview-rectitem.png
++           {Rectangle drawn near the origin}
+ 
+     QGraphicsRectItem uses the rectangle and the pen width to provide
+     a reasonable implementation of boundingRect(), shape(), and
+@@ -8501,7 +8506,9 @@ QVariant QGraphicsRectItem::extension(const QVariant &variant) const
+     \table
+         \row
+             \li \inlineimage graphicsview-ellipseitem.png
++                             {Complete ellipse shape}
+             \li \inlineimage graphicsview-ellipseitem-pie.png
++                             {Ellipse shape with a start and span angle}
+     \endtable
+ 
+     To set the item's ellipse, pass a QRectF to QGraphicsEllipseItem's
+@@ -8801,6 +8808,7 @@ QVariant QGraphicsEllipseItem::extension(const QVariant &variant) const
+     function. The polygon() function returns the current polygon.
+ 
+     \image graphicsview-polygonitem.png
++           {Polygon drawn near the origin}
+ 
+     QGraphicsPolygonItem uses the polygon and the pen width to provide
+     a reasonable implementation of boundingRect(), shape(), and
+@@ -9025,6 +9033,7 @@ QVariant QGraphicsPolygonItem::extension(const QVariant &variant) const
+     width of 0, but you can change this by calling setPen().
+ 
+     \image graphicsview-lineitem.png
++           {Line segment drawn near the origin}
+ 
+     QGraphicsLineItem uses the line and the pen width to provide a reasonable
+     implementation of boundingRect(), shape(), and contains(). The paint()
+@@ -9276,6 +9285,7 @@ QVariant QGraphicsLineItem::extension(const QVariant &variant) const
+     reasonable implementation of boundingRect(), shape(), and contains().
+ 
+     \image graphicsview-pixmapitem.png
++           {Pixmap of the Qt logo drawn near the origin}
+ 
+     The pixmap is drawn at the item's (0, 0) coordinate, as returned by
+     offset(). You can change the drawing offset by calling setOffset().
+@@ -9645,6 +9655,7 @@ QVariant QGraphicsPixmapItem::extension(const QVariant &variant) const
+     Otherwise, you can call adjustSize() after setting the item's text.
+ 
+     \image graphicsview-textitem.png
++           {Paragraph drawn near the origin}
+ 
+     \note QGraphicsTextItem accepts \l{QGraphicsItem::acceptHoverEvents()}{hover events}
+           by default. You can change this with \l{QGraphicsItem::}{setAcceptHoverEvents()}.
+@@ -10558,6 +10569,7 @@ void QGraphicsSimpleTextItemPrivate::updateBoundingRect()
+     QGraphicsTextItem, which provides full text control capabilities.
+ 
+     \image graphicsview-simpletextitem.png
++           {"Qt" text with custom fill and outline drawn near the origin}
+ 
+     \sa QGraphicsTextItem, QGraphicsPathItem, QGraphicsRectItem,
+     QGraphicsEllipseItem, QGraphicsPixmapItem, QGraphicsPolygonItem,
+diff --git a/src/widgets/graphicsview/qgraphicsproxywidget.cpp b/src/widgets/graphicsview/qgraphicsproxywidget.cpp
+index 8d00bde1004..99db9748166 100644
+--- a/src/widgets/graphicsview/qgraphicsproxywidget.cpp
++++ b/src/widgets/graphicsview/qgraphicsproxywidget.cpp
+@@ -74,6 +74,7 @@ QT_BEGIN_NAMESPACE
+     contents rect labeled.
+ 
+     \image qgraphicsproxywidget-embed.png
++           {Proxy widget and its embedded widget with their positions}
+ 
+     Alternatively, you can start by creating a new QGraphicsProxyWidget item,
+     and then call setWidget() to embed a QWidget later. The widget() function
+diff --git a/src/widgets/graphicsview/qgraphicsview.cpp b/src/widgets/graphicsview/qgraphicsview.cpp
+index 10f75774b83..657fc828074 100644
+--- a/src/widgets/graphicsview/qgraphicsview.cpp
++++ b/src/widgets/graphicsview/qgraphicsview.cpp
+@@ -96,7 +96,7 @@ static const int QGRAPHICSVIEW_PREALLOC_STYLE_OPTIONS = 503; // largest prime <
+     each frame. Call QOpenGLWidget::currentTargetBuffer() to query which buffer
+     is currently being drawn to.
+ 
+-    \image graphicsview-view.png
++    \image graphicsview-view.png {Grid of computer chips}
+ 
+     \note Using an OpenGL viewport limits the ability to use QGraphicsProxyWidget.
+     Not all combinations of widgets and styles can be supported with such a setup.
+diff --git a/src/widgets/itemviews/qabstractitemdelegate.cpp b/src/widgets/itemviews/qabstractitemdelegate.cpp
+index 236bbd8604c..e010bee91a0 100644
+--- a/src/widgets/itemviews/qabstractitemdelegate.cpp
++++ b/src/widgets/itemviews/qabstractitemdelegate.cpp
+@@ -62,7 +62,7 @@ QT_BEGIN_NAMESPACE
+     We give an example of drawing a progress bar in items; in our case
+     for a package management program.
+ 
+-    \image widgetdelegate.png
++    \image widgetdelegate.png {Package manager showing download progress}
+ 
+     We create the \c WidgetDelegate class, which inherits from
+     QStyledItemDelegate. We do the drawing in the paint() function:
+diff --git a/src/widgets/itemviews/qcolumnview.cpp b/src/widgets/itemviews/qcolumnview.cpp
+index f071d195fa6..6365c17fc24 100644
+--- a/src/widgets/itemviews/qcolumnview.cpp
++++ b/src/widgets/itemviews/qcolumnview.cpp
+@@ -35,7 +35,7 @@ QT_BEGIN_NAMESPACE
+     QAbstractItemView class to allow it to display data provided by
+     models derived from the QAbstractItemModel class.
+ 
+-    \image qcolumnview.png
++    \image qcolumnview.png {Address information in a column view}
+ 
+     \sa {Model/View Programming}
+ */
+diff --git a/src/widgets/itemviews/qlistview.cpp b/src/widgets/itemviews/qlistview.cpp
+index 8b50bd4301c..e4d36e0bce7 100644
+--- a/src/widgets/itemviews/qlistview.cpp
++++ b/src/widgets/itemviews/qlistview.cpp
+@@ -42,7 +42,7 @@ extern bool qt_sendSpontaneousEvent(QObject *receiver, QEvent *event);
+     \ingroup advanced
+     \inmodule QtWidgets
+ 
+-    \image fusion-listview.png
++    \image fusion-listview.png {List of weather icons}
+ 
+     A QListView presents items stored in a model, either as a simple
+     non-hierarchical list, or as a collection of icons. This class is used
+diff --git a/src/widgets/itemviews/qlistwidget.cpp b/src/widgets/itemviews/qlistwidget.cpp
+index 1f810dd26ee..d175bf9c5a1 100644
+--- a/src/widgets/itemviews/qlistwidget.cpp
++++ b/src/widgets/itemviews/qlistwidget.cpp
+@@ -1178,7 +1178,7 @@ void QListWidgetPrivate::dataChanged(const QModelIndex &topLeft,
+     \ingroup model-view
+     \inmodule QtWidgets
+ 
+-    \image fusion-listview.png
++    \image fusion-listview.png {List of weather icons}
+ 
+     QListWidget is a convenience class that provides a list view similar to the
+     one supplied by QListView, but with a classic item-based interface for
+diff --git a/src/widgets/itemviews/qtableview.cpp b/src/widgets/itemviews/qtableview.cpp
+index c36de15d8f0..ece9f05c738 100644
+--- a/src/widgets/itemviews/qtableview.cpp
++++ b/src/widgets/itemviews/qtableview.cpp
+@@ -1161,7 +1161,7 @@ int QTableViewPrivate::heightHintForIndex(const QModelIndex &index, int hint, QS
+     \ingroup advanced
+     \inmodule QtWidgets
+ 
+-    \image fusion-tableview.png
++    \image fusion-tableview.png {Table of months and amounts}
+ 
+     A QTableView implements a table view that displays items from a
+     model. This class is used to provide standard tables that were
+@@ -1207,6 +1207,7 @@ int QTableViewPrivate::heightHintForIndex(const QModelIndex &index, int hint, QS
+ 
+     \table
+     \row \li \inlineimage qtableview-resized.png
++             {Table of names, addresses, and quantity}
+     \li By default, the cells in a table do not expand to fill the available space.
+ 
+     You can make the cells fill the available space by stretching the last
+diff --git a/src/widgets/itemviews/qtablewidget.cpp b/src/widgets/itemviews/qtablewidget.cpp
+index 9ef3c77e079..85b399746b1 100644
+--- a/src/widgets/itemviews/qtablewidget.cpp
++++ b/src/widgets/itemviews/qtablewidget.cpp
+@@ -1549,7 +1549,7 @@ QTableWidgetItem &QTableWidgetItem::operator=(const QTableWidgetItem &other)
+     \ingroup model-view
+     \inmodule QtWidgets
+ 
+-    \image fusion-tableview.png
++    \image fusion-tableview.png {Table of months and amounts}
+ 
+     Table widgets provide standard table display facilities for applications.
+     The items in a QTableWidget are provided by QTableWidgetItem.
+diff --git a/src/widgets/itemviews/qtreeview.cpp b/src/widgets/itemviews/qtreeview.cpp
+index 57a2d2939e9..da1fbbd60df 100644
+--- a/src/widgets/itemviews/qtreeview.cpp
++++ b/src/widgets/itemviews/qtreeview.cpp
+@@ -40,6 +40,7 @@ QT_BEGIN_NAMESPACE
+     \inmodule QtWidgets
+ 
+     \image fusion-treeview.png
++           {Directory widget showing the contents using a tree view}
+ 
+     A QTreeView implements a tree representation of items from a
+     model. This class is used to provide standard hierarchical lists that
+diff --git a/src/widgets/itemviews/qtreewidget.cpp b/src/widgets/itemviews/qtreewidget.cpp
+index 748f8627578..6b03b6f9f1a 100644
+--- a/src/widgets/itemviews/qtreewidget.cpp
++++ b/src/widgets/itemviews/qtreewidget.cpp
+@@ -2401,7 +2401,7 @@ void QTreeWidgetPrivate::dataChanged(const QModelIndex &topLeft,
+   \ingroup model-view
+   \inmodule QtWidgets
+ 
+-  \image fusion-treeview.png
++  \image fusion-treeview.png {Directory displaying its contents as a tree}
+ 
+   The QTreeWidget class is a convenience class that provides a standard
+   tree widget with a classic item-based interface similar to that used by
+diff --git a/src/widgets/kernel/qboxlayout.cpp b/src/widgets/kernel/qboxlayout.cpp
+index ad3744986d7..312297fd603 100644
+--- a/src/widgets/kernel/qboxlayout.cpp
++++ b/src/widgets/kernel/qboxlayout.cpp
+@@ -432,7 +432,7 @@ int QBoxLayoutPrivate::validateIndex(int index) const
+     the parentWidget()), divides it up into a row of boxes, and makes
+     each managed widget fill one box.
+ 
+-    \image qhboxlayout-with-5-children.png Horizontal box layout with five child widgets
++    \image qhboxlayout-with-5-children.png {Five buttons in horizontal layout}
+ 
+     If the QBoxLayout's orientation is Qt::Horizontal the boxes are
+     placed in a row, with suitable sizes. Each widget (or other box)
+@@ -440,7 +440,7 @@ int QBoxLayoutPrivate::validateIndex(int index) const
+     Any excess space is shared according to the stretch factors (more
+     about that below).
+ 
+-    \image qvboxlayout-with-5-children.png Vertical box layout with five child widgets
++    \image qvboxlayout-with-5-children.png {Five buttons in vertical layout}
+ 
+     If the QBoxLayout's orientation is Qt::Vertical, the boxes are
+     placed in a column, again with suitable sizes.
+@@ -1225,7 +1225,8 @@ QBoxLayout::Direction QBoxLayout::direction() const
+     object onto \c window. At that point, the widgets in the layout are
+     reparented to have \c window as their parent.
+ 
+-    \image qhboxlayout-with-5-children.png Horizontal box layout with five child widgets
++    \image qhboxlayout-with-5-children.png
++           {Five buttons in horizontal layout}
+ 
+     \sa QVBoxLayout, QGridLayout, QStackedLayout, {Layout Management}, {Basic Layouts Example}
+ */
+@@ -1298,7 +1299,8 @@ QHBoxLayout::~QHBoxLayout()
+     object onto \c window. At that point, the widgets in the layout are
+     reparented to have \c window as their parent.
+ 
+-    \image qvboxlayout-with-5-children.png Horizontal box layout with five child widgets
++    \image qvboxlayout-with-5-children.png
++           {Horizontal box layout with five child widgets}
+ 
+     \sa QHBoxLayout, QGridLayout, QStackedLayout, {Layout Management}, {Basic Layouts Example}
+ */
+diff --git a/src/widgets/kernel/qformlayout.cpp b/src/widgets/kernel/qformlayout.cpp
+index 3cc7256d957..e94ca478ef7 100644
+--- a/src/widgets/kernel/qformlayout.cpp
++++ b/src/widgets/kernel/qformlayout.cpp
+@@ -1074,9 +1074,13 @@ QLayoutItem* QFormLayoutPrivate::replaceAt(int index, QLayoutItem *newitem)
+         \li Qt Extended styles
+     \row
+         \li \inlineimage qformlayout-win.png
++            {Form layout in traditional desktop style}
+         \li \inlineimage qformlayout-mac.png
++            {Form layout in macOS Aqua style}
+         \li \inlineimage qformlayout-kde.png
++            {Form layout in KDE Plastique style}
+         \li \inlineimage qformlayout-qpe.png
++            {Form layout in Qt Extended style}
+     \row
+         \li Traditional style used for Windows, GNOME, and earlier
+            versions of KDE. Labels are left aligned, and expanding
+diff --git a/src/widgets/kernel/qgesture.cpp b/src/widgets/kernel/qgesture.cpp
+index 736c95ac296..14e4a345fa3 100644
+--- a/src/widgets/kernel/qgesture.cpp
++++ b/src/widgets/kernel/qgesture.cpp
+@@ -196,7 +196,7 @@ QGesture::GestureCancelPolicy QGesture::gestureCancelPolicy() const
+     \ingroup gestures
+     \inmodule QtWidgets
+ 
+-    \image pangesture.png
++    \image pangesture.png {Demonstration of moving an image with pan gesture}
+ 
+     For an overview of gesture handling in Qt and information on using gestures
+     in your applications, see the \l{Gestures in Widgets and Graphics View} document.
+@@ -327,7 +327,7 @@ void QPanGesture::setAcceleration(qreal value)
+     For an overview of gesture handling in Qt and information on using gestures
+     in your applications, see the \l{Gestures in Widgets and Graphics View} document.
+ 
+-    \image pinchgesture.png
++    \image pinchgesture.png {Demonstration of pinch gesture with two fingers}
+ 
+     Instead of repeatedly applying the same pinching gesture, the user may
+     continue to touch the input device in one place, and apply a second touch
+@@ -591,7 +591,7 @@ void QPinchGesture::setRotationAngle(qreal value)
+     \ingroup gestures
+     \inmodule QtWidgets
+ 
+-    \image swipegesture.png
++    \image swipegesture.png {Demonstration of swipe gesture}
+ 
+     For an overview of gesture handling in Qt and information on using gestures
+     in your applications, see the \l{Gestures in Widgets and Graphics View} document.
+diff --git a/src/widgets/kernel/qrhiwidget.cpp b/src/widgets/kernel/qrhiwidget.cpp
+index dbea5f16240..e7c23572ce4 100644
+--- a/src/widgets/kernel/qrhiwidget.cpp
++++ b/src/widgets/kernel/qrhiwidget.cpp
+@@ -91,7 +91,7 @@ QT_BEGIN_NAMESPACE
+ 
+     The result is a widget that shows the following:
+ 
+-    \image qrhiwidget-intro.jpg
++    \image qrhiwidget-intro.jpg {Multicolored triangle on a green background}
+ 
+     For a complete, minimal, introductory example check out the \l{Simple RHI
+     Widget Example}.
+diff --git a/src/widgets/kernel/qwhatsthis.cpp b/src/widgets/kernel/qwhatsthis.cpp
+index 75e916fa511..bc91c76494e 100644
+--- a/src/widgets/kernel/qwhatsthis.cpp
++++ b/src/widgets/kernel/qwhatsthis.cpp
+@@ -73,7 +73,7 @@ QT_BEGIN_NAMESPACE
+     the appropriate help text is shown. The mode is left when help is
+     given or when the user presses Esc.
+ 
+-    \image whatsthis.png
++    \image whatsthis.png {"What's This?" mode for New File button}
+ 
+     You can enter "What's This?" mode programmatically with
+     enterWhatsThisMode(), check the mode with inWhatsThisMode(), and
+diff --git a/src/widgets/kernel/qwidget.cpp b/src/widgets/kernel/qwidget.cpp
+index d460a5f2e78..b3d95989085 100644
+--- a/src/widgets/kernel/qwidget.cpp
++++ b/src/widgets/kernel/qwidget.cpp
+@@ -389,7 +389,9 @@ void QWidget::setAutoFillBackground(bool enabled)
+     example, it is possible to display a button as a top-level window, but most
+     people prefer to put their buttons inside other widgets, such as QDialog.
+ 
+-    \image parent-child-widgets.png A parent widget containing various child widgets.
++    \image parent-child-widgets.png
++           {Appointment widget with labeled child widgets}
++    \caption A parent widget containing various child widgets.
+ 
+     The diagram above shows a QGroupBox widget being used to hold various child
+     widgets in a layout provided by QGridLayout. The QLabel child widgets have
+@@ -689,6 +691,8 @@ void QWidget::setAutoFillBackground(bool enabled)
+     can be fine-tuned to achieve different effects.
+ 
+     \image propagation-custom.png
++           {Three pixmaps of a house with different background properties:
++           transparent, filled with white, and uninitialized}
+ 
+     In the above diagram, a semi-transparent rectangular child widget with an
+     area removed is constructed and added to a parent widget (a QLabel showing
+@@ -732,6 +736,8 @@ void QWidget::setAutoFillBackground(bool enabled)
+     in a non-standard way, as shown in the diagram below.
+ 
+     \image propagation-standard.png
++           {One widget has a transparent background
++           and the other widget has a filled background}
+ 
+     The scope for customizing the painting behavior of standard Qt widgets,
+     without resorting to subclassing, is slightly less than that possible for
+diff --git a/src/widgets/styles/qstyle.cpp b/src/widgets/styles/qstyle.cpp
+index 22d089866f2..797c2c5c157 100644
+--- a/src/widgets/styles/qstyle.cpp
++++ b/src/widgets/styles/qstyle.cpp
+@@ -79,6 +79,7 @@ static int unpackControlTypes(QSizePolicy::ControlTypes controls, QSizePolicy::C
+     is a zero pointer.
+ 
+     \image paintsystem-stylepainter.png
++           {Diagram showing QStylePainter inherits from QPainter}
+ 
+     The paint system also provides the QStylePainter class inheriting
+     from QPainter.  QStylePainter is a convenience class for drawing
+@@ -89,7 +90,7 @@ static int unpackControlTypes(QSizePolicy::ControlTypes controls, QSizePolicy::C
+ 
+     \table 100%
+     \row
+-    \li \inlineimage paintsystem-icon.png
++    \li \inlineimage paintsystem-icon.png {Icon used in Qt}
+     \li \b QIcon
+ 
+     The QIcon class provides scalable icons in different modes and states.
+@@ -129,7 +130,7 @@ static int unpackControlTypes(QSizePolicy::ControlTypes controls, QSizePolicy::C
+     native widgets. The diagram below shows a QComboBox in nine
+     different styles.
+ 
+-    \image qstyle-comboboxes.png Nine combo boxes
++    \image qstyle-comboboxes.png {Nine combo boxes showing different styles}
+ 
+     Topics:
+ 
+diff --git a/src/widgets/styles/qstyleoption.cpp b/src/widgets/styles/qstyleoption.cpp
+index 21fa5f3ea65..58aa637c093 100644
+--- a/src/widgets/styles/qstyleoption.cpp
++++ b/src/widgets/styles/qstyleoption.cpp
+@@ -1070,6 +1070,7 @@ QStyleOptionToolBar::QStyleOptionToolBar(int version)
+     \enum QStyleOptionToolBar::ToolBarPosition
+ 
+     \image qstyleoptiontoolbar-position.png
++    {Diagram of thee toolbar line and the positions relative to the line}
+ 
+     This enum is used to describe the position of a toolbar line, as
+     well as the toolbar's position within the line.
+diff --git a/src/widgets/styles/qwindowsstyle.cpp b/src/widgets/styles/qwindowsstyle.cpp
+index 21b5a2699dd..de17cefc850 100644
+--- a/src/widgets/styles/qwindowsstyle.cpp
++++ b/src/widgets/styles/qwindowsstyle.cpp
+@@ -163,7 +163,7 @@ bool QWindowsStyle::eventFilter(QObject *o, QEvent *e)
+ 
+     This style is Qt's default GUI style on Windows.
+ 
+-    \image qwindowsstyle.png
++    \image qwindowsstyle.png {Gallery of widgets using the default GUI style}
+     \sa QWindowsVistaStyle, QMacStyle, QFusionStyle
+ */
+ 
+diff --git a/src/widgets/util/qundoview.cpp b/src/widgets/util/qundoview.cpp
+index 7be4afe3bf5..1f7385b4c15 100644
+--- a/src/widgets/util/qundoview.cpp
++++ b/src/widgets/util/qundoview.cpp
+@@ -230,7 +230,7 @@ QIcon QUndoModel::cleanIcon() const
+     be set with setGroup(). The view will then update itself automatically whenever the
+     active stack of the group changes.
+ 
+-    \image qundoview.png
++    \image qundoview.png {Undo stack showing list of commands}
+ */
+ 
+ class QUndoViewPrivate : public QListViewPrivate
+diff --git a/src/widgets/widgets/qabstractspinbox.cpp b/src/widgets/widgets/qabstractspinbox.cpp
+index e9cfb452e7d..e89bcf46d7a 100644
+--- a/src/widgets/widgets/qabstractspinbox.cpp
++++ b/src/widgets/widgets/qabstractspinbox.cpp
+@@ -156,7 +156,9 @@ QAbstractSpinBox::~QAbstractSpinBox()
+     in a spin box.
+ 
+     \inlineimage qspinbox-updown.png
++                 {Spinbox with the up and down arrow symbols}
+     \inlineimage qspinbox-plusminus.png
++                 {Spinbox with the plus and minus symbols}
+ 
+     \value UpDownArrows Little arrows in the classic style.
+     \value PlusMinus \b{+} and \b{-} symbols.
+diff --git a/src/widgets/widgets/qcalendarwidget.cpp b/src/widgets/widgets/qcalendarwidget.cpp
+index 56a9f8199ea..293468e41b2 100644
+--- a/src/widgets/widgets/qcalendarwidget.cpp
++++ b/src/widgets/widgets/qcalendarwidget.cpp
+@@ -2015,6 +2015,7 @@ void QCalendarWidgetPrivate::_q_editingFinished()
+     \inmodule QtWidgets
+ 
+     \image fusion-calendarwidget.png
++           {Calendar widget showing the month, year, and a selected day}
+ 
+     The widget is initialized with the current month and year, but
+     QCalendarWidget provides several public slots to change the year
+@@ -2053,6 +2054,7 @@ void QCalendarWidgetPrivate::_q_editingFinished()
+     \table
+     \row \li
+         \image qcalendarwidget-grid.png
++               {Calendar widget with a visible grid}
+     \row \li
+         \snippet code/src_gui_widgets_qcalendarwidget.cpp 0
+     \endtable
+@@ -2483,6 +2485,7 @@ void QCalendarWidget::showToday()
+     \table
+     \row
+     \li \image qcalendarwidget-minimum.png
++               {Calendar widget with the disabled dates before the minimum date}
+     \row
+     \li
+     \snippet code/src_gui_widgets_qcalendarwidget.cpp 1
+@@ -2539,6 +2542,7 @@ void QCalendarWidget::clearMinimumDate()
+     \table
+     \row
+     \li \image qcalendarwidget-maximum.png
++               {Calendar widget with the disabled dates after the maximum date}
+     \row
+     \li
+     \snippet code/src_gui_widgets_qcalendarwidget.cpp 2
+@@ -2713,6 +2717,7 @@ void QCalendarWidget::setVerticalHeaderFormat(QCalendarWidget::VerticalHeaderFor
+     \table
+     \row
+         \li \inlineimage qcalendarwidget-grid.png
++                         {Calendar widget set to be visible}
+     \row
+         \li
+         \snippet code/src_gui_widgets_qcalendarwidget.cpp 5
+diff --git a/src/widgets/widgets/qcheckbox.cpp b/src/widgets/widgets/qcheckbox.cpp
+index f542533dbf5..2dcb1519f20 100644
+--- a/src/widgets/widgets/qcheckbox.cpp
++++ b/src/widgets/widgets/qcheckbox.cpp
+@@ -40,7 +40,7 @@ public:
+     \ingroup basicwidgets
+     \inmodule QtWidgets
+ 
+-    \image fusion-checkbox.png
++    \image fusion-checkbox.png {Check box for the save option}
+ 
+     A QCheckBox is an option button that can be switched on (checked) or off
+     (unchecked). Checkboxes are typically used to represent features in an
+@@ -55,7 +55,9 @@ public:
+ 
+     \table
+     \row \li \inlineimage checkboxes-exclusive.png
++             {Check box group that allows only one option checked}
+          \li \inlineimage checkboxes-non-exclusive.png
++             {Check box group that allows multiple options checked}
+     \endtable
+ 
+     Whenever a checkbox is checked or cleared, it emits the signal
+diff --git a/src/widgets/widgets/qcombobox.cpp b/src/widgets/widgets/qcombobox.cpp
+index fbec606ae4a..5da2b0441ef 100644
+--- a/src/widgets/widgets/qcombobox.cpp
++++ b/src/widgets/widgets/qcombobox.cpp
+@@ -974,9 +974,11 @@ QComboBox::QComboBox(QComboBoxPrivate &dd, QWidget *parent)
+     \table
+        \row
+           \li \image collapsed_combobox.png
++              {Combo box with collapsed options list}
+               \caption Collapsed QCombobox
+           \li
+               \image expanded_combobox.png
++              {Combo box with expanded options list}
+               \caption Expanded QCombobox
+     \endtable
+ 
+diff --git a/src/widgets/widgets/qdatetimeedit.cpp b/src/widgets/widgets/qdatetimeedit.cpp
+index 1c3118fe785..a7965b7cd89 100644
+--- a/src/widgets/widgets/qdatetimeedit.cpp
++++ b/src/widgets/widgets/qdatetimeedit.cpp
+@@ -41,7 +41,7 @@ using namespace Qt::StringLiterals;
+   \ingroup basicwidgets
+   \inmodule QtWidgets
+ 
+-  \image fusion-datetimeedit.png
++  \image fusion-datetimeedit.png {Widget for editing time and date}
+ 
+   QDateTimeEdit allows the user to edit dates by using the keyboard or
+   the arrow keys to increase and decrease date and time values. The
+@@ -1607,7 +1607,7 @@ void QDateTimeEdit::mousePressEvent(QMouseEvent *event)
+   \ingroup basicwidgets
+   \inmodule QtWidgets
+ 
+-  \image fusion-timeedit.png
++  \image fusion-timeedit.png {Editable time}
+ 
+   Many of the properties and functions provided by QTimeEdit are implemented in
+   QDateTimeEdit. These are the relevant properties of this class:
+@@ -1678,7 +1678,7 @@ QTimeEdit::~QTimeEdit()
+   \ingroup basicwidgets
+   \inmodule QtWidgets
+ 
+-  \image fusion-dateedit.png
++  \image fusion-dateedit.png {Editable date}
+ 
+   Many of the properties and functions provided by QDateEdit are implemented in
+   QDateTimeEdit. These are the relevant properties of this class:
+diff --git a/src/widgets/widgets/qdial.cpp b/src/widgets/widgets/qdial.cpp
+index 8e80dc2a00d..7eea89b1cc7 100644
+--- a/src/widgets/widgets/qdial.cpp
++++ b/src/widgets/widgets/qdial.cpp
+@@ -143,7 +143,7 @@ int QDialPrivate::valueFromPoint(const QPoint &p) const
+     \ingroup basicwidgets
+     \inmodule QtWidgets
+ 
+-    \image fusion-dial.png
++    \image fusion-dial.png {Round dial with notches}
+ 
+     QDial is used when the user needs to control a value within a
+     program-definable range, and the range either wraps around
+diff --git a/src/widgets/widgets/qdialogbuttonbox.cpp b/src/widgets/widgets/qdialogbuttonbox.cpp
+index 695b2a42966..db214c114ce 100644
+--- a/src/widgets/widgets/qdialogbuttonbox.cpp
++++ b/src/widgets/widgets/qdialogbuttonbox.cpp
+@@ -67,13 +67,21 @@ QT_BEGIN_NAMESPACE
+ 
+     Currently the buttons are laid out in the following way if the button box is horizontal:
+     \table
+-    \row \li \inlineimage buttonbox-gnomelayout-horizontal.png GnomeLayout Horizontal
++    \row \li \inlineimage buttonbox-gnomelayout-horizontal.png
++             {Several buttons using the GnomeLayout horizontal layout}
++             GnomeLayout Horizontal
+          \li Button box laid out in horizontal GnomeLayout
+-    \row \li \inlineimage buttonbox-kdelayout-horizontal.png KdeLayout Horizontal
++    \row \li \inlineimage buttonbox-kdelayout-horizontal.png
++             {Several buttons using the KdeLayout horizontal layout}
++             KdeLayout Horizontal
+          \li Button box laid out in horizontal KdeLayout
+-    \row \li \inlineimage buttonbox-maclayout-horizontal.png MacLayout Horizontal
++    \row \li \inlineimage buttonbox-maclayout-horizontal.png
++             {Several buttons using the MacLayout horizontal layout}
++             MacLayout Horizontal
+          \li Button box laid out in horizontal MacLayout
+-    \row \li \inlineimage buttonbox-winlayout-horizontal.png  WinLayout Horizontal
++    \row \li \inlineimage buttonbox-winlayout-horizontal.png
++             {Several buttons using the WinLayout horizontal layout}
++             WinLayout Horizontal
+          \li Button box laid out in horizontal WinLayout
+     \endtable
+ 
+@@ -84,10 +92,18 @@ QT_BEGIN_NAMESPACE
+          \li KdeLayout
+          \li MacLayout
+          \li WinLayout
+-    \row \li \inlineimage buttonbox-gnomelayout-vertical.png GnomeLayout Vertical
+-         \li \inlineimage buttonbox-kdelayout-vertical.png KdeLayout Vertical
+-         \li \inlineimage buttonbox-maclayout-vertical.png MacLayout Vertical
+-         \li \inlineimage buttonbox-winlayout-vertical.png WinLayout Vertical
++    \row \li \inlineimage buttonbox-gnomelayout-vertical.png
++             {Several buttons using the GnomeLayout vertical layout}
++             GnomeLayout Vertical
++         \li \inlineimage buttonbox-kdelayout-vertical.png
++             {Several buttons using the KdeLayout vertical layout}
++             KdeLayout Vertical
++         \li \inlineimage buttonbox-maclayout-vertical.png
++             {Several buttons using the MacLayout vertical layout}
++             MacLayout Vertical
++         \li \inlineimage buttonbox-winlayout-vertical.png
++             {Several buttons using the WinLayout vertical layout}
++             WinLayout Vertical
+     \endtable
+ 
+     Additionally, button boxes that contain only buttons with ActionRole or
+@@ -95,9 +111,13 @@ QT_BEGIN_NAMESPACE
+ 
+     \table
+     \row \li modeless horizontal MacLayout
+-         \li \inlineimage buttonbox-mac-modeless-horizontal.png Screenshot of modeless horizontal MacLayout
++         \li \inlineimage buttonbox-mac-modeless-horizontal.png
++             {Several buttons using the horizontal modeless style on macOS}
++             Screenshot of modeless horizontal MacLayout
+     \row \li modeless vertical MacLayout
+-         \li \inlineimage buttonbox-mac-modeless-vertical.png Screenshot of modeless vertical MacLayout
++         \li \inlineimage buttonbox-mac-modeless-vertical.png
++             {Several buttons using the horizontal modeless style on macOS}
++             Screenshot of modeless vertical MacLayout
+     \endtable
+ 
+     When a button is clicked in the button box, the clicked() signal is emitted
+diff --git a/src/widgets/widgets/qdockwidget.cpp b/src/widgets/widgets/qdockwidget.cpp
+index aa4b4441859..fa7e98a3eff 100644
+--- a/src/widgets/widgets/qdockwidget.cpp
++++ b/src/widgets/widgets/qdockwidget.cpp
+@@ -1263,6 +1263,7 @@ void QDockWidgetPrivate::setWindowState(WindowStates states, const QRect &rect)
+     QMainWindow.
+ 
+     \image mainwindow-docks.png
++           {Diagram of dock widget within toolbars and a container for widgets}
+ 
+     Dock windows can be moved inside their current area, moved into
+     new areas and floated (e.g., undocked) by the end-user.  The
+diff --git a/src/widgets/widgets/qgroupbox.cpp b/src/widgets/widgets/qgroupbox.cpp
+index a56044c9cc6..2d0d21225d0 100644
+--- a/src/widgets/widgets/qgroupbox.cpp
++++ b/src/widgets/widgets/qgroupbox.cpp
+@@ -113,7 +113,7 @@ void QGroupBoxPrivate::click()
+     \ingroup geomanagement
+     \inmodule QtWidgets
+ 
+-    \image fusion-groupbox.png
++    \image fusion-groupbox.png {Group box displaying several radio button items}
+ 
+     A group box provides a frame, a title on top, a keyboard shortcut, and
+     displays various other widgets inside itself. The keyboard shortcut moves
+diff --git a/src/widgets/widgets/qlabel.cpp b/src/widgets/widgets/qlabel.cpp
+index 72f299792bb..d2c7a269662 100644
+--- a/src/widgets/widgets/qlabel.cpp
++++ b/src/widgets/widgets/qlabel.cpp
+@@ -51,7 +51,9 @@ QLabelPrivate::~QLabelPrivate()
+     \ingroup basicwidgets
+     \inmodule QtWidgets
+ 
+-    \image fusion-label.png
++    \image fusion-label.png {Label}
++
++
+ 
+     QLabel is used for displaying text or an image. No user
+     interaction functionality is provided. The visual appearance of
+diff --git a/src/widgets/widgets/qlcdnumber.cpp b/src/widgets/widgets/qlcdnumber.cpp
+index 34e926fda1c..6819177f761 100644
+--- a/src/widgets/widgets/qlcdnumber.cpp
++++ b/src/widgets/widgets/qlcdnumber.cpp
+@@ -38,7 +38,7 @@ public:
+     \ingroup basicwidgets
+     \inmodule QtWidgets
+ 
+-    \image fusion-lcdnumber.png
++    \image fusion-lcdnumber.png {"1234" with LCD-like digital appearance}
+ 
+     It can display a number in just about any size. It can display
+     decimal, hexadecimal, octal or binary numbers. It is easy to
+diff --git a/src/widgets/widgets/qlineedit.cpp b/src/widgets/widgets/qlineedit.cpp
+index 2f68ad5d4d5..0b05c418884 100644
+--- a/src/widgets/widgets/qlineedit.cpp
++++ b/src/widgets/widgets/qlineedit.cpp
+@@ -99,7 +99,7 @@ void QLineEdit::initStyleOption(QStyleOptionFrame *option) const
+     \ingroup basicwidgets
+     \inmodule QtWidgets
+ 
+-    \image fusion-lineedit.png
++    \image fusion-lineedit.png {Line edit showing a text greeting}
+ 
+     A line edit allows users to enter and edit a single line of
+     plain text with useful editing functions, including undo and redo, cut and
+diff --git a/src/widgets/widgets/qmainwindow.cpp b/src/widgets/widgets/qmainwindow.cpp
+index 102927f2e56..d76cf9ead81 100644
+--- a/src/widgets/widgets/qmainwindow.cpp
++++ b/src/widgets/widgets/qmainwindow.cpp
+@@ -130,6 +130,7 @@ void QMainWindowPrivate::init()
+     layout below.
+ 
+     \image mainwindowlayout.png
++           {Diagram of main window and the position of its components}
+ 
+     \section1 Creating Main Window Components
+ 
+diff --git a/src/widgets/widgets/qmdiarea.cpp b/src/widgets/widgets/qmdiarea.cpp
+index 9d2c14daaea..11981e84e3b 100644
+--- a/src/widgets/widgets/qmdiarea.cpp
++++ b/src/widgets/widgets/qmdiarea.cpp
+@@ -52,7 +52,9 @@
+ 
+     \table
+     \row \li \inlineimage mdi-cascade.png
++             {MDI windows in cascading order}
+          \li \inlineimage mdi-tile.png
++             {MDI windows in a tiling pattern}
+     \endtable
+ 
+     \note The default scroll bar property for QMdiArea is Qt::ScrollBarAlwaysOff.
+diff --git a/src/widgets/widgets/qmdisubwindow.cpp b/src/widgets/widgets/qmdisubwindow.cpp
+index bb5cf18ecd2..dcc851a35b5 100644
+--- a/src/widgets/widgets/qmdisubwindow.cpp
++++ b/src/widgets/widgets/qmdisubwindow.cpp
+@@ -16,6 +16,7 @@
+     title bar and a center area for the internal widget.
+ 
+     \image qmdisubwindowlayout.png
++           {MDI window with a title bar and an internal widget}
+ 
+     The most common way to construct a QMdiSubWindow is to call
+     QMdiArea::addSubWindow() with the internal widget as the argument.
+diff --git a/src/widgets/widgets/qmenu.cpp b/src/widgets/widgets/qmenu.cpp
+index a8d42e556fd..33bec72948c 100644
+--- a/src/widgets/widgets/qmenu.cpp
++++ b/src/widgets/widgets/qmenu.cpp
+@@ -1652,7 +1652,7 @@ void QMenu::initStyleOption(QStyleOptionMenuItem *option, const QAction *action)
+     \ingroup basicwidgets
+     \inmodule QtWidgets
+ 
+-    \image fusion-menu.png
++    \image fusion-menu.png {Menu containing several action items}
+ 
+     A menu widget is a selection menu. It can be either a pull-down
+     menu in a menu bar or a standalone context menu. Pull-down menus
+diff --git a/src/widgets/widgets/qprogressbar.cpp b/src/widgets/widgets/qprogressbar.cpp
+index 530b1737894..2152dff09d6 100644
+--- a/src/widgets/widgets/qprogressbar.cpp
++++ b/src/widgets/widgets/qprogressbar.cpp
+@@ -155,7 +155,7 @@ bool QProgressBarPrivate::repaintRequired() const
+     \ingroup basicwidgets
+     \inmodule QtWidgets
+ 
+-    \image fusion-progressbar.png
++    \image fusion-progressbar.png {Progress bar showing 42%}
+ 
+     A progress bar is used to give the user an indication of the
+     progress of an operation and to reassure them that the application
+diff --git a/src/widgets/widgets/qpushbutton.cpp b/src/widgets/widgets/qpushbutton.cpp
+index 7c1d918dcd7..cfc985d290f 100644
+--- a/src/widgets/widgets/qpushbutton.cpp
++++ b/src/widgets/widgets/qpushbutton.cpp
+@@ -45,6 +45,7 @@ QT_BEGIN_NAMESPACE
+     \inmodule QtWidgets
+ 
+     \image fusion-pushbutton.png
++           {Push button for creating a new document}
+ 
+     The push button, or command button, is perhaps the most commonly
+     used widget in any graphical user interface. Push (click) a button
+@@ -512,7 +513,8 @@ bool QPushButton::hitButton(const QPoint &pos) const
+ 
+     Ownership of the menu is \e not transferred to the push button.
+ 
+-    \image fusion-pushbutton-menu.png Screenshot of a Fusion style push button with popup menu.
++    \image fusion-pushbutton-menu.png
++           {Push button with popup menu}
+     A push button with popup menus shown in the \l{Qt Widget Gallery}
+     {Fusion widget style}.
+ 
+diff --git a/src/widgets/widgets/qradiobutton.cpp b/src/widgets/widgets/qradiobutton.cpp
+index 533a78c330d..ffda3c8bb34 100644
+--- a/src/widgets/widgets/qradiobutton.cpp
++++ b/src/widgets/widgets/qradiobutton.cpp
+@@ -47,7 +47,7 @@ void QRadioButtonPrivate::init()
+     \ingroup basicwidgets
+     \inmodule QtWidgets
+ 
+-    \image fusion-radiobutton.png
++    \image fusion-radiobutton.png {Two radio buttons representing two options}
+ 
+     A QRadioButton is an option button that can be switched on (checked) or
+     off (unchecked). Radio buttons typically present the user with a "one
+diff --git a/src/widgets/widgets/qscrollarea.cpp b/src/widgets/widgets/qscrollarea.cpp
+index 731f416f30e..ba42bb17f92 100644
+--- a/src/widgets/widgets/qscrollarea.cpp
++++ b/src/widgets/widgets/qscrollarea.cpp
+@@ -39,8 +39,12 @@ QT_BEGIN_NAMESPACE
+     \table
+     \row
+     \li \inlineimage qscrollarea-noscrollbars.png
++                     {Image without the scroll bar}
+     \li \inlineimage qscrollarea-onescrollbar.png
++                     {Image with a horizontal scroll bar}
+     \li \inlineimage qscrollarea-twoscrollbars.png
++                     {Image with a horizontal and a vertical scroll bar}
++
+     \endtable
+ 
+     The scroll bars appearance depends on the currently set \l
+diff --git a/src/widgets/widgets/qscrollbar.cpp b/src/widgets/widgets/qscrollbar.cpp
+index 92ccfe7db9d..ef793cecdbb 100644
+--- a/src/widgets/widgets/qscrollbar.cpp
++++ b/src/widgets/widgets/qscrollbar.cpp
+@@ -56,6 +56,8 @@ using namespace Qt::StringLiterals;
+ 
+     \table
+     \row \li \image qscrollbar-picture.png
++             {The parts of the scroll bar such as slider, scroll arrows,
++             and page control}
+     \li Scroll bars typically include four separate controls: a slider,
+     scroll arrows, and a page control.
+ 
+@@ -108,6 +110,8 @@ using namespace Qt::StringLiterals;
+ 
+     \table
+     \row \li \inlineimage qscrollbar-values.png
++                          {The document length, scrolling range, and page step
++                          of a scroll bar}
+     \li The relationship between a document length, the range of values used
+     in a scroll bar, and the page step is simple in many common situations.
+     The scroll bar's range of values is determined by subtracting a
+diff --git a/src/widgets/widgets/qsizegrip.cpp b/src/widgets/widgets/qsizegrip.cpp
+index 2500983450e..ad29514e1bd 100644
+--- a/src/widgets/widgets/qsizegrip.cpp
++++ b/src/widgets/widgets/qsizegrip.cpp
+@@ -143,11 +143,9 @@ Qt::Corner QSizeGripPrivate::corner() const
+     guideline, and won't show unless used in a QMdiSubWindow. Set another
+     style on size grips that you want to be visible in main windows.
+ 
+-    \table 50%
+-    \row \li \inlineimage fusion-statusbar-sizegrip.png Screenshot of a Fusion style size grip
+-    \li A size grip widget at the bottom-right corner of a main window, shown in the
++    \image fusion-statusbar-sizegrip.png {Size grip at the bottom-right corner}
++    \caption  A size grip widget at the bottom-right corner of a main window, shown in the
+     \l{Qt Widget Gallery}{Fusion widget style}.
+-    \endtable
+ 
+     The QSizeGrip class inherits QWidget and reimplements the \l
+     {QWidget::mousePressEvent()}{mousePressEvent()} and \l
+diff --git a/src/widgets/widgets/qslider.cpp b/src/widgets/widgets/qslider.cpp
+index 7288c472ac3..c0b71d67232 100644
+--- a/src/widgets/widgets/qslider.cpp
++++ b/src/widgets/widgets/qslider.cpp
+@@ -177,7 +177,7 @@ QStyle::SubControl QSliderPrivate::newHoverControl(const QPoint &pos)
+     \ingroup basicwidgets
+     \inmodule QtWidgets
+ 
+-    \image fusion-slider.png
++    \image fusion-slider.png {Horizontal slider with tick marks}
+ 
+     The slider is the classic widget for controlling a bounded value.
+     It lets the user move a slider handle along a horizontal or vertical
+diff --git a/src/widgets/widgets/qspinbox.cpp b/src/widgets/widgets/qspinbox.cpp
+index 88b5f238caa..67bdd5efd1d 100644
+--- a/src/widgets/widgets/qspinbox.cpp
++++ b/src/widgets/widgets/qspinbox.cpp
+@@ -82,7 +82,7 @@ public:
+     \ingroup basicwidgets
+     \inmodule QtWidgets
+ 
+-    \image fusion-spinbox.png
++    \image fusion-spinbox.png {Spin box widget displaying an integer}
+ 
+     QSpinBox is designed to handle integers and discrete sets of
+     values (e.g., month names); use QDoubleSpinBox for floating point
+@@ -553,7 +553,7 @@ void QSpinBox::fixup(QString &input) const
+     \ingroup basicwidgets
+     \inmodule QtWidgets
+ 
+-    \image fusion-doublespinbox.png
++    \image fusion-doublespinbox.png {Spin box displaying a double}
+ 
+     QDoubleSpinBox allows the user to choose a value by clicking the
+     up and down buttons or by pressing Up or Down on the keyboard to
+diff --git a/src/widgets/widgets/qtabbar.cpp b/src/widgets/widgets/qtabbar.cpp
+index 450b4eaf0d6..b64c739bc0f 100644
+--- a/src/widgets/widgets/qtabbar.cpp
++++ b/src/widgets/widgets/qtabbar.cpp
+@@ -280,9 +280,9 @@ void QTabBar::initStyleOption(QStyleOptionTab *option, int tabIndex) const
+     returns the visual geometry of a single tab.
+ 
+     \table 100%
+-    \row \li \inlineimage {fusion-tabbar.png} {Screenshot of a Fusion style tab bar}
++    \row \li \inlineimage {fusion-tabbar.png} {Tab bar with three tabs}
+          \li A tab bar shown in the \l{Qt Widget Gallery}{Fusion widget style}.
+-    \row \li \inlineimage {fusion-tabbar-truncated.png} {Screenshot of a truncated Fusion tab bar}
++    \row \li \inlineimage {fusion-tabbar-truncated.png} {Truncated tab bar}
+          \li A truncated tab bar shown in the Fusion widget style.
+     \endtable
+ 
+diff --git a/src/widgets/widgets/qtabwidget.cpp b/src/widgets/widgets/qtabwidget.cpp
+index 803bdc46202..26bc7251f89 100644
+--- a/src/widgets/widgets/qtabwidget.cpp
++++ b/src/widgets/widgets/qtabwidget.cpp
+@@ -29,7 +29,7 @@ using namespace Qt::StringLiterals;
+     \ingroup basicwidgets
+     \inmodule QtWidgets
+ 
+-    \image fusion-tabwidget.png
++    \image fusion-tabwidget.png {Tab widget with two tabs}
+ 
+     A tab widget provides a tab bar (see QTabBar) and a "page area"
+     that is used to display pages related to each tab. By default, the
+diff --git a/src/widgets/widgets/qtoolbutton.cpp b/src/widgets/widgets/qtoolbutton.cpp
+index e9aea588e66..698da43cd72 100644
+--- a/src/widgets/widgets/qtoolbutton.cpp
++++ b/src/widgets/widgets/qtoolbutton.cpp
+@@ -130,11 +130,10 @@ bool QToolButtonPrivate::hasMenu() const
+     of possible pages to jump to. The timeout is style dependent,
+     see QStyle::SH_ToolButton_PopupDelay.
+ 
+-    \table 100%
+-    \row \li \inlineimage assistant-toolbar.png Qt Assistant's toolbar with tool buttons
+-    \row \li Qt Assistant's toolbar contains tool buttons that are associated
++    \image assistant-toolbar.png {Qt Assistant's toolbar with tool buttons}
++    \caption Qt Assistant's toolbar contains tool buttons that are associated
+          with actions used in other parts of the main window.
+-    \endtable
++
+ 
+     \sa QPushButton, QToolBar, QMainWindow, QAction
+ */
+-- 
+2.51.2
+

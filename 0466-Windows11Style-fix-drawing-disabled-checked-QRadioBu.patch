@@ -1,0 +1,43 @@
+From b0f91ec71613a7f05d5e1326a3a4401c6e471503 Mon Sep 17 00:00:00 2001
+From: Christian Ehrlicher <ch.ehrlicher@gmx.de>
+Date: Fri, 17 Oct 2025 16:01:55 +0200
+Subject: [PATCH 466/553] Windows11Style: fix drawing disabled, checked
+ QRadioButton
+
+A disabled, checked QRadioButton is not drawn as checked. This was
+introduced with a39047eeb6202a3c081d2441be9dc4f3d017fb97
+
+Task-number: QTBUG-139605
+Fixes: QTBUG-140449
+Change-Id: I2c34637b0ef51d619a81a78862021a76ae5b20a0
+Reviewed-by: Axel Spoerl <axel.spoerl@qt.io>
+(cherry picked from commit b252b715c14da194c41e802319933f562e736082)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/plugins/styles/modernwindows/qwindows11style.cpp | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/src/plugins/styles/modernwindows/qwindows11style.cpp b/src/plugins/styles/modernwindows/qwindows11style.cpp
+index 1c3ed2637ec..b6d0dd3c426 100644
+--- a/src/plugins/styles/modernwindows/qwindows11style.cpp
++++ b/src/plugins/styles/modernwindows/qwindows11style.cpp
+@@ -915,15 +915,13 @@ void QWindows11Style::drawPrimitive(PrimitiveElement element, const QStyleOption
+     case PE_IndicatorRadioButton: {
+             const bool isRtl = option->direction == Qt::RightToLeft;
+             const bool isOn = option->state & State_On;
+-            qreal innerRadius = 7.0f;
++            qreal innerRadius = radioButtonInnerRadius(state);
+             if (d->transitionsEnabled() && option->styleObject) {
+                 if (option->styleObject->property("_q_end_radius").isNull())
+                     option->styleObject->setProperty("_q_end_radius", innerRadius);
+                 QNumberStyleAnimation *animation = qobject_cast<QNumberStyleAnimation *>(d->animation(option->styleObject));
+                 innerRadius = animation ? animation->currentValue() : option->styleObject->property("_q_end_radius").toFloat();
+                 option->styleObject->setProperty("_q_inner_radius", innerRadius);
+-            } else {
+-                innerRadius = radioButtonInnerRadius(state);
+             }
+ 
+             QRectF rect = isRtl ? option->rect.adjusted(0, 0, -2, 0) : option->rect.adjusted(2, 0, 0, 0);
+-- 
+2.51.2
+

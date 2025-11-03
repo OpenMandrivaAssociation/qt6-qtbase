@@ -1,0 +1,75 @@
+From 7491964113ff58c467d711b2d4349cfa4d295e80 Mon Sep 17 00:00:00 2001
+From: Christian Ehrlicher <ch.ehrlicher@gmx.de>
+Date: Fri, 10 Oct 2025 17:39:44 +0200
+Subject: [PATCH 379/553] QApplication: avoid conversion from/to QPoint(F)
+
+Avoid some useless conversions from/to QPointF when the point is given
+to a function which already takes a QPointF. Since the conversion from
+QPoint to QPointF is implicit, no compiler warning is given here.
+Also remove the unused variable 'hoverGlobalPos'.
+
+Change-Id: I87eb2eff944a89dd8a3a13a3739d7523d91f6d78
+Reviewed-by: Friedemann Kleint <Friedemann.Kleint@qt.io>
+(cherry picked from commit f0b1caafd8dcc74b7771ee1c451587218075136a)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/widgets/kernel/qapplication.cpp | 8 +++-----
+ src/widgets/kernel/qapplication_p.h | 2 +-
+ 2 files changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/src/widgets/kernel/qapplication.cpp b/src/widgets/kernel/qapplication.cpp
+index f4eba61a80e..564f2b67baa 100644
+--- a/src/widgets/kernel/qapplication.cpp
++++ b/src/widgets/kernel/qapplication.cpp
+@@ -2768,7 +2768,7 @@ bool QApplication::notify(QObject *receiver, QEvent *e)
+ 
+             QPointer<QWidget> pw = w;
+             while (w) {
+-                QMouseEvent me(mouse->type(), relpos, mouse->scenePosition(), mouse->globalPosition().toPoint(),
++                QMouseEvent me(mouse->type(), relpos, mouse->scenePosition(), mouse->globalPosition(),
+                                mouse->button(), mouse->buttons(), mouse->modifiers(), mouse->source(),
+                                mouse->pointingDevice());
+                 me.m_spont = mouse->spontaneous();
+@@ -2802,7 +2802,7 @@ bool QApplication::notify(QObject *receiver, QEvent *e)
+ 
+                 w = static_cast<QWidget *>(receiver);
+                 relpos = mouse->position().toPoint();
+-                QPoint diff = relpos - w->mapFromGlobal(mouse->globalPosition().toPoint());
++                QPoint diff = relpos - w->mapFromGlobal(mouse->globalPosition()).toPoint();
+                 while (w) {
+                     if (w->testAttribute(Qt::WA_Hover) &&
+                         (!QApplication::activePopupWidget() || QApplication::activePopupWidget() == w->window())) {
+@@ -2816,8 +2816,6 @@ bool QApplication::notify(QObject *receiver, QEvent *e)
+                     w = w->parentWidget();
+                 }
+             }
+-
+-            d->hoverGlobalPos = mouse->globalPosition().toPoint();
+             break;
+         }
+ #if QT_CONFIG(wheelevent)
+@@ -3836,7 +3834,7 @@ bool QApplicationPrivate::translateRawTouchEvent(QWidget *window, const QTouchEv
+                     window = QApplication::topLevelAt(touchPoint.globalPosition().toPoint());
+                 if (!window)
+                     continue;
+-                target = window->childAt(window->mapFromGlobal(touchPoint.globalPosition().toPoint()));
++                target = window->childAt(window->mapFromGlobal(touchPoint.globalPosition()));
+                 if (!target)
+                     target = window;
+             }
+diff --git a/src/widgets/kernel/qapplication_p.h b/src/widgets/kernel/qapplication_p.h
+index 2b33e33a2a4..25b887aa4be 100644
+--- a/src/widgets/kernel/qapplication_p.h
++++ b/src/widgets/kernel/qapplication_p.h
+@@ -124,7 +124,7 @@ public:
+ #endif
+ 
+     QBasicTimer toolTipWakeUp, toolTipFallAsleep;
+-    QPoint toolTipPos, toolTipGlobalPos, hoverGlobalPos;
++    QPoint toolTipPos, toolTipGlobalPos;
+     QPointer<QWidget> toolTipWidget;
+ 
+     static QSize app_strut;
+-- 
+2.51.2
+

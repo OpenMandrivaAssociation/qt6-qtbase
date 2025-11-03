@@ -1,0 +1,65 @@
+From 7dd5f4cb0f0d878bc36db4372ec6c615907c5fbc Mon Sep 17 00:00:00 2001
+From: Laszlo Agocs <lagocs83@gmail.com>
+Date: Mon, 29 Sep 2025 09:26:18 +0200
+Subject: [PATCH 301/553] Expand QRhiWidget color buffer size docs
+
+Traditionally we always talk about the "supersampling" example
+with textureSize type of properties (following Quick's docs from
+the Qt 5.0 days), whereas in reality the more common use these
+days is to set a smaller size so that one gets content upscaled
+from a lower resolution. (e.g. because the developer decides
+that rendering at 1080p is sufficient with a fullscreen QRhiWidget
+on a 4K screen) Expand also on the consequences of a > 1 device
+pixel ratio, to make it clearer that it is in effect an implicit
+fixedColorBufferSize = 2 * pixel_size, when it comes to the
+visual results.
+
+Pick-to: 6.9 6.8
+Change-Id: I9ede72ddcc314798fa2b17115cca288d7d90da98
+Reviewed-by: Andy Nichols <andy.nichols@qt.io>
+(cherry picked from commit eaf885f3033e4ff825378ad9b87c8cbf07225e24)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/widgets/kernel/qrhiwidget.cpp | 22 +++++++++++++++++++---
+ 1 file changed, 19 insertions(+), 3 deletions(-)
+
+diff --git a/src/widgets/kernel/qrhiwidget.cpp b/src/widgets/kernel/qrhiwidget.cpp
+index 731605dc58d..dbea5f16240 100644
+--- a/src/widgets/kernel/qrhiwidget.cpp
++++ b/src/widgets/kernel/qrhiwidget.cpp
+@@ -903,13 +903,29 @@ void QRhiWidget::setSampleCount(int samples)
+     will appear stretched (scaled up) or scaled down onto the widget's area.
+ 
+     For example, setting a size that is exactly twice the widget's (pixel) size
+-    effectively performs 2x supersampling (rendering at twice the resolution
+-    and then implicitly scaling down when texturing the quad corresponding to
+-    the widget in the window).
++    effectively performs 2x supersampling (rendering at twice the resolution and
++    then implicitly scaling down when texturing the quad corresponding to the
++    widget in the window). On the other hand, setting a size that is half of the
++    widget's effectively achieves rendering at half resolution and then
++    upscaling the results.
+ 
+     By default the value is a null QSize. A null or empty QSize means that the
+     texture's size follows the QRhiWidget's size. (\c{texture size} = \c{widget
+     size} * \c{device pixel ratio}).
++
++    \note The device pixel ratio (the system compositor's scale factor) can have
++    a big impact on performance, since a scale factor of 2 (200%) means
++    rendering at twice the resolution, so twice of what the developer and UI
++    designer perceives as the widget's size, and then effectively downscaling
++    the content, similarly to what happens when setting this property to twice
++    the widget's pixel size on a system where the device pixel ratio is 1.
++    Therefore, this property is expected to be rarely used with sizes bigger
++    than the widget's pixel size, since many modern desktop systems have neither
++    have the need nor the performance budget for it, when a larger than 1 device
++    pixel ratio is used anyway by the system. Instead, the main use case for
++    this property is to set a smaller size, in order to render at a reasonable
++    smaller resolution instead of blindly following the window geometry, however
++    big that may be.
+  */
+ 
+ QSize QRhiWidget::fixedColorBufferSize() const
+-- 
+2.51.2
+

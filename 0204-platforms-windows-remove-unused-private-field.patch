@@ -1,0 +1,33 @@
+From d238a353c79aa2b230fc4a6d818603769d249dd2 Mon Sep 17 00:00:00 2001
+From: Tim Blechmann <tim.blechmann@qt.io>
+Date: Wed, 24 Sep 2025 12:11:25 +0800
+Subject: [PATCH 204/553] platforms: windows - remove unused private field
+
+Silences a -Wunused-private-field when compiling with Clang.
+
+Amends 127468e053c84e089f0afc87704758ae360406e9, which removed
+the last use of the variable.
+
+Change-Id: I17cd41f19a1c352582bfbdcd432672c05a9df5e3
+Reviewed-by: Marc Mutz <marc.mutz@qt.io>
+(cherry picked from commit f3a80cc4a5f1f7aea2b9feab9e787dbe4a7e1b39)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/plugins/platforms/windows/qwindowswindow.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/plugins/platforms/windows/qwindowswindow.h b/src/plugins/platforms/windows/qwindowswindow.h
+index a0e150aeb01..e302cb79285 100644
+--- a/src/plugins/platforms/windows/qwindowswindow.h
++++ b/src/plugins/platforms/windows/qwindowswindow.h
+@@ -386,7 +386,6 @@ private:
+     mutable unsigned m_flags = WithinCreate;
+     HDC m_hdc = nullptr;
+     Qt::WindowStates m_windowState = Qt::WindowNoState;
+-    bool m_windowWasArranged = false;
+     QString m_windowTitle;
+     qreal m_opacity = 1;
+ #ifndef QT_NO_CURSOR
+-- 
+2.51.2
+

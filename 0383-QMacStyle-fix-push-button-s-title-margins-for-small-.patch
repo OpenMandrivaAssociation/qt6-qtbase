@@ -1,0 +1,39 @@
+From 54bd61a234f14dbc85d98005bb4353d1d7150ad2 Mon Sep 17 00:00:00 2001
+From: Timur Pocheptsov <timur.pocheptsov@qt.io>
+Date: Tue, 9 Sep 2025 17:07:20 +0200
+Subject: [PATCH 383/553] QMacStyle: fix push button's title margins for
+ 'small' control size
+
+This amends b027f12392223db66914ec9d8c8824fb203c868f, size "small" also
+needs vertical adjustment (but "mini" is fine as it is now).
+
+Pick-to: 6.9 6.8 6.5
+Task-number: QTBUG-139944
+Change-Id: I5c35666af67a37a88555cd54f931e7938f1c5cc4
+Reviewed-by: Richard Moe Gustavsen <richard.gustavsen@qt.io>
+(cherry picked from commit 779f7dde903b10f313c2692b593f964e7136da79)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/plugins/styles/mac/qmacstyle_mac.mm | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/plugins/styles/mac/qmacstyle_mac.mm b/src/plugins/styles/mac/qmacstyle_mac.mm
+index 7aa7f03c682..5ba6f3e1649 100644
+--- a/src/plugins/styles/mac/qmacstyle_mac.mm
++++ b/src/plugins/styles/mac/qmacstyle_mac.mm
+@@ -1762,8 +1762,11 @@ QMarginsF QMacStylePrivate::CocoaControl::titleMargins() const
+                 return QMarginsF(12, 6, 12, 8);
+             return QMarginsF(12, 5, 12, 9);
+         }
+-        if (size == QStyleHelper::SizeSmall)
++        if (size == QStyleHelper::SizeSmall) {
++            if (qt_apple_runningWithLiquidGlass())
++                return QMarginsF(12, 6, 12, 7);
+             return QMarginsF(12, 4, 12, 9);
++        }
+         if (size == QStyleHelper::SizeMini)
+             return QMarginsF(10, 1, 10, 2);
+     }
+-- 
+2.51.2
+
