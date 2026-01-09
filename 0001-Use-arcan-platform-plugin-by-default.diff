@@ -1,0 +1,19 @@
+diff --git a/src/gui/kernel/qguiapplication.cpp b/src/gui/kernel/qguiapplication.cpp
+index 97610802635..42482b32bf3 100644
+--- a/src/gui/kernel/qguiapplication.cpp
++++ b/src/gui/kernel/qguiapplication.cpp
+@@ -1513,6 +1513,14 @@ void QGuiApplicationPrivate::createPlatformIntegration()
+             platformName.clear();
+     }
+ 
++    const bool defaultIsArcan = platformPluginBase == "arcan";
++    const QByteArray arcanPlatformName = defaultIsArcan ? platformName : "arcan";
++    if (qEnvironmentVariableIsSet("ARCAN_CONNPATH")) {
++        preferredPlatformOrder << arcanPlatformName;
++        if (defaultIsArcan)
++            platformName.clear();
++    }
++
+     if (!platformName.isEmpty())
+         preferredPlatformOrder.append(platformName);
+ 

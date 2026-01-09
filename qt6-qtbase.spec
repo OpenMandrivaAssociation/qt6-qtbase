@@ -16,7 +16,7 @@ Source:		https://download.qt.io/%{?beta:development}%{!?beta:official}_releases/
 # rpm macros
 Source100:	macros.qt6
 %{load:%{S:100}}
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}2
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
@@ -81,6 +81,8 @@ License:	LGPLv3/GPLv3/GPLv2
 #qtbase-init-pluginpath.patch
 qtbase-6.2.0-aarch64-buildfix.patch
 #aarch64-qhash-fix-build-with-gcc.patch
+# Automatically detect whether or not the arcan QPA should be used
+https://codeberg.org/vimpostor/qtarcan/raw/branch/master/distr/0001-Use-arcan-platform-plugin-by-default.diff
 
 %description
 Version %{qtmajor} of the Qt framework
