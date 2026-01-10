@@ -335,7 +335,6 @@ The legacy qmake build tool for Qt %{qtmajor}
 %{_qtdir}/bin/qmake6
 %{_qtdir}/mkspecs
 %exclude %{_qtdir}/mkspecs/modules/*
-%{_qtdir}/mkspecs/modules/README
 %{_qtdir}/libexec/qt-internal-configure-examples
 %{_qtdir}/libexec/qt-internal-configure-tests
 %{_qtdir}/libexec/ensure_pro_file.cmake
