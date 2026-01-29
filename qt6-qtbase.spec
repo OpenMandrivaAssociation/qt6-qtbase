@@ -6,7 +6,7 @@
 %endif
 
 Name:		qt6-qtbase
-Version:	6.10.1
+Version:	6.10.2
 %if 0%{?snapshot:1}
 # "git archive"-d from "dev" branch of git://code.qt.io/qt/qtbase.git
 Source:		qtbase-%{snapshot}.tar.zst
@@ -16,7 +16,7 @@ Source:		https://download.qt.io/%{?beta:development}%{!?beta:official}_releases/
 # rpm macros
 Source100:	macros.qt6
 %{load:%{S:100}}
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}3
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
@@ -95,6 +95,7 @@ Version %{qtmajor} of the Qt framework
 %dir %{_qtdir}/libexec \
 %{_qtdir}/libexec/moc \
 %{_qtdir}/libexec/rcc \
+%{_qtdir}/libexec/qt_cyclonedx_generator.py \
 %dir %{_qtdir}/metatypes \
 %dir %{_qtdir}/modules \
 %{_libdir}/pkgconfig/Qt6Platform.pc \
