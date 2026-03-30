@@ -6,7 +6,7 @@
 %endif
 
 Name:		qt6-qtbase
-Version:	6.10.2
+Version:	6.11.0
 %if 0%{?snapshot:1}
 # "git archive"-d from "dev" branch of git://code.qt.io/qt/qtbase.git
 Source:		qtbase-%{snapshot}.tar.zst
@@ -98,6 +98,7 @@ Version %{qtmajor} of the Qt framework
 %{_qtdir}/libexec/qt_cyclonedx_generator.py \
 %dir %{_qtdir}/metatypes \
 %dir %{_qtdir}/modules \
+%{_qtdir}/share \
 %{_libdir}/pkgconfig/Qt6Platform.pc \
 %{_qtdir}/lib/pkgconfig
 
@@ -178,6 +179,7 @@ Requires: cmake(Qt6Gui)
 
 %define extra_files_Network \
 %dir %{_qtdir}/plugins/networkinformation \
+%{_qtdir}/plugins/networkinformation/libqconnman.so \
 %{_qtdir}/plugins/networkinformation/libqnetworkmanager.so \
 %{_qtdir}/plugins/networkinformation/libqglib.so \
 %dir %{_qtdir}/plugins/tls \
@@ -218,7 +220,6 @@ Requires: %{name}-sql-sqlite
 %{_qtdir}/plugins/wayland-shell-integration/libxdg-shell.so
 
 %define extra_devel_files_Test \
-%{_qtdir}/libexec/qt-testrunner.py \
 %{_qtdir}/mkspecs/modules/qt_lib_testlib.pri \
 %{_qtdir}/mkspecs/modules/qt_lib_testlib_private.pri \
 %{_qtdir}/lib/cmake/Qt%{qtmajor}TestInternalsPrivate \
@@ -235,12 +236,8 @@ Requires: %{name}-sql-sqlite
 %define extra_devel_files_Widgets \
 %{_qtdir}/libexec/uic
 
-%define extra_devel_files_ExampleIcons \
-%{_qtdir}/lib/objects-RelWithDebInfo/ExampleIconsPrivate_resources_1 \
-%{_qtdir}/mkspecs/modules/qt_lib_example_icons_private.pri
-
 %qt6libs Core Concurrent DBus EglFSDeviceIntegration EglFsKmsSupport EglFsKmsGbmSupport Gui Network OpenGL OpenGLWidgets PrintSupport Sql Test WaylandClient WlShellIntegration Widgets XcbQpa Xml
-%qt6staticlibs DeviceDiscoverySupport ExamplesAssetDownloader FbSupport ExampleIcons InputSupport KmsSupport
+%qt6staticlibs DeviceDiscoverySupport FbSupport InputSupport KmsSupport
 
 %package sql-sqlite
 Summary: QtSQL plugin for accessing SQLite databases
@@ -338,7 +335,6 @@ The legacy qmake build tool for Qt %{qtmajor}
 %exclude %{_qtdir}/mkspecs/modules/*
 %{_qtdir}/libexec/qt-internal-configure-examples
 %{_qtdir}/libexec/qt-internal-configure-tests
-%{_qtdir}/libexec/ensure_pro_file.cmake
 
 %package -n qt%{qtmajor}-cmake
 Summary: Cmake extensions for Qt %{qtmajor}
@@ -371,13 +367,14 @@ Qt %{qtmajor} build tools
 %{_qtdir}/bin/androiddeployqt
 %{_qtdir}/bin/androiddeployqt%{qtmajor}
 %{_qtdir}/bin/androidtestrunner
+%{_qtdir}/bin/wasmdeployqt
+%{_qtdir}/bin/wasmdeployqt%{qtmajor}
 %{_qtdir}/libexec/qlalr
 %{_qtdir}/libexec/qt-android-runner.py
 %{_qtdir}/bin/qtpaths
 %{_qtdir}/bin/qtpaths%{qtmajor}
 %{_qtdir}/libexec/qvkgen
 %{_qtdir}/libexec/tracegen
-%{_qtdir}/libexec/sanitizer-testrunner.py
 %{_qtdir}/libexec/syncqt
 %{_qtdir}/libexec/tracepointgen
 %{_qtdir}/sbom
