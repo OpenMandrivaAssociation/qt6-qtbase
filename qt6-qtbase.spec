@@ -6,7 +6,7 @@
 %endif
 
 Name:		qt6-qtbase
-Version:	6.11.0
+Version:	6.11.1
 %if 0%{?snapshot:1}
 # "git archive"-d from "dev" branch of git://code.qt.io/qt/qtbase.git
 Source:		qtbase-%{snapshot}.tar.zst
@@ -105,7 +105,44 @@ Version %{qtmajor} of the Qt framework
 %define extra_devel_reqprov_Core \
 Requires: %{name}-tools = %{EVRD} \
 Requires: qmake-qt%{qtmajor} = %{EVRD} \
-Requires: cmake(Qt6)
+Requires: cmake(Qt6) \
+Provides: cmake(Qt6ConcurrentPrivate) = %{EVRD}
+
+%define extra_devel_reqprov_XcbQpa \
+Provides: cmake(Qt6XcbQpaPrivatePrivate) = %{EVRD}
+
+%define extra_devel_reqprov_WlShellIntegration \
+Provides: cmake(Qt6WlShellIntegrationPrivatePrivate) = %{EVRD}
+
+%define extra_devel_reqprov_WaylandClient \
+Provides: cmake(Qt6WaylandGlobalPrivatePrivate) = %{EVRD}
+
+%define extra_devel_reqprov_Test \
+Provides: cmake(Qt6TestInternalsPrivatePrivate) = %{EVRD}
+
+%define extra_devel_reqprov_DeviceDiscoverySupport \
+Provides: cmake(Qt6DeviceDiscoverySupportPrivatePrivate) = %{EVRD}
+
+%define extra_devel_reqprov_EglFSDeviceIntegration \
+Provides: cmake(Qt6EglFSDeviceIntegrationPrivatePrivate) = %{EVRD}
+
+%define extra_devel_reqprov_EglFsKmsSupport \
+Provides: cmake(Qt6EglFsKmsSupportPrivatePrivate) = %{EVRD}
+
+%define extra_devel_reqprov_EglFsKmsGbmSupport \
+Provides: cmake(Qt6EglFsKmsGbmSupportPrivatePrivate) = %{EVRD}
+
+%define extra_devel_reqprov_FbSupport \
+Provides: cmake(Qt6FbSupportPrivatePrivate) = %{EVRD}
+
+%define extra_devel_reqprov_InputSupport \
+Provides: cmake(Qt6InputSupportPrivatePrivate) = %{EVRD}
+
+%define extra_devel_reqprov_KmsSupport \
+Provides: cmake(Qt6KmsSupportPrivatePrivate) = %{EVRD}
+
+%define extra_devel_reqprov_OpenGLWidgets \
+Provides: cmake(Qt6OpenGLWidgetsPrivate) = %{EVRD}
 
 %define extra_devel_reqprov_Gui \
 Requires: cmake(Qt6DBus) \
