@@ -18,7 +18,7 @@ Source100:	macros.qt6
 %{load:%{S:100}}
 # Extra PGO trainer: chained QByteArray case conversion + typical QSet ops
 Source101:	pgo-train-containers.cpp
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}2
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}3
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
@@ -86,6 +86,9 @@ qtbase-6.2.0-aarch64-buildfix.patch
 #aarch64-qhash-fix-build-with-gcc.patch
 # Automatically detect whether or not the arcan QPA should be used
 https://codeberg.org/vimpostor/qtarcan/raw/branch/master/distr/0001-Use-arcan-platform-plugin-by-default.diff
+# QTBUG-149431: setFallbackThemeName() must not change themeName()
+# https://codereview.qt-project.org/c/qt/qtbase/+/763319 (6.11.3+)
+qtbase-6.11.2-qiconloader-themeName.patch
 
 %description
 Version %{qtmajor} of the Qt framework
