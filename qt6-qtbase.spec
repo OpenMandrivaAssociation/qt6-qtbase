@@ -16,7 +16,9 @@ Source:		https://download.qt.io/%{?beta:development}%{!?beta:official}_releases/
 # rpm macros
 Source100:	macros.qt6
 %{load:%{S:100}}
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
+# Extra PGO trainer: chained QByteArray case conversion + typical QSet ops
+Source101:	pgo-train-containers.cpp
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}2
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
@@ -60,6 +62,7 @@ BuildRequires:	pkgconfig(egl)
 BuildRequires:	pkgconfig(x11)
 BuildRequires:	pkgconfig(xrender)
 BuildRequires:	pkgconfig(openssl)
+BuildRequires:	pkgconfig(libb2)
 BuildRequires:	pkgconfig(systemd)
 BuildRequires:	cups-devel
 BuildRequires:	openvg-devel
@@ -421,6 +424,11 @@ Qt %{qtmajor} build tools
 
 sed -i -e 's,@QTDIR@,%{_qtdir},g' src/gui/kernel/qguiapplication.cpp
 
+# %pgo only needs tests/benchmarks. Do not configure the autotest
+# tree, but keep sources some benches include (baseline/shared, …).
+printf '%s\n' '# skipped: PGO trainer uses tests/benchmarks only' > tests/auto/CMakeLists.txt
+printf '%s\n' '# skipped: PGO trainer uses tests/benchmarks only' > tests/baseline/CMakeLists.txt
+
 # FIXME This may be interesting in the future:
 #	-DQT_FEATURE_cxx2a:BOOL=ON
 # As of 6.0.0-rc2 and clang 11.0.1, causes a compile failure
@@ -440,6 +448,9 @@ sed -i -e 's,@QTDIR@,%{_qtdir},g' src/gui/kernel/qguiapplication.cpp
 %cmake -G Ninja \
 	-DCMAKE_INSTALL_PREFIX=%{_qtdir} \
 	-DQT_BUILD_EXAMPLES:BOOL=ON \
+	-DQT_BUILD_TESTS:BOOL=ON \
+	-DQT_BUILD_TESTS_BY_DEFAULT:BOOL=OFF \
+	-DQT_BUILD_BENCHMARKS:BOOL=ON \
 	-DBUILD_SHARED_LIBS:BOOL=ON \
 	-DQT_FEATURE_aesni:BOOL=ON \
 	-DQT_FEATURE_cxx20:BOOL=ON \
@@ -456,6 +467,8 @@ sed -i -e 's,@QTDIR@,%{_qtdir},g' src/gui/kernel/qguiapplication.cpp
 	-DQT_FEATURE_xcb_native_painting:BOOL=ON \
 	-DQT_FEATURE_openssl:BOOL=ON \
 	-DQT_FEATURE_openssl_linked:BOOL=ON \
+	-DQT_FEATURE_openssl_hash:BOOL=ON \
+	-DQT_FEATURE_system_libb2:BOOL=ON \
 	-DQT_FEATURE_system_jpeg:BOOL=ON \
 	-DQT_FEATURE_system_png:BOOL=ON \
 	-DQT_FEATURE_system_zlib:BOOL=ON \
@@ -470,6 +483,7 @@ sed -i -e 's,@QTDIR@,%{_qtdir},g' src/gui/kernel/qguiapplication.cpp
 	-DINPUT_doubleconversion=system \
 	-DINPUT_freetype=system \
 	-DINPUT_harfbuzz=system \
+	-DINPUT_libb2=system \
 	-DINPUT_libjpeg=system \
 	-DINPUT_libpng=system \
 	-DINPUT_sqlite=system \
@@ -490,6 +504,73 @@ sed -i -e 's,@QTDIR@,%{_qtdir},g' src/gui/kernel/qguiapplication.cpp
 %build
 export LD_LIBRARY_PATH="$(pwd)/build/lib:${LD_LIBRARY_PATH}"
 %ninja_build -C build
+
+# Train on Qt's own microbenchmarks (QString/QObject/QPainter/…).
+# Offscreen QPA: no display. Failures are ignored so one broken bench
+# does not abort the package. Autotests are a bad profile (error paths).
+#
+# Do not pass -platform on the command line: QCoreApplication benches
+# (QVector/QMap/QByteArray/QSet/QList/QString/…) treat it as an unknown
+# test option, print help, and never run — so PGO saw those paths as
+# cold and made them slower. QT_QPA_PLATFORM=offscreen is enough for GUI.
+%pgo
+export LD_LIBRARY_PATH="$(pwd)/build/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+export QT_QPA_PLATFORM=offscreen
+export QT_PLUGIN_PATH="$(pwd)/build/plugins"
+# Build bench executables only (the 'benchmark' target also *runs* them)
+benches=$(ninja -C build -t targets | sed 's/:.*//' | sed -n 's|.*/||; s/_benchmark$//p' | grep -v '^benchmark$' | sort -u)
+if [ -n "$benches" ]; then
+	ninja -C build $benches || :
+fi
+find_bench() {
+	find build/tests/benchmarks -type f -name "$1" -executable 2>/dev/null | head -1
+}
+# Extra weight for containers PGO otherwise treats as cold vs QPainter.
+# Skip quadratic / 100MB rows that burn the timeout before useful paths.
+train() {
+	local t=$1 bin=$2
+	shift 2
+	[ -n "$bin" ] && [ -x "$bin" ] || return 0
+	timeout "$t" "$bin" "$@" >/dev/null 2>&1 || :
+}
+train 60 "$(find_bench tst_bench_qvector)" -iterations 8
+train 60 "$(find_bench tst_bench_qmap)" -iterations 8
+# Full QSet bench (intersect/unite/contains_then_insert). 90s so the
+# 1e6 rows finish — 45s only got through intersect.
+train 90 "$(find_bench tst_bench_qset)" -iterations 4
+# Include chained toUpper().toLower() (the remaining ~0.07x hole) and
+# toLongLong; skip only the 100MB append:100000000 row.
+train 60 "$(find_bench tst_bench_qbytearray)" -iterations 8 \
+	append:1 append:10 append:100 append:1000 append:10000 \
+	append:100000 append:1000000 append:10000000 \
+	toUpper toLower toUpperThenLower toLowerThenUpper \
+	toLongLong toULongLong toPercentEncoding \
+	latin1Uppercasing_qt54 latin1Uppercasing_xlate \
+	latin1Uppercasing_xlate_checked latin1Uppercasing_category \
+	latin1Uppercasing_bitcheck operator_assign_char
+train 60 "$(find_bench tst_bench_qlist)" -iterations 6 \
+	removeAll_primitive removeAll_movable removeAll_complex \
+	appendOne_int appendOne_primitive appendOne_movable \
+	appendOne_complex appendOne_QString \
+	prependOne_int prependOne_QString \
+	appendPrependOne_int \
+	removeFirstGeneral_int removeFirstSpecial_int
+# Typical QByteArray / QSet use the upstream benches do not cover
+# (chained case conversion, insert/lookup/remove, modest set algebra).
+c++ -O2 -std=c++20 -fPIC -pthread \
+	-Ibuild/include -Ibuild/include/QtCore -DQT_CORE_LIB \
+	%{S:101} -Lbuild/lib -Wl,-rpath,"$(pwd)/build/lib" -lQt6Core \
+	-o build/pgo-train-containers \
+	&& timeout 60 build/pgo-train-containers >/dev/null 2>&1 || :
+find build/tests/benchmarks -type f -executable ! -name '*.so*' ! -name '*Wrapper*' 2>/dev/null \
+| while read -r bin; do
+	case "$bin" in
+	*testlib*|*dbus*|*sql*) continue ;;
+	# Already trained above with more iterations; skip the huge rows here.
+	*tst_bench_qvector|*tst_bench_qmap|*tst_bench_qset|*tst_bench_qbytearray|*tst_bench_qlist) continue ;;
+	esac
+	timeout 90 "$bin" -iterations 1 >/dev/null 2>&1 || :
+done
 
 %install
 %ninja_install -C build
