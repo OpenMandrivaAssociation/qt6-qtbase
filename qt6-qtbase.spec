@@ -429,6 +429,12 @@ sed -i -e 's,@QTDIR@,%{_qtdir},g' src/gui/kernel/qguiapplication.cpp
 printf '%s\n' '# skipped: PGO trainer uses tests/benchmarks only' > tests/auto/CMakeLists.txt
 printf '%s\n' '# skipped: PGO trainer uses tests/benchmarks only' > tests/baseline/CMakeLists.txt
 
+# Out-of-tree so the PGO wipe removes only this directory between passes.
+# Configure has to be here: prep runs before rpm injects -fprofile-generate,
+# and a build configured earlier never writes .profraw files.
+%conf
+export CMAKE_BUILD_DIR=_OMV_rpm_build
+
 # FIXME This may be interesting in the future:
 #	-DQT_FEATURE_cxx2a:BOOL=ON
 # As of 6.0.0-rc2 and clang 11.0.1, causes a compile failure
@@ -502,8 +508,10 @@ printf '%s\n' '# skipped: PGO trainer uses tests/benchmarks only' > tests/baseli
 	-DBUILD_WITH_PCH:BOOL=OFF
 
 %build
-export LD_LIBRARY_PATH="$(pwd)/build/lib:${LD_LIBRARY_PATH}"
-%ninja_build -C build
+export LD_LIBRARY_PATH="$(pwd)/_OMV_rpm_build/lib:${LD_LIBRARY_PATH}"
+# moc/rcc run during the build; keep their profiles in the PGO directory.
+export LLVM_PROFILE_FILE="%{_pgo_profile_dir}/qtbase-%%m-%%p.profraw"
+%ninja_build -C _OMV_rpm_build
 
 # Train on Qt's own microbenchmarks (QString/QObject/QPainter/…).
 # Offscreen QPA: no display. Failures are ignored so one broken bench
@@ -514,16 +522,17 @@ export LD_LIBRARY_PATH="$(pwd)/build/lib:${LD_LIBRARY_PATH}"
 # test option, print help, and never run — so PGO saw those paths as
 # cold and made them slower. QT_QPA_PLATFORM=offscreen is enough for GUI.
 %pgo
-export LD_LIBRARY_PATH="$(pwd)/build/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+export LD_LIBRARY_PATH="$(pwd)/_OMV_rpm_build/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 export QT_QPA_PLATFORM=offscreen
-export QT_PLUGIN_PATH="$(pwd)/build/plugins"
+export QT_PLUGIN_PATH="$(pwd)/_OMV_rpm_build/plugins"
+export LLVM_PROFILE_FILE="%{_pgo_profile_dir}/qtbase-%%m-%%p.profraw"
 # Build bench executables only (the 'benchmark' target also *runs* them)
-benches=$(ninja -C build -t targets | sed 's/:.*//' | sed -n 's|.*/||; s/_benchmark$//p' | grep -v '^benchmark$' | sort -u)
+benches=$(ninja -C _OMV_rpm_build -t targets | sed 's/:.*//' | sed -n 's|.*/||; s/_benchmark$//p' | grep -v '^benchmark$' | sort -u)
 if [ -n "$benches" ]; then
-	ninja -C build $benches || :
+	ninja -C _OMV_rpm_build $benches || :
 fi
 find_bench() {
-	find build/tests/benchmarks -type f -name "$1" -executable 2>/dev/null | head -1
+	find _OMV_rpm_build/tests/benchmarks -type f -name "$1" -executable 2>/dev/null | head -1
 }
 # Extra weight for containers PGO otherwise treats as cold vs QPainter.
 # Skip quadratic / 100MB rows that burn the timeout before useful paths.
@@ -558,11 +567,11 @@ train 60 "$(find_bench tst_bench_qlist)" -iterations 6 \
 # Typical QByteArray / QSet use the upstream benches do not cover
 # (chained case conversion, insert/lookup/remove, modest set algebra).
 c++ -O2 -std=c++20 -fPIC -pthread \
-	-Ibuild/include -Ibuild/include/QtCore -DQT_CORE_LIB \
-	%{S:101} -Lbuild/lib -Wl,-rpath,"$(pwd)/build/lib" -lQt6Core \
-	-o build/pgo-train-containers \
-	&& timeout 60 build/pgo-train-containers >/dev/null 2>&1 || :
-find build/tests/benchmarks -type f -executable ! -name '*.so*' ! -name '*Wrapper*' 2>/dev/null \
+	-I_OMV_rpm_build/include -I_OMV_rpm_build/include/QtCore -DQT_CORE_LIB \
+	%{S:101} -L_OMV_rpm_build/lib -Wl,-rpath,"$(pwd)/_OMV_rpm_build/lib" -lQt6Core \
+	-o _OMV_rpm_build/pgo-train-containers \
+	&& timeout 60 _OMV_rpm_build/pgo-train-containers >/dev/null 2>&1 || :
+find _OMV_rpm_build/tests/benchmarks -type f -executable ! -name '*.so*' ! -name '*Wrapper*' 2>/dev/null \
 | while read -r bin; do
 	case "$bin" in
 	*testlib*|*dbus*|*sql*) continue ;;
@@ -573,7 +582,7 @@ find build/tests/benchmarks -type f -executable ! -name '*.so*' ! -name '*Wrappe
 done
 
 %install
-%ninja_install -C build
+%ninja_install -C _OMV_rpm_build
 
 # Add rpm macros
 mkdir -p %{buildroot}%{_prefix}/lib/rpm/macros.d/
