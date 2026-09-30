@@ -6,7 +6,7 @@
 %endif
 
 Name:		qt6-qtbase
-Version:	6.11.2
+Version:	6.12.0
 %if 0%{?snapshot:1}
 # "git archive"-d from "dev" branch of git://code.qt.io/qt/qtbase.git
 Source:		qtbase-%{snapshot}.tar.zst
@@ -18,7 +18,7 @@ Source100:	macros.qt6
 %{load:%{S:100}}
 # Extra PGO trainer: chained QByteArray case conversion + typical QSet ops
 Source101:	pgo-train-containers.cpp
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}3
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
@@ -85,10 +85,7 @@ License:	LGPLv3/GPLv3/GPLv2
 qtbase-6.2.0-aarch64-buildfix.patch
 #aarch64-qhash-fix-build-with-gcc.patch
 # Automatically detect whether or not the arcan QPA should be used
-https://codeberg.org/vimpostor/qtarcan/raw/branch/master/distr/0001-Use-arcan-platform-plugin-by-default.diff
-# QTBUG-149431: setFallbackThemeName() must not change themeName()
-# https://codereview.qt-project.org/c/qt/qtbase/+/763319 (6.11.3+)
-qtbase-6.11.2-qiconloader-themeName.patch
+0001-Use-arcan-platform-plugin-by-default.diff
 
 %description
 Version %{qtmajor} of the Qt framework
