@@ -409,6 +409,9 @@ Qt %{qtmajor} build tools
 %{_qtdir}/bin/androidtestrunner
 %{_qtdir}/bin/wasmdeployqt
 %{_qtdir}/bin/wasmdeployqt%{qtmajor}
+%{_qtdir}/bin/harmonydeployqt
+%{_qtdir}/bin/harmonydeployqt%{qtmajor}
+%{_qtdir}/bin/harmonyostestrunner
 %{_qtdir}/libexec/qlalr
 %{_qtdir}/libexec/qt-android-runner.py
 %{_qtdir}/bin/qtpaths
