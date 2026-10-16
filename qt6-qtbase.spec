@@ -18,7 +18,7 @@ Source100:	macros.qt6
 %{load:%{S:100}}
 # Extra PGO trainer: chained QByteArray case conversion + typical QSet ops
 Source101:	pgo-train-containers.cpp
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}1
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}2
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
@@ -86,6 +86,18 @@ qtbase-6.2.0-aarch64-buildfix.patch
 #aarch64-qhash-fix-build-with-gcc.patch
 # Automatically detect whether or not the arcan QPA should be used
 0001-Use-arcan-platform-plugin-by-default.diff
+# QTBUG-150280: do not mark the Wayland touchpad as PixelScroll.
+# Mice are attributed to that device too, which makes widget scrolling
+# slow and breaks QTabBar. https://codereview.qt-project.org/c/qt/qtbase/+/778943
+# 6.12: ddf0f49dc949
+qtbase-6.12.0-wayland-revert-touchpad-pixelscroll.patch
+# QTBUG-150279: a failed QRhiVulkan::beginFrame() must still notify endFrame.
+# 6.12: c68e1fc11dd8
+qtbase-6.12.0-vulkan-endframe-on-beginframe-failure.patch
+# KDE bug 525054: anchor a parentless Wayland popup to the top left of its
+# 1px anchor rect, so a resize does not walk it one pixel to the right.
+# 6.12: a7fceb1150ed
+qtbase-6.12.0-wayland-popup-resize-anchor.patch
 
 %description
 Version %{qtmajor} of the Qt framework
