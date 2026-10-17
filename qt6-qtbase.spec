@@ -449,6 +449,20 @@ printf '%s\n' '# skipped: PGO trainer uses tests/benchmarks only' > tests/baseli
 # and a build configured earlier never writes .profraw files.
 %conf
 export CMAKE_BUILD_DIR=_OMV_rpm_build
+%ifarch znver1
+# 678036 was SIGKILL'd linking libQt6Gui with full LTO
+# (-fprofile-generate -flto -g3) at ninja -j8, one link at a time.
+# Qt's own clang mkspec uses -flto=thin. Keep PGO, and stop lld from
+# running a ThinLTO backend on every core.
+[ -n "$CFLAGS" ] || CFLAGS="%{optflags}"
+[ -n "$CXXFLAGS" ] || CXXFLAGS="%{optflags}"
+[ -n "$LDFLAGS" ] || LDFLAGS="%{build_ldflags}"
+CFLAGS=$(printf '%s\n' "$CFLAGS" | sed -e 's/-flto\(=[^[:space:]]*\)\{0,1\}/-flto=thin/g')
+CXXFLAGS=$(printf '%s\n' "$CXXFLAGS" | sed -e 's/-flto\(=[^[:space:]]*\)\{0,1\}/-flto=thin/g')
+LDFLAGS=$(printf '%s\n' "$LDFLAGS" | sed -e 's/-flto\(=[^[:space:]]*\)\{0,1\}/-flto=thin/g' -e 's/ *-Wl,--thinlto-jobs=[0-9][0-9]*//g')
+LDFLAGS="$LDFLAGS -Wl,--thinlto-jobs=2"
+export CFLAGS CXXFLAGS LDFLAGS
+%endif
 
 # FIXME This may be interesting in the future:
 #	-DQT_FEATURE_cxx2a:BOOL=ON
@@ -503,6 +517,7 @@ export CMAKE_BUILD_DIR=_OMV_rpm_build
 	-DQT_FEATURE_renameat2:BOOL=ON \
 %ifarch znver1
 	-DCMAKE_JOB_POOL_LINK:STRING=console \
+	-DCMAKE_MODULE_LINKER_FLAGS:STRING="${LDFLAGS/-Wl,--no-undefined/}" \
 %endif
 	-DINPUT_doubleconversion=system \
 	-DINPUT_freetype=system \
@@ -532,7 +547,9 @@ export LLVM_PROFILE_FILE="%{_pgo_profile_dir}/qtbase-%%m-%%p.profraw"
 %ifarch znver1
 # PGO+LTO at ninja -j32 is SIGKILL'd on the znver1 builders
 # (677620 linking libQt6Gui, 677828 compiling examples).
+# 678036 still died on the full-LTO QtGui link at -j8.
 # CMAKE_JOB_POOL_LINK=console above links one target at a time.
+# Configure above switches this arch to -flto=thin with two ThinLTO threads.
 RPM_BUILD_NCPUS=8
 %endif
 %ninja_build -C _OMV_rpm_build
