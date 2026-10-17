@@ -502,7 +502,6 @@ export CMAKE_BUILD_DIR=_OMV_rpm_build
 	-DQT_FEATURE_futimes:BOOL=ON \
 	-DQT_FEATURE_renameat2:BOOL=ON \
 %ifarch znver1
-	# One LTO link at a time. Parallel links of libQt6Gui are OOM-killed.
 	-DCMAKE_JOB_POOL_LINK:STRING=console \
 %endif
 	-DINPUT_doubleconversion=system \
@@ -533,6 +532,7 @@ export LLVM_PROFILE_FILE="%{_pgo_profile_dir}/qtbase-%%m-%%p.profraw"
 %ifarch znver1
 # PGO+LTO at ninja -j32 is SIGKILL'd on the znver1 builders
 # (677620 linking libQt6Gui, 677828 compiling examples).
+# CMAKE_JOB_POOL_LINK=console above links one target at a time.
 RPM_BUILD_NCPUS=8
 %endif
 %ninja_build -C _OMV_rpm_build
