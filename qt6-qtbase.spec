@@ -501,6 +501,10 @@ export CMAKE_BUILD_DIR=_OMV_rpm_build
 	-DQT_FEATURE_gc_binaries:BOOL=ON \
 	-DQT_FEATURE_futimes:BOOL=ON \
 	-DQT_FEATURE_renameat2:BOOL=ON \
+%ifarch znver1
+	# One LTO link at a time. Parallel links of libQt6Gui are OOM-killed.
+	-DCMAKE_JOB_POOL_LINK:STRING=console \
+%endif
 	-DINPUT_doubleconversion=system \
 	-DINPUT_freetype=system \
 	-DINPUT_harfbuzz=system \
@@ -526,6 +530,11 @@ export CMAKE_BUILD_DIR=_OMV_rpm_build
 export LD_LIBRARY_PATH="$(pwd)/_OMV_rpm_build/lib:${LD_LIBRARY_PATH}"
 # moc/rcc run during the build; keep their profiles in the PGO directory.
 export LLVM_PROFILE_FILE="%{_pgo_profile_dir}/qtbase-%%m-%%p.profraw"
+%ifarch znver1
+# PGO+LTO at ninja -j32 is SIGKILL'd on the znver1 builders
+# (677620 linking libQt6Gui, 677828 compiling examples).
+RPM_BUILD_NCPUS=8
+%endif
 %ninja_build -C _OMV_rpm_build
 
 # Train on Qt's own microbenchmarks (QString/QObject/QPainter/…).
@@ -537,6 +546,10 @@ export LLVM_PROFILE_FILE="%{_pgo_profile_dir}/qtbase-%%m-%%p.profraw"
 # test option, print help, and never run — so PGO saw those paths as
 # cold and made them slower. QT_QPA_PLATFORM=offscreen is enough for GUI.
 %pgo
+%ifarch znver1
+# Same cap as %build. This section is a separate shell.
+RPM_BUILD_NCPUS=8
+%endif
 export LD_LIBRARY_PATH="$(pwd)/_OMV_rpm_build/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 export QT_QPA_PLATFORM=offscreen
 export QT_PLUGIN_PATH="$(pwd)/_OMV_rpm_build/plugins"
@@ -544,7 +557,7 @@ export LLVM_PROFILE_FILE="%{_pgo_profile_dir}/qtbase-%%m-%%p.profraw"
 # Build bench executables only (the 'benchmark' target also *runs* them)
 benches=$(ninja -C _OMV_rpm_build -t targets | sed 's/:.*//' | sed -n 's|.*/||; s/_benchmark$//p' | grep -v '^benchmark$' | sort -u)
 if [ -n "$benches" ]; then
-	ninja -C _OMV_rpm_build $benches || :
+	ninja -C _OMV_rpm_build -j${RPM_BUILD_NCPUS} $benches || :
 fi
 find_bench() {
 	find _OMV_rpm_build/tests/benchmarks -type f -name "$1" -executable 2>/dev/null | head -1
