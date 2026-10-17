@@ -449,19 +449,6 @@ printf '%s\n' '# skipped: PGO trainer uses tests/benchmarks only' > tests/baseli
 # and a build configured earlier never writes .profraw files.
 %conf
 export CMAKE_BUILD_DIR=_OMV_rpm_build
-%ifarch znver1
-# znver1 builders SIGKILL the LTO link of libQt6Gui
-# (677620 and 678036 full LTO, 678051 thin LTO). 678081 was
-# killed compiling one file after the tmpfs root filled with
-# bitcode. Keep PGO. Do not use LTO. -g1 keeps that root smaller.
-[ -n "$CFLAGS" ] || CFLAGS="%{optflags}"
-[ -n "$CXXFLAGS" ] || CXXFLAGS="%{optflags}"
-[ -n "$LDFLAGS" ] || LDFLAGS="%{build_ldflags}"
-CFLAGS=$(printf '%s\n' "$CFLAGS" | sed -e 's/-flto\(=[^[:space:]]*\)\{0,1\}/-fno-lto/g' -e 's/-g3/-g1/g')
-CXXFLAGS=$(printf '%s\n' "$CXXFLAGS" | sed -e 's/-flto\(=[^[:space:]]*\)\{0,1\}/-fno-lto/g' -e 's/-g3/-g1/g')
-LDFLAGS=$(printf '%s\n' "$LDFLAGS" | sed -e 's/-flto\(=[^[:space:]]*\)\{0,1\}/-fno-lto/g' -e 's/-g3/-g1/g' -e 's/ *-Wl,--thinlto-jobs=[0-9][0-9]*//g')
-export CFLAGS CXXFLAGS LDFLAGS
-%endif
 
 # FIXME This may be interesting in the future:
 #	-DQT_FEATURE_cxx2a:BOOL=ON
@@ -514,10 +501,6 @@ export CFLAGS CXXFLAGS LDFLAGS
 	-DQT_FEATURE_gc_binaries:BOOL=ON \
 	-DQT_FEATURE_futimes:BOOL=ON \
 	-DQT_FEATURE_renameat2:BOOL=ON \
-%ifarch znver1
-	-DQT_FEATURE_ltcg:BOOL=OFF \
-	-DCMAKE_MODULE_LINKER_FLAGS:STRING="${LDFLAGS/-Wl,--no-undefined/}" \
-%endif
 	-DINPUT_doubleconversion=system \
 	-DINPUT_freetype=system \
 	-DINPUT_harfbuzz=system \
@@ -543,11 +526,6 @@ export CFLAGS CXXFLAGS LDFLAGS
 export LD_LIBRARY_PATH="$(pwd)/_OMV_rpm_build/lib:${LD_LIBRARY_PATH}"
 # moc/rcc run during the build; keep their profiles in the PGO directory.
 export LLVM_PROFILE_FILE="%{_pgo_profile_dir}/qtbase-%%m-%%p.profraw"
-%ifarch znver1
-# No LTO on this arch. Stay under the builder default of 32 so a
-# busy host does not SIGKILL clang (677828, 678081).
-RPM_BUILD_NCPUS=8
-%endif
 %ninja_build -C _OMV_rpm_build
 
 # Train on Qt's own microbenchmarks (QString/QObject/QPainter/…).
@@ -559,10 +537,6 @@ RPM_BUILD_NCPUS=8
 # test option, print help, and never run — so PGO saw those paths as
 # cold and made them slower. QT_QPA_PLATFORM=offscreen is enough for GUI.
 %pgo
-%ifarch znver1
-# Same cap as the compile above. This section is a separate shell.
-RPM_BUILD_NCPUS=8
-%endif
 export LD_LIBRARY_PATH="$(pwd)/_OMV_rpm_build/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 export QT_QPA_PLATFORM=offscreen
 export QT_PLUGIN_PATH="$(pwd)/_OMV_rpm_build/plugins"
@@ -570,7 +544,7 @@ export LLVM_PROFILE_FILE="%{_pgo_profile_dir}/qtbase-%%m-%%p.profraw"
 # Build bench executables only (the 'benchmark' target also *runs* them)
 benches=$(ninja -C _OMV_rpm_build -t targets | sed 's/:.*//' | sed -n 's|.*/||; s/_benchmark$//p' | grep -v '^benchmark$' | sort -u)
 if [ -n "$benches" ]; then
-	ninja -C _OMV_rpm_build -j${RPM_BUILD_NCPUS} $benches || :
+	ninja -C _OMV_rpm_build $benches || :
 fi
 find_bench() {
 	find _OMV_rpm_build/tests/benchmarks -type f -name "$1" -executable 2>/dev/null | head -1
