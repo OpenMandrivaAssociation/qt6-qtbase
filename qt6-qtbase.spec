@@ -450,17 +450,17 @@ printf '%s\n' '# skipped: PGO trainer uses tests/benchmarks only' > tests/baseli
 %conf
 export CMAKE_BUILD_DIR=_OMV_rpm_build
 %ifarch znver1
-# 678036 was SIGKILL'd linking libQt6Gui with full LTO
-# (-fprofile-generate -flto -g3) at ninja -j8, one link at a time.
-# Qt's own clang mkspec uses -flto=thin. Keep PGO, and stop lld from
-# running a ThinLTO backend on every core.
+# 678051 still SIGKILL'd the profile-use link of libQt6Gui
+# (-flto=thin --thinlto-jobs=2 -g3) while other compiles kept running.
+# -g1 shrinks the bitcode on the tmpfs build root and in the link.
+# One ThinLTO thread. PGO stays on.
 [ -n "$CFLAGS" ] || CFLAGS="%{optflags}"
 [ -n "$CXXFLAGS" ] || CXXFLAGS="%{optflags}"
 [ -n "$LDFLAGS" ] || LDFLAGS="%{build_ldflags}"
-CFLAGS=$(printf '%s\n' "$CFLAGS" | sed -e 's/-flto\(=[^[:space:]]*\)\{0,1\}/-flto=thin/g')
-CXXFLAGS=$(printf '%s\n' "$CXXFLAGS" | sed -e 's/-flto\(=[^[:space:]]*\)\{0,1\}/-flto=thin/g')
-LDFLAGS=$(printf '%s\n' "$LDFLAGS" | sed -e 's/-flto\(=[^[:space:]]*\)\{0,1\}/-flto=thin/g' -e 's/ *-Wl,--thinlto-jobs=[0-9][0-9]*//g')
-LDFLAGS="$LDFLAGS -Wl,--thinlto-jobs=2"
+CFLAGS=$(printf '%s\n' "$CFLAGS" | sed -e 's/-flto\(=[^[:space:]]*\)\{0,1\}/-flto=thin/g' -e 's/-g3/-g1/g')
+CXXFLAGS=$(printf '%s\n' "$CXXFLAGS" | sed -e 's/-flto\(=[^[:space:]]*\)\{0,1\}/-flto=thin/g' -e 's/-g3/-g1/g')
+LDFLAGS=$(printf '%s\n' "$LDFLAGS" | sed -e 's/-flto\(=[^[:space:]]*\)\{0,1\}/-flto=thin/g' -e 's/-g3/-g1/g' -e 's/ *-Wl,--thinlto-jobs=[0-9][0-9]*//g')
+LDFLAGS="$LDFLAGS -Wl,--thinlto-jobs=1"
 export CFLAGS CXXFLAGS LDFLAGS
 %endif
 
@@ -516,7 +516,9 @@ export CFLAGS CXXFLAGS LDFLAGS
 	-DQT_FEATURE_futimes:BOOL=ON \
 	-DQT_FEATURE_renameat2:BOOL=ON \
 %ifarch znver1
-	-DCMAKE_JOB_POOL_LINK:STRING=console \
+	"-DCMAKE_JOB_POOLS:STRING=znver1=2" \
+	-DCMAKE_JOB_POOL_COMPILE:STRING=znver1 \
+	-DCMAKE_JOB_POOL_LINK:STRING=znver1 \
 	-DCMAKE_MODULE_LINKER_FLAGS:STRING="${LDFLAGS/-Wl,--no-undefined/}" \
 %endif
 	-DINPUT_doubleconversion=system \
@@ -547,10 +549,10 @@ export LLVM_PROFILE_FILE="%{_pgo_profile_dir}/qtbase-%%m-%%p.profraw"
 %ifarch znver1
 # PGO+LTO at ninja -j32 is SIGKILL'd on the znver1 builders
 # (677620 linking libQt6Gui, 677828 compiling examples).
-# 678036 still died on the full-LTO QtGui link at -j8.
-# CMAKE_JOB_POOL_LINK=console above links one target at a time.
-# Configure above switches this arch to -flto=thin with two ThinLTO threads.
-RPM_BUILD_NCPUS=8
+# 678051 died on the thin-LTO QtGui link at -j8.
+# The znver1 pool above allows two compile/link jobs total.
+# Unpooled steps (moc, rcc) still follow this cap.
+RPM_BUILD_NCPUS=2
 %endif
 %ninja_build -C _OMV_rpm_build
 
@@ -564,8 +566,8 @@ RPM_BUILD_NCPUS=8
 # cold and made them slower. QT_QPA_PLATFORM=offscreen is enough for GUI.
 %pgo
 %ifarch znver1
-# Same cap as %build. This section is a separate shell.
-RPM_BUILD_NCPUS=8
+# Same cap as the compile above. This section is a separate shell.
+RPM_BUILD_NCPUS=2
 %endif
 export LD_LIBRARY_PATH="$(pwd)/_OMV_rpm_build/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 export QT_QPA_PLATFORM=offscreen
