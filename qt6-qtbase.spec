@@ -18,7 +18,7 @@ Source100:	macros.qt6
 %{load:%{S:100}}
 # Extra PGO trainer: chained QByteArray case conversion + typical QSet ops
 Source101:	pgo-train-containers.cpp
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}3
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}4
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
@@ -98,6 +98,10 @@ qtbase-6.12.0-vulkan-endframe-on-beginframe-failure.patch
 # 1px anchor rect, so a resize does not walk it one pixel to the right.
 # 6.12: a7fceb1150ed
 qtbase-6.12.0-wayland-popup-resize-anchor.patch
+# CVE-2026-105924: converting a CBOR URL tag that wraps an empty
+# definite-length string to JSON dereferenced a null ByteData pointer.
+# 6.12: a2cd9d2a7057 (9e9988ee57c0), QTBUG-149841
+qtbase-6.12.0-cve-2026-105924.patch
 
 %description
 Version %{qtmajor} of the Qt framework
