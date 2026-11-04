@@ -18,7 +18,7 @@ Source100:	macros.qt6
 %{load:%{S:100}}
 # Extra PGO trainer: chained QByteArray case conversion + typical QSet ops
 Source101:	pgo-train-containers.cpp
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}4
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}5
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
@@ -102,6 +102,11 @@ qtbase-6.12.0-wayland-popup-resize-anchor.patch
 # definite-length string to JSON dereferenced a null ByteData pointer.
 # 6.12: a2cd9d2a7057 (9e9988ee57c0), QTBUG-149841
 qtbase-6.12.0-cve-2026-105924.patch
+# QTBUG-128874: hint FreeType glyphs at the size they have on the device.
+# With fontconfig, a device pixel ratio no longer forces HintNone; glyphs
+# are hinted vertically instead. QT_DISABLE_DPR_FONT_HINTING=1 restores
+# the old DPR behavior. dev: cab30cd3dba7 (not in the 6.12 branch)
+qtbase-6.12.0-freetype-hint-at-device-size.patch
 
 %description
 Version %{qtmajor} of the Qt framework
