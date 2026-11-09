@@ -18,7 +18,7 @@ Source100:	macros.qt6
 %{load:%{S:100}}
 # Extra PGO trainer: chained QByteArray case conversion + typical QSet ops
 Source101:	pgo-train-containers.cpp
-Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}5
+Release:	%{?beta:0.%{beta}.}%{?snapshot:0.%{snapshot}.}6
 Group:		System/Libraries
 Summary:	Version %{qtmajor} of the Qt framework
 BuildRequires:	cmake
@@ -107,6 +107,18 @@ qtbase-6.12.0-cve-2026-105924.patch
 # are hinted vertically instead. QT_DISABLE_DPR_FONT_HINTING=1 restores
 # the old DPR behavior. dev: cab30cd3dba7 (not in the 6.12 branch)
 qtbase-6.12.0-freetype-hint-at-device-size.patch
+# CVE-2026-116337 / QTBUG-150779: readHeader() accumulated the response
+# header block with no size check until the block ended, so a server that
+# never terminates it could exhaust memory. Apply this before the status
+# line patch; that patch's test expects headerSizeLimit().
+# 6.12: aac1d303c032 (89bceafa2016)
+# https://codereview.qt-project.org/c/qt/qtbase/+/777191
+qtbase-6.12.0-cve-2026-116337-header-limit.patch
+# CVE-2026-116337 / QTBUG-150779: the HTTP status line was buffered with
+# no length limit. Reject it once it can no longer be a valid status line.
+# 6.12: f78a3740281d (e4b130879d7d)
+# https://codereview.qt-project.org/c/qt/qtbase/+/777902
+qtbase-6.12.0-cve-2026-116337-status-line.patch
 
 %description
 Version %{qtmajor} of the Qt framework
